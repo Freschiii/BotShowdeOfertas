@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Show de Ofertas - Bot Manager</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1><i class="fas fa-robot"></i> Show de Ofertas Bot</h1>
+            <p>Bot automático para WhatsApp e Telegram</p>
+        </header>
+
+        <main>
+            <!-- Status dos Bots -->
+            <div class="card">
+                <h2><i class="fas fa-signal"></i> Status dos Bots</h2>
+                <div class="bot-status">
+                    <div class="status-item">
+                        <i class="fab fa-whatsapp"></i>
+                        <span>WhatsApp Bot</span>
+                        <div class="status-indicator" id="whatsappStatus">
+                            <span class="status-dot offline"></span>
+                            <span>Desconectado</span>
+                        </div>
+                    </div>
+                    <div class="status-item">
+                        <i class="fab fa-telegram"></i>
+                        <span>Telegram Bot</span>
+                        <div class="status-indicator" id="telegramStatus">
+                            <span class="status-dot offline"></span>
+                            <span>Desconectado</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuração WhatsApp -->
+            <div class="card">
+                <h2><i class="fab fa-whatsapp"></i> Configurar WhatsApp Bot</h2>
+                <div class="bot-config">
+                    <button id="connectWhatsApp" class="btn-whatsapp">
+                        <i class="fas fa-qrcode"></i> Conectar WhatsApp
+                    </button>
+                    <div id="whatsappQR" class="qr-container" style="display: none;">
+                        <h3>Escaneie o QR Code com seu WhatsApp</h3>
+                        <div id="qrCode"></div>
+                        <p>1. Abra o WhatsApp no seu celular</p>
+                        <p>2. Vá em Menu > Dispositivos conectados</p>
+                        <p>3. Escaneie o QR Code acima</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuração Telegram -->
+            <div class="card">
+                <h2><i class="fab fa-telegram"></i> Configurar Telegram Bot</h2>
+                <div class="bot-config">
+                    <div class="input-group">
+                        <input type="text" id="telegramToken" placeholder="Token do Bot Telegram (obtenha com @BotFather)" />
+                        <button id="connectTelegram" class="btn-telegram">
+                            <i class="fas fa-link"></i> Conectar
+                        </button>
+                    </div>
+                    <div class="help-text">
+                        <p><strong>Como obter o token:</strong></p>
+                        <p>1. Abra o Telegram e procure por @BotFather</p>
+                        <p>2. Digite /newbot e siga as instruções</p>
+                        <p>3. Copie o token gerado e cole acima</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Configuração de Canais -->
+            <div class="card">
+                <h2><i class="fas fa-broadcast-tower"></i> Configurar Canais</h2>
+                <div class="group-config">
+                    <div class="input-group">
+                        <label>Canal WhatsApp:</label>
+                        <input type="text" id="whatsappGroup" placeholder="Nome do canal ou ID" />
+                    </div>
+                    <div class="input-group">
+                        <label>Canal Telegram:</label>
+                        <input type="text" id="telegramGroup" placeholder="ID do canal (ex: -1001234567890)" />
+                    </div>
+                    <button id="saveGroups" class="btn-primary">
+                        <i class="fas fa-save"></i> Salvar Canais
+                    </button>
+                    <div id="autoSaveIndicator" class="auto-save-indicator" style="display: none;">
+                        <i class="fas fa-check-circle"></i> Dados salvos automaticamente
+                    </div>
+                </div>
+            </div>
+
+            <!-- Envio de Mensagens -->
+            <div class="card">
+                <h2><i class="fas fa-paper-plane"></i> Enviar Mensagem</h2>
+                <div class="message-sender">
+                    <div class="image-upload">
+                        <input type="file" id="imageInput" accept="image/*" />
+                        <label for="imageInput" class="upload-btn">
+                            <i class="fas fa-cloud-upload-alt"></i>
+                            <span>Escolher Imagem</span>
+                        </label>
+                        <div id="imagePreview" class="image-preview"></div>
+                    </div>
+                    
+                    <textarea id="messageInput" placeholder="Digite sua mensagem aqui..."></textarea>
+                    
+                    <div class="send-options">
+                        <label>
+                            <input type="checkbox" id="sendToWhatsApp" checked>
+                            <i class="fab fa-whatsapp"></i> Enviar para WhatsApp
+                        </label>
+                        <label>
+                            <input type="checkbox" id="sendToTelegram" checked>
+                            <i class="fab fa-telegram"></i> Enviar para Telegram
+                        </label>
+                    </div>
+                    
+                    <button id="sendMessage" class="btn-send">
+                        <i class="fas fa-paper-plane"></i> Enviar Mensagem
+                    </button>
+                </div>
+            </div>
+
+            <!-- Descobrir IDs dos Canais -->
+            <div class="card">
+                <h2><i class="fas fa-search"></i> Descobrir IDs dos Canais</h2>
+                <div id="discoveryInterface"></div>
+            </div>
+
+            <!-- Histórico de Mensagens -->
+            <div class="card">
+                <h2><i class="fas fa-history"></i> Histórico de Envios</h2>
+                <div id="messageHistory" class="message-history">
+                    <p class="empty-history">Nenhuma mensagem enviada ainda</p>
+                </div>
+            </div>
+        </main>
+
+        <footer>
+            <p>Feito com ❤️ para ajudar no Show de Ofertas</p>
+        </footer>
+    </div>
+
+    <script src="bot.js"></script>
+    <script src="discover-ids.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
