@@ -702,11 +702,24 @@ body.dark-mode .whatsapp-attach-btn:hover {
 .editable-message .message-text a {
     color: #25d366 !important;
     text-decoration: none !important;
+    font-size: 14px !important;
 }
 
 .editable-message .message-text a:hover {
     text-decoration: underline !important;
     color: #1ea952 !important;
+}
+
+/* Forçar cor verde para links */
+.whatsapp-messages .editable-message .message-text a {
+    color: #25d366 !important;
+    text-decoration: none !important;
+    font-size: 14px !important;
+}
+
+.whatsapp-messages .editable-message .message-text a:hover {
+    color: #1ea952 !important;
+    text-decoration: underline !important;
 }
 
 /* Forçar tamanho normal para emojis */
@@ -819,7 +832,10 @@ body.dark-mode .editable-message .message-text:empty:before {
 /* Imagem na mensagem editável */
 .editable-message .message-image {
     margin: 0 0 8px 0;
-    padding: 0 8px 0 0; /* Alinha com a margem verde do texto */
+    padding: 0;
+    background: #dcf8c6;
+    border-radius: 18px;
+    overflow: hidden;
 }
 
 .editable-message .message-image img {
@@ -828,8 +844,8 @@ body.dark-mode .editable-message .message-text:empty:before {
     height: auto;
     max-height: 400px;
     min-height: 200px;
-    border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    border-radius: 0;
+    box-shadow: none;
     object-fit: cover;
     display: block;
 }
