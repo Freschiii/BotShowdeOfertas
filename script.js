@@ -1439,7 +1439,9 @@ async function processMessageQueue(sendToWhatsApp, sendToTelegram) {
     botManager.showMessage(summary, 'success');
     
     // Limpar caixas após envio para evitar duplicatas
+    console.log('🧹 Chamando clearAllMessageBoxes após envio...');
     clearAllMessageBoxes();
+    console.log('✅ clearAllMessageBoxes concluído');
 }
 
 // Enviar mensagem imediata
@@ -1552,8 +1554,11 @@ function clearAllMessageBoxes() {
     messageQueue = [];
     console.log('📋 Fila de mensagens limpa');
     
-    // Limpar todas as caixas do WhatsApp
+    // Verificar quantas caixas existem
     const allMessageBoxes = document.querySelectorAll('.whatsapp-message.received.editable-message');
+    console.log('📦 Caixas encontradas para limpeza:', allMessageBoxes.length);
+    
+    // Limpar todas as caixas do WhatsApp
     allMessageBoxes.forEach((messageBox, index) => {
         const messageText = messageBox.querySelector('.message-text');
         const messageImage = messageBox.querySelector('.message-image');
