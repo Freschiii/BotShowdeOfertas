@@ -873,7 +873,8 @@ body.dark-mode .editable-message .message-text:empty:before {
     object-fit: cover;
     display: block;
     border-bottom: none;
-    background: transparent;
+    background: #2A2A2A;
+    mix-blend-mode: multiply;
 }
 
 /* Controles do WhatsApp */
@@ -1020,6 +1021,8 @@ body.dark-mode .whatsapp-message.typing .message-text {
     box-shadow: none;
     object-fit: cover;
     display: block;
+    background: #2A2A2A;
+    mix-blend-mode: multiply;
 }
 
 /* Conteúdo da Mensagem */
