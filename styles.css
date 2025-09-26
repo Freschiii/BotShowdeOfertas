@@ -707,13 +707,33 @@ body.dark-mode .whatsapp-attach-btn:hover {
     text-decoration: underline;
 }
 
-/* Emojis com tamanho normal */
+/* Forçar tamanho normal para emojis */
 .editable-message .message-text {
-    font-size: 14px;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
 }
 
+/* Resetar tamanho de emojis especificamente */
 .editable-message .message-text * {
-    font-size: inherit;
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+}
+
+/* Forçar tamanho de emojis */
+.editable-message .message-text {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    font-weight: normal !important;
+}
+
+/* Resetar qualquer herança de tamanho */
+.editable-message .message-text,
+.editable-message .message-text *,
+.editable-message .message-text::before,
+.editable-message .message-text::after {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
 }
 
 .editable-message .message-text:focus {
@@ -740,6 +760,27 @@ body.dark-mode .editable-message .message-text:focus {
 
 body.dark-mode .editable-message .message-text:empty:before {
     color: #666;
+}
+
+/* Forçar tamanho de emojis com CSS mais específico */
+.whatsapp-messages .editable-message .message-text {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+.whatsapp-messages .editable-message .message-text * {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+}
+
+/* Resetar tamanho de emojis em todos os contextos */
+.whatsapp-messages .message-text,
+.whatsapp-messages .message-text *,
+.whatsapp-messages .message-text::before,
+.whatsapp-messages .message-text::after {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
 }
 
 /* Imagem na mensagem editável */

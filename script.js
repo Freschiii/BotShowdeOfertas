@@ -77,7 +77,9 @@ document.addEventListener('DOMContentLoaded', function() {
     }
     
     if (whatsappAddBtn) {
-        whatsappAddBtn.addEventListener('click', function() {
+        whatsappAddBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
             console.log('Botão adicionar clicado!');
             addMessageFromWhatsAppInput();
         });
@@ -428,18 +430,12 @@ function handleWhatsAppImageUpload(event) {
 
 // Adicionar mensagem do input do WhatsApp
 function addMessageFromWhatsAppInput() {
-    console.log('Função addMessageFromWhatsAppInput chamada');
     const messageTextInput = document.getElementById('messageTextInput');
-    
-    console.log('messageTextInput:', messageTextInput);
-    console.log('textContent:', messageTextInput ? messageTextInput.textContent : 'não encontrado');
     
     if (!messageTextInput || !messageTextInput.textContent.trim() || messageTextInput.textContent.trim() === 'Digite sua mensagem aqui...') {
         botManager.showMessage('Digite uma mensagem primeiro!', 'error');
         return;
     }
-    
-    console.log('Adicionando mensagem à fila...');
     
     // Adicionar mensagem à fila
     addMessageToQueue();
