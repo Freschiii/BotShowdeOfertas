@@ -53,8 +53,8 @@ document.addEventListener('DOMContentLoaded', function() {
     const darkModeToggle = document.getElementById('darkModeToggle');
     const body = document.body;
     
-    // Carregar preferência salva
-    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    // Carregar preferência salva (padrão: modo escuro)
+    const isDarkMode = localStorage.getItem('darkMode') !== 'false';
     if (isDarkMode) {
         body.classList.add('dark-mode');
         darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
@@ -146,25 +146,29 @@ function createMessageElement(item, number) {
         <div class="queue-item-header">
             <div class="queue-item-number">Mensagem ${number}</div>
             <div class="queue-item-controls">
-                <button class="queue-schedule-toggle" onclick="toggleSchedule('${item.id}')">
-                    <i class="fas fa-clock"></i> Agendar
+                <button class="queue-schedule-toggle" onclick="toggleSchedule('${item.id}')" title="Agendar mensagem">
+                    <i class="fas fa-clock"></i>
                 </button>
-                ${messageQueue.length > 1 ? `<button class="queue-remove-btn" onclick="removeMessageFromQueue('${item.id}')">
-                    <i class="fas fa-trash"></i> Remover
+                ${messageQueue.length > 1 ? `<button class="queue-remove-btn" onclick="removeMessageFromQueue('${item.id}')" title="Remover mensagem">
+                    <i class="fas fa-trash"></i>
                 </button>` : ''}
             </div>
         </div>
         
-        <div class="image-upload">
-            <input type="file" class="queue-image-input" data-message-id="${item.id}" accept="image/*" />
-            <label for="queue-image-${item.id}" class="upload-btn">
-                <i class="fas fa-cloud-upload-alt"></i>
-                <span>Escolher Imagem</span>
-            </label>
-            <div class="image-preview queue-image-preview" data-message-id="${item.id}"></div>
+        <div class="message-content">
+            <div class="image-upload">
+                <input type="file" class="queue-image-input" data-message-id="${item.id}" accept="image/*" />
+                <label for="queue-image-${item.id}" class="upload-btn">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    <span>Escolher Imagem</span>
+                </label>
+                <div class="image-preview queue-image-preview" data-message-id="${item.id}"></div>
+            </div>
+            
+            <div class="message-input-container">
+                <textarea class="queue-message-input" data-message-id="${item.id}" placeholder="Digite sua mensagem aqui..."></textarea>
+            </div>
         </div>
-        
-        <textarea class="queue-message-input" data-message-id="${item.id}" placeholder="Digite sua mensagem aqui..."></textarea>
         
         <div class="queue-schedule-controls" id="schedule-${item.id}">
             <div class="schedule-input">
