@@ -52,6 +52,52 @@ document.addEventListener('DOMContentLoaded', function() {
             document.getElementById(targetTab + '-tab').classList.add('active');
         });
     });
+
+    // Modo Escuro
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const body = document.body;
+    
+    // Carregar preferência salva
+    const isDarkMode = localStorage.getItem('darkMode') === 'true';
+    if (isDarkMode) {
+        body.classList.add('dark-mode');
+        darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
+    }
+
+    darkModeToggle.addEventListener('click', () => {
+        body.classList.toggle('dark-mode');
+        const isDark = body.classList.contains('dark-mode');
+        
+        // Salvar preferência
+        localStorage.setItem('darkMode', isDark);
+        
+        // Atualizar ícone
+        darkModeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
+    });
+
+    // Controles de Modo de Envio
+    const modeRadios = document.querySelectorAll('input[name="sendMode"]');
+    const sequenceControls = document.getElementById('sequenceControls');
+    const scheduleControls = document.getElementById('scheduleControls');
+
+    modeRadios.forEach(radio => {
+        radio.addEventListener('change', () => {
+            // Esconder todos os controles
+            sequenceControls.style.display = 'none';
+            scheduleControls.style.display = 'none';
+
+            // Mostrar controles baseado no modo selecionado
+            if (radio.value === 'sequence') {
+                sequenceControls.style.display = 'block';
+            } else if (radio.value === 'schedule') {
+                scheduleControls.style.display = 'block';
+                // Definir data/hora mínima como agora
+                const now = new Date();
+                now.setMinutes(now.getMinutes() + 1); // Mínimo 1 minuto no futuro
+                document.getElementById('scheduleDateTime').min = now.toISOString().slice(0, 16);
+            }
+        });
+    });
 });
 
 // Conectar WhatsApp
@@ -180,31 +226,25 @@ async function sendMessage() {
         return;
     }
 
+    // Obter modo de envio
+    const sendMode = document.querySelector('input[name="sendMode"]:checked').value;
+    
     try {
         elements.sendMessage.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
         elements.sendMessage.disabled = true;
         
-        // Enviar mensagem
-        const platforms = {
-            whatsapp: sendToWhatsApp,
-            telegram: sendToTelegram
-        };
-        
         // Preparar imagem para envio
         const imageData = await prepareImageForSending();
         
-        const results = await botManager.sendMessage(message, imageData, platforms);
-        
-        // Mostrar resultados
-        const successCount = results.filter(r => r.success).length;
-        const totalCount = results.length;
-        
-        if (successCount === totalCount) {
-            botManager.showMessage(`Mensagem enviada com sucesso para ${successCount} plataforma(s)!`, 'success');
-        } else if (successCount > 0) {
-            botManager.showMessage(`Mensagem enviada para ${successCount} de ${totalCount} plataforma(s)`, 'success');
-        } else {
-            botManager.showMessage('Erro ao enviar mensagem para todas as plataformas', 'error');
+        if (sendMode === 'single') {
+            // Envio único
+            await sendSingleMessage(message, imageData, sendToWhatsApp, sendToTelegram);
+        } else if (sendMode === 'sequence') {
+            // Envio em sequência
+            await sendSequenceMessages(message, imageData, sendToWhatsApp, sendToTelegram);
+        } else if (sendMode === 'schedule') {
+            // Agendamento
+            await scheduleMessage(message, imageData, sendToWhatsApp, sendToTelegram);
         }
         
     } catch (error) {
@@ -213,6 +253,91 @@ async function sendMessage() {
         elements.sendMessage.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Mensagem';
         elements.sendMessage.disabled = false;
     }
+}
+
+// Envio único
+async function sendSingleMessage(message, imageData, sendToWhatsApp, sendToTelegram) {
+    const platforms = {
+        whatsapp: sendToWhatsApp,
+        telegram: sendToTelegram
+    };
+    
+    const results = await botManager.sendMessage(message, imageData, platforms);
+    
+    // Mostrar resultados
+    const successCount = results.filter(r => r.success).length;
+    const totalCount = results.length;
+    
+    if (successCount === totalCount) {
+        botManager.showMessage(`Mensagem enviada com sucesso para ${successCount} plataforma(s)!`, 'success');
+    } else if (successCount > 0) {
+        botManager.showMessage(`Mensagem enviada para ${successCount} de ${totalCount} plataforma(s)`, 'success');
+    } else {
+        botManager.showMessage('Erro ao enviar mensagem para todas as plataformas', 'error');
+    }
+}
+
+// Envio em sequência
+async function sendSequenceMessages(message, imageData, sendToWhatsApp, sendToTelegram) {
+    const count = parseInt(document.getElementById('sequenceCount').value);
+    const interval = parseInt(document.getElementById('sequenceInterval').value) * 1000; // Converter para ms
+    
+    botManager.showMessage(`Iniciando sequência de ${count} mensagens...`, 'info');
+    
+    for (let i = 1; i <= count; i++) {
+        botManager.showMessage(`Enviando mensagem ${i} de ${count}...`, 'info');
+        
+        const platforms = {
+            whatsapp: sendToWhatsApp,
+            telegram: sendToTelegram
+        };
+        
+        await botManager.sendMessage(`${message} (${i}/${count})`, imageData, platforms);
+        
+        if (i < count) {
+            botManager.showMessage(`Aguardando ${interval/1000}s antes da próxima mensagem...`, 'info');
+            await new Promise(resolve => setTimeout(resolve, interval));
+        }
+    }
+    
+    botManager.showMessage(`Sequência de ${count} mensagens concluída!`, 'success');
+}
+
+// Agendamento
+async function scheduleMessage(message, imageData, sendToWhatsApp, sendToTelegram) {
+    const scheduleDateTime = document.getElementById('scheduleDateTime').value;
+    
+    if (!scheduleDateTime) {
+        botManager.showMessage('Selecione uma data e hora para agendamento!', 'error');
+        return;
+    }
+    
+    const scheduleTime = new Date(scheduleDateTime).getTime();
+    const now = new Date().getTime();
+    
+    if (scheduleTime <= now) {
+        botManager.showMessage('A data/hora deve ser no futuro!', 'error');
+        return;
+    }
+    
+    const delay = scheduleTime - now;
+    
+    botManager.showMessage(`Mensagem agendada para ${new Date(scheduleTime).toLocaleString('pt-BR')}`, 'info');
+    
+    // Agendar envio
+    setTimeout(async () => {
+        botManager.showMessage('Enviando mensagem agendada...', 'info');
+        
+        const platforms = {
+            whatsapp: sendToWhatsApp,
+            telegram: sendToTelegram
+        };
+        
+        const results = await botManager.sendMessage(message, imageData, platforms);
+        
+        const successCount = results.filter(r => r.success).length;
+        botManager.showMessage(`Mensagem agendada enviada para ${successCount} plataforma(s)!`, 'success');
+    }, delay);
 }
 
 // Preparar imagem para envio

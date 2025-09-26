@@ -9,6 +9,52 @@ body {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     color: #333;
+    transition: all 0.3s ease;
+}
+
+/* Modo Escuro */
+body.dark-mode {
+    background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%);
+    color: #ecf0f1;
+}
+
+body.dark-mode .card {
+    background: #34495e;
+    color: #ecf0f1;
+    border: 1px solid #4a5f7a;
+}
+
+body.dark-mode .tabs {
+    background: #34495e;
+    border: 1px solid #4a5f7a;
+}
+
+body.dark-mode .tab-button {
+    color: #bdc3c7;
+}
+
+body.dark-mode .tab-button:hover {
+    background: #4a5f7a;
+    color: #ecf0f1;
+}
+
+body.dark-mode .tab-button.active {
+    background: #3498db;
+    color: white;
+}
+
+body.dark-mode input, 
+body.dark-mode textarea, 
+body.dark-mode select {
+    background: #2c3e50;
+    color: #ecf0f1;
+    border: 1px solid #4a5f7a;
+}
+
+body.dark-mode input:focus, 
+body.dark-mode textarea:focus {
+    border-color: #3498db;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
 }
 
 .container {
@@ -21,6 +67,7 @@ header {
     text-align: center;
     margin-bottom: 30px;
     color: white;
+    position: relative;
 }
 
 header h1 {
@@ -32,6 +79,37 @@ header h1 {
 header p {
     font-size: 1.1rem;
     opacity: 0.9;
+}
+
+.header-controls {
+    position: absolute;
+    top: 0;
+    right: 0;
+}
+
+.btn-dark-mode {
+    background: rgba(255, 255, 255, 0.2);
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    color: white;
+    padding: 10px 15px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 1.2rem;
+}
+
+.btn-dark-mode:hover {
+    background: rgba(255, 255, 255, 0.3);
+    transform: scale(1.1);
+}
+
+body.dark-mode .btn-dark-mode {
+    background: rgba(52, 152, 219, 0.3);
+    border-color: rgba(52, 152, 219, 0.5);
+}
+
+body.dark-mode .btn-dark-mode:hover {
+    background: rgba(52, 152, 219, 0.5);
 }
 
 .card {
@@ -492,6 +570,124 @@ header p {
 
 .tab-content.active {
     display: block;
+}
+
+/* Controles de Modo de Envio */
+.send-mode-options {
+    margin: 20px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+}
+
+body.dark-mode .send-mode-options {
+    background: #2c3e50;
+    border-color: #4a5f7a;
+}
+
+.mode-selector {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.mode-option {
+    display: flex;
+    align-items: center;
+    cursor: pointer;
+    padding: 12px 20px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    transition: all 0.3s ease;
+    background: white;
+    flex: 1;
+    justify-content: center;
+    gap: 8px;
+}
+
+.mode-option:hover {
+    border-color: #007bff;
+    background: #f8f9ff;
+}
+
+.mode-option input[type="radio"] {
+    display: none;
+}
+
+.mode-option:has(input:checked) {
+    border-color: #007bff;
+    background: #e3f2fd;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
+}
+
+.mode-option span {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 500;
+}
+
+body.dark-mode .mode-option {
+    background: #34495e;
+    border-color: #4a5f7a;
+    color: #ecf0f1;
+}
+
+body.dark-mode .mode-option:hover {
+    border-color: #3498db;
+    background: #4a5f7a;
+}
+
+body.dark-mode .mode-option:has(input:checked) {
+    border-color: #3498db;
+    background: #2c3e50;
+}
+
+/* Controles de Sequência */
+.sequence-controls, .schedule-controls {
+    margin: 20px 0;
+    padding: 20px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    border: 2px solid #e9ecef;
+}
+
+body.dark-mode .sequence-controls, 
+body.dark-mode .schedule-controls {
+    background: #2c3e50;
+    border-color: #4a5f7a;
+}
+
+.sequence-input, .schedule-input {
+    margin-bottom: 15px;
+}
+
+.sequence-input label, .schedule-input label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 500;
+    color: #495057;
+}
+
+body.dark-mode .sequence-input label, 
+body.dark-mode .schedule-input label {
+    color: #ecf0f1;
+}
+
+.sequence-input input, .schedule-input input {
+    width: 100%;
+    padding: 10px;
+    border: 2px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.sequence-input input:focus, .schedule-input input:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25);
 }
 
 /* Mensagens de Feedback */
