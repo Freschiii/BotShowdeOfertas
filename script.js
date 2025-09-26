@@ -1674,23 +1674,44 @@ function clearAllMessageBoxes() {
             console.log(`✅ Área de agendamento da caixa ${index + 1} fechada`);
         }
         
-        // Limpeza final agressiva: remover QUALQUER conteúdo restante
-        const allRemainingText = whatsappBox.querySelectorAll('*');
-        allRemainingText.forEach((element) => {
-            if (element.textContent && element.textContent.trim() && 
-                (element.classList.contains('message-text') || 
-                 element.textContent.includes('{"ok":true') ||
-                 element.textContent.includes('result'))) {
-                element.textContent = '';
-                element.innerHTML = '';
+        // Para a primeira caixa, restaurar ao estado inicial
+        if (index === 0) {
+            console.log(`🔄 Restaurando caixa ${index + 1} ao estado inicial...`);
+            
+            // Remover todas as mensagens recebidas
+            const allReceivedMessages = whatsappBox.querySelectorAll('.whatsapp-message.received');
+            allReceivedMessages.forEach(msg => {
+                msg.remove();
+            });
+            
+            // Limpar input principal
+            const mainInput = whatsappBox.querySelector('#messageTextInput');
+            if (mainInput) {
+                mainInput.textContent = '';
+                mainInput.innerHTML = '';
+                mainInput.value = '';
             }
-        });
-        
-        // Remover qualquer imagem restante
-        const allRemainingImages = whatsappBox.querySelectorAll('img');
-        allRemainingImages.forEach((img) => {
-            img.remove();
-        });
+            
+            console.log(`✅ Caixa ${index + 1} restaurada ao estado inicial`);
+        } else {
+            // Para caixas duplicadas, limpeza normal
+            const allRemainingText = whatsappBox.querySelectorAll('*');
+            allRemainingText.forEach((element) => {
+                if (element.textContent && element.textContent.trim() && 
+                    (element.classList.contains('message-text') || 
+                     element.textContent.includes('{"ok":true') ||
+                     element.textContent.includes('result'))) {
+                    element.textContent = '';
+                    element.innerHTML = '';
+                }
+            });
+            
+            // Remover qualquer imagem restante
+            const allRemainingImages = whatsappBox.querySelectorAll('img');
+            allRemainingImages.forEach((img) => {
+                img.remove();
+            });
+        }
         
         // Debug: verificar conteúdo após a limpeza
         const afterText = whatsappBox.querySelector('.message-text')?.textContent || '';
