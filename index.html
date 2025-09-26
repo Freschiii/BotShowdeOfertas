@@ -17,9 +17,23 @@
         </header>
 
         <main>
-            <!-- Status dos Bots -->
-            <div class="card">
-                <h2><i class="fas fa-signal"></i> Status dos Bots</h2>
+            <!-- Sistema de Abas -->
+            <div class="tabs-container">
+                <div class="tabs">
+                    <button class="tab-button active" data-tab="main">
+                        <i class="fas fa-home"></i> Principal
+                    </button>
+                    <button class="tab-button" data-tab="config">
+                        <i class="fas fa-cog"></i> Configurações
+                    </button>
+                </div>
+            </div>
+
+            <!-- Aba Principal -->
+            <div id="main-tab" class="tab-content active">
+                <!-- Status dos Bots -->
+                <div class="card">
+                    <h2><i class="fas fa-signal"></i> Status dos Bots</h2>
                 <div class="bot-status">
                     <div class="status-item">
                         <i class="fab fa-whatsapp"></i>
@@ -40,60 +54,71 @@
                 </div>
             </div>
 
-            <!-- Configuração WhatsApp -->
-            <div class="card">
-                <h2><i class="fab fa-whatsapp"></i> Configurar WhatsApp Bot</h2>
-                <div class="bot-config">
-                    <button id="connectWhatsApp" class="btn-whatsapp">
-                        <i class="fas fa-qrcode"></i> Conectar WhatsApp
-                    </button>
-                    <div id="whatsappQR" class="qr-container" style="display: none;">
-                        <h3>Escaneie o QR Code com seu WhatsApp</h3>
-                        <div id="qrCode"></div>
-                        <p>1. Abra o WhatsApp no seu celular</p>
-                        <p>2. Vá em Menu > Dispositivos conectados</p>
-                        <p>3. Escaneie o QR Code acima</p>
-                    </div>
-                </div>
             </div>
 
-            <!-- Configuração Telegram -->
-            <div class="card">
-                <h2><i class="fab fa-telegram"></i> Configurar Telegram Bot</h2>
-                <div class="bot-config">
-                    <div class="input-group">
-                        <input type="text" id="telegramToken" placeholder="Token do Bot Telegram (obtenha com @BotFather)" />
-                        <button id="connectTelegram" class="btn-telegram">
-                            <i class="fas fa-link"></i> Conectar
+            <!-- Aba Configurações -->
+            <div id="config-tab" class="tab-content">
+                <!-- Configuração WhatsApp -->
+                <div class="card">
+                    <h2><i class="fab fa-whatsapp"></i> Configurar WhatsApp Bot</h2>
+                    <div class="bot-config">
+                        <button id="connectWhatsApp" class="btn-whatsapp">
+                            <i class="fas fa-qrcode"></i> Conectar WhatsApp
                         </button>
-                    </div>
-                    <div class="help-text">
-                        <p><strong>Como obter o token:</strong></p>
-                        <p>1. Abra o Telegram e procure por @BotFather</p>
-                        <p>2. Digite /newbot e siga as instruções</p>
-                        <p>3. Copie o token gerado e cole acima</p>
+                        <div id="whatsappQR" class="qr-container" style="display: none;">
+                            <h3>Escaneie o QR Code com seu WhatsApp</h3>
+                            <div id="qrCode"></div>
+                            <p>1. Abra o WhatsApp no seu celular</p>
+                            <p>2. Vá em Menu > Dispositivos conectados</p>
+                            <p>3. Escaneie o QR Code acima</p>
+                        </div>
                     </div>
                 </div>
-            </div>
 
-            <!-- Configuração de Canais -->
-            <div class="card">
-                <h2><i class="fas fa-broadcast-tower"></i> Configurar Canais</h2>
-                <div class="group-config">
-                    <div class="input-group">
-                        <label>Canal WhatsApp:</label>
-                        <input type="text" id="whatsappGroup" placeholder="Nome do canal ou ID" />
+                <!-- Configuração Telegram -->
+                <div class="card">
+                    <h2><i class="fab fa-telegram"></i> Configurar Telegram Bot</h2>
+                    <div class="bot-config">
+                        <div class="input-group">
+                            <input type="text" id="telegramToken" placeholder="Token do Bot Telegram (obtenha com @BotFather)" />
+                            <button id="connectTelegram" class="btn-telegram">
+                                <i class="fas fa-link"></i> Conectar
+                            </button>
+                        </div>
+                        <div class="help-text">
+                            <p><strong>Como obter o token:</strong></p>
+                            <p>1. Abra o Telegram e procure por @BotFather</p>
+                            <p>2. Digite /newbot e siga as instruções</p>
+                            <p>3. Copie o token gerado e cole acima</p>
+                        </div>
                     </div>
-                    <div class="input-group">
-                        <label>Canal Telegram:</label>
-                        <input type="text" id="telegramGroup" placeholder="ID do canal (ex: -1001234567890)" />
+                </div>
+
+                <!-- Configuração de Canais -->
+                <div class="card">
+                    <h2><i class="fas fa-broadcast-tower"></i> Configurar Canais</h2>
+                    <div class="group-config">
+                        <div class="input-group">
+                            <label>Canal WhatsApp:</label>
+                            <input type="text" id="whatsappGroup" placeholder="Nome do canal ou ID" />
+                        </div>
+                        <div class="input-group">
+                            <label>Canal Telegram:</label>
+                            <input type="text" id="telegramGroup" placeholder="ID do canal (ex: -1001234567890)" />
+                        </div>
+                        <button id="saveGroups" class="btn-primary">
+                            <i class="fas fa-save"></i> Salvar Canais
+                        </button>
+                        <div id="autoSaveIndicator" class="auto-save-indicator" style="display: none;">
+                            <i class="fas fa-check-circle"></i> Dados salvos automaticamente
+                        </div>
                     </div>
-                    <button id="saveGroups" class="btn-primary">
-                        <i class="fas fa-save"></i> Salvar Canais
-                    </button>
-                    <div id="autoSaveIndicator" class="auto-save-indicator" style="display: none;">
-                        <i class="fas fa-check-circle"></i> Dados salvos automaticamente
-                    </div>
+                </div>
+
+                <!-- Descobrir IDs dos Canais -->
+                <div class="card">
+                    <h2><i class="fas fa-search"></i> Descobrir IDs dos Canais</h2>
+                    <div id="discoveryInterface"></div>
                 </div>
             </div>
 
@@ -123,42 +148,10 @@
                         </label>
                     </div>
                     
-                    <div class="send-mode">
-                        <h4><i class="fas fa-cog"></i> Modo de Envio</h4>
-                        <div class="mode-options">
-                            <label class="mode-option">
-                                <input type="radio" name="sendMode" value="image" id="modeImage" checked>
-                                <div class="mode-content">
-                                    <i class="fas fa-image"></i>
-                                    <div>
-                                        <strong>Enviar Imagem</strong>
-                                        <p>Telegram: Imagem anexada<br>WhatsApp: Link com preview (linkPreview: true)</p>
-                                    </div>
-                                </div>
-                            </label>
-                            <label class="mode-option">
-                                <input type="radio" name="sendMode" value="both" id="modeBoth">
-                                <div class="mode-content">
-                                    <i class="fas fa-images"></i>
-                                    <div>
-                                        <strong>Enviar Ambos</strong>
-                                        <p>Telegram: Imagem anexada<br>WhatsApp: Imagem anexada</p>
-                                    </div>
-                                </div>
-                            </label>
-                        </div>
-                    </div>
-                    
                     <button id="sendMessage" class="btn-send">
                         <i class="fas fa-paper-plane"></i> Enviar Mensagem
                     </button>
                 </div>
-            </div>
-
-            <!-- Descobrir IDs dos Canais -->
-            <div class="card">
-                <h2><i class="fas fa-search"></i> Descobrir IDs dos Canais</h2>
-                <div id="discoveryInterface"></div>
             </div>
 
             <!-- Histórico de Mensagens -->

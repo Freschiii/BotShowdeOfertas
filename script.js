@@ -34,6 +34,26 @@ elements.saveGroups.addEventListener('click', saveGroups);
 elements.imageInput.addEventListener('change', handleImageUpload);
 elements.sendMessage.addEventListener('click', sendMessage);
 
+// Sistema de Abas
+document.addEventListener('DOMContentLoaded', function() {
+    const tabButtons = document.querySelectorAll('.tab-button');
+    const tabContents = document.querySelectorAll('.tab-content');
+
+    tabButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            const targetTab = button.getAttribute('data-tab');
+            
+            // Remover classe active de todos os botões e conteúdos
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            tabContents.forEach(content => content.classList.remove('active'));
+            
+            // Adicionar classe active ao botão clicado e conteúdo correspondente
+            button.classList.add('active');
+            document.getElementById(targetTab + '-tab').classList.add('active');
+        });
+    });
+});
+
 // Conectar WhatsApp
 async function connectWhatsApp() {
     try {
@@ -164,62 +184,16 @@ async function sendMessage() {
         elements.sendMessage.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
         elements.sendMessage.disabled = true;
         
-        // Obter modo de envio
-        const sendMode = document.querySelector('input[name="sendMode"]:checked').value;
-        console.log('📤 Modo de envio selecionado:', sendMode);
-        
         // Enviar mensagem
         const platforms = {
             whatsapp: sendToWhatsApp,
             telegram: sendToTelegram
         };
         
-        // Preparar dados baseado no modo
-        let whatsappData = null;
-        let telegramData = null;
+        // Preparar imagem para envio
+        const imageData = await prepareImageForSending();
         
-        if (sendMode === 'image') {
-            // Modo: Telegram com imagem, WhatsApp com link
-            console.log('📤 Modo IMAGEM: Telegram=imagem, WhatsApp=link');
-            
-            if (sendToTelegram) {
-                // Telegram: enviar imagem anexada
-                telegramData = {
-                    message: message,
-                    image: await prepareImageForSending()
-                };
-            }
-            
-            if (sendToWhatsApp) {
-                // WhatsApp: enviar apenas link (sem imagem) - com delay para preview
-                console.log('📱 WhatsApp: Modo link com preview - será aplicado delay de 3s');
-                whatsappData = {
-                    message: message,
-                    image: null
-                };
-            }
-        } else {
-            // Modo: Ambos com imagem
-            console.log('📤 Modo AMBOS: Telegram=imagem, WhatsApp=imagem');
-            
-            const imageData = await prepareImageForSending();
-            
-            if (sendToTelegram) {
-                telegramData = {
-                    message: message,
-                    image: imageData
-                };
-            }
-            
-            if (sendToWhatsApp) {
-                whatsappData = {
-                    message: message,
-                    image: imageData
-                };
-            }
-        }
-        
-        const results = await botManager.sendMessageWithMode(message, whatsappData, telegramData, platforms);
+        const results = await botManager.sendMessage(message, imageData, platforms);
         
         // Mostrar resultados
         const successCount = results.filter(r => r.success).length;
