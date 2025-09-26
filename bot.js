@@ -350,22 +350,33 @@ class BotManager {
                 throw new Error('Servidor não disponível');
             }
 
-            // Delay para carregar preview do link (apenas quando não há imagem)
+            // Estratégia especial para preview do link (apenas quando não há imagem)
             if (!image) {
-                console.log('📱 WhatsApp: Digitando mensagem para carregar preview...');
+                console.log('📱 WhatsApp: Enviando mensagem para carregar preview...');
                 
-                // Primeiro, enviar a mensagem para que o WhatsApp "digite" e carregue o preview
+                // Primeiro envio - para que o WhatsApp processe o link
                 this.socket.emit('send-whatsapp', {
                     chatId: this.whatsappGroup,
                     message: message,
                     image: null
                 });
                 
-                console.log('📱 WhatsApp: Aguardando delay para carregar preview do link...');
-                await new Promise(resolve => setTimeout(resolve, 10000)); // 10 segundos de delay
-                console.log('📱 WhatsApp: Delay concluído, preview deve estar carregado!');
+                console.log('📱 WhatsApp: Aguardando 3s para processar link...');
+                await new Promise(resolve => setTimeout(resolve, 3000));
                 
-                // Retornar sucesso sem enviar novamente
+                console.log('📱 WhatsApp: Enviando novamente para forçar preview...');
+                // Segundo envio - para forçar o preview
+                this.socket.emit('send-whatsapp', {
+                    chatId: this.whatsappGroup,
+                    message: message,
+                    image: null
+                });
+                
+                console.log('📱 WhatsApp: Aguardando mais 5s para preview carregar...');
+                await new Promise(resolve => setTimeout(resolve, 5000));
+                
+                console.log('📱 WhatsApp: Preview deve estar carregado!');
+                
                 return {
                     success: true,
                     message: `Mensagem enviada para o canal WhatsApp: ${this.whatsappGroup} (com preview)`
