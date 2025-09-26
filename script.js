@@ -28,7 +28,19 @@ let messageCounter = 0;
 elements.connectWhatsApp.addEventListener('click', connectWhatsApp);
 elements.connectTelegram.addEventListener('click', connectTelegram);
 elements.saveGroups.addEventListener('click', saveGroups);
-elements.sendMessage.addEventListener('click', sendMessage);
+
+// Verificar se o botão de enviar existe antes de adicionar o listener
+if (elements.sendMessage) {
+    elements.sendMessage.addEventListener('click', sendMessage);
+    console.log('✅ Event listener do botão enviar adicionado');
+    
+    // Teste simples para verificar se o botão está funcionando
+    elements.sendMessage.addEventListener('click', function() {
+        console.log('🖱️ Botão enviar clicado!');
+    });
+} else {
+    console.error('❌ Botão sendMessage não encontrado!');
+}
 
 // WhatsApp Input Events
 document.addEventListener('DOMContentLoaded', function() {
@@ -39,7 +51,6 @@ document.addEventListener('DOMContentLoaded', function() {
     const whatsappDeleteBtn = document.getElementById('whatsappDeleteBtn');
     const whatsappScheduleBtn = document.getElementById('whatsappScheduleBtn');
     const whatsappScheduleArea = document.getElementById('whatsappScheduleArea');
-    const whatsappScheduleInput = document.getElementById('whatsappScheduleInput');
     const whatsappScheduleConfirmBtn = document.getElementById('whatsappScheduleConfirmBtn');
     const whatsappScheduleCancelBtn = document.getElementById('whatsappScheduleCancelBtn');
     
@@ -50,14 +61,16 @@ document.addEventListener('DOMContentLoaded', function() {
         messageTextInput.addEventListener('input', function() {
             // Detectar e converter links automaticamente
             detectAndConvertLinks(this);
-            // Não chamar updateWhatsAppPreview para não limpar o conteúdo
+            // NÃO chamar updateWhatsAppPreview para não limpar o conteúdo
         });
         
-        // Prevenir Enter de adicionar mensagem automaticamente
+        // Permitir Enter para quebra de linha
         messageTextInput.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                // Se Shift+Enter, permitir quebra de linha
+                // Se Enter sozinho, adicionar mensagem à fila
                 e.preventDefault();
-                // Não fazer nada, apenas prevenir o comportamento padrão
+                addMessageFromWhatsAppInput();
             }
         });
         
@@ -109,7 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
             e.preventDefault();
             e.stopPropagation();
             console.log('Botão adicionar clicado!');
-            addMessageFromWhatsAppInput();
+            duplicateMessageBox();
         });
     } else {
         console.log('Botão whatsappAddBtn não encontrado!');
@@ -159,27 +172,8 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 
-    // Modo Escuro
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    const body = document.body;
-    
-    // Carregar preferência salva (padrão: modo escuro)
-    const isDarkMode = localStorage.getItem('darkMode') !== 'false';
-    if (isDarkMode) {
-        body.classList.add('dark-mode');
-        darkModeToggle.innerHTML = '<i class="fas fa-sun"></i>';
-    }
-
-    darkModeToggle.addEventListener('click', () => {
-        body.classList.toggle('dark-mode');
-        const isDark = body.classList.contains('dark-mode');
-        
-        // Salvar preferência
-        localStorage.setItem('darkMode', isDark);
-        
-        // Atualizar ícone
-        darkModeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
-    });
+    // Modo escuro sempre ativo
+    document.body.classList.add('dark-mode');
 
     // Inicializar primeira mensagem na fila
     initializeMessageQueue();
@@ -230,14 +224,20 @@ function updateAddMessageButton() {
     newBtn.innerHTML = '<i class="fas fa-plus"></i> Adicionar Mensagem';
     newBtn.addEventListener('click', addMessageToQueue);
     
-    // Inserir após a fila de mensagens
+    // Inserir após a fila de mensagens (se existir)
     const messageQueue = document.getElementById('messageQueue');
+    if (messageQueue && messageQueue.parentNode) {
     messageQueue.parentNode.insertBefore(newBtn, messageQueue.nextSibling);
+    }
 }
 
 // Renderizar fila de mensagens
 function renderMessageQueue() {
     const queueContainer = document.getElementById('messageQueue');
+    if (!queueContainer) {
+        console.log('Elemento messageQueue não encontrado, pulando renderização');
+        return;
+    }
     queueContainer.innerHTML = '';
     
     messageQueue.forEach((item, index) => {
@@ -485,41 +485,347 @@ function handleWhatsAppImageUpload(event) {
     reader.readAsDataURL(file);
 }
 
-// Adicionar mensagem do input do WhatsApp
-function addMessageFromWhatsAppInput() {
-    const messageTextInput = document.getElementById('messageTextInput');
+// Manipular upload de imagem para novas caixas do WhatsApp
+function handleNewWhatsAppImageUpload(event, whatsappBox) {
+    const file = event.target.files[0];
+    if (!file) return;
     
-    if (!messageTextInput || !messageTextInput.textContent.trim() || messageTextInput.textContent.trim() === 'Digite sua mensagem aqui...') {
-        botManager.showMessage('Digite uma mensagem primeiro!', 'error');
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        // Mostrar imagem na mensagem editável da nova caixa
+        const editableMessage = whatsappBox.querySelector('.editable-message');
+        const messageContent = editableMessage.querySelector('.message-content');
+        
+        // Remover imagem anterior se existir
+        const existingImage = messageContent.querySelector('.message-image');
+        if (existingImage) {
+            existingImage.remove();
+        }
+        
+        // Adicionar nova imagem
+        const imageDiv = document.createElement('div');
+        imageDiv.className = 'message-image';
+        imageDiv.innerHTML = `<img src="${e.target.result}" alt="Imagem">`;
+        
+        // Inserir imagem antes do texto
+        const messageText = messageContent.querySelector('.message-text');
+        messageContent.insertBefore(imageDiv, messageText);
+        
+        // Salvar imagem para quando adicionar à fila
+        window.currentImage = e.target.result;
+    };
+    reader.readAsDataURL(file);
+}
+
+// Duplicar caixa de mensagem
+function duplicateMessageBox() {
+    const whatsappPreview = document.getElementById('whatsappPreview');
+    
+    if (!whatsappPreview) {
+        console.log('Elemento whatsappPreview não encontrado!');
         return;
     }
     
-    // Adicionar mensagem à fila
-    addMessageToQueue();
+    // Criar nova caixa COMPLETA do WhatsApp
+    const newWhatsAppBox = document.createElement('div');
+    newWhatsAppBox.className = 'whatsapp-preview';
+    newWhatsAppBox.id = `whatsappBox_${Date.now()}`;
     
-    const newMessage = messageQueue[messageQueue.length - 1];
-    newMessage.text = messageTextInput.textContent.trim();
+    const uniqueId = Date.now();
+    newWhatsAppBox.innerHTML = `
+        <div class="whatsapp-chat">
+            <div class="whatsapp-header">
+                <div class="whatsapp-contact">
+                    <div class="whatsapp-avatar"></div>
+                    <div class="whatsapp-info">
+                        <div class="whatsapp-name">Canal de Ofertas</div>
+                        <div class="whatsapp-status">online</div>
+                    </div>
+                </div>
+            </div>
+            <div class="whatsapp-messages" id="whatsappPreview_${uniqueId}">
+                <div class="whatsapp-message received editable-message" id="editableMessage_${uniqueId}">
+                    <div class="message-content">
+                        <div class="message-text" contenteditable="true" placeholder="Digite sua mensagem aqui..."></div>
+                    </div>
+                    <div class="message-time">Agora</div>
+                </div>
+            </div>
+            <!-- Controles da Mensagem -->
+            <div class="whatsapp-controls">
+                <div class="whatsapp-controls-row">
+                    <button class="whatsapp-control-btn" title="Adicionar Imagem">
+                        <i class="fas fa-image"></i>
+                    </button>
+                    <input type="file" accept="image/*" style="display: none;" />
+                    
+                    <button class="whatsapp-control-btn" title="Agendar Mensagem">
+                        <i class="fas fa-clock"></i>
+                    </button>
+                    
+                    <button class="whatsapp-control-btn" title="Adicionar Mensagem">
+                        <i class="fas fa-plus"></i>
+                    </button>
+                    
+                    <button class="whatsapp-control-btn whatsapp-delete-btn" title="Deletar Mensagem" style="display: inline-block;">
+                        <i class="fas fa-trash"></i>
+                    </button>
+                </div>
+                
+                <!-- Área de Agendamento -->
+                <div class="whatsapp-schedule-area" id="whatsappScheduleArea_${uniqueId}" style="display: none;">
+                    <div class="schedule-container">
+                        <div class="schedule-header">
+                            <i class="fas fa-clock"></i>
+                            <span>Agendar Mensagem</span>
+                        </div>
+                        <div class="schedule-inputs">
+                            <div class="date-input-group">
+                                <label>Quando:</label>
+                                <select class="schedule-date-select" id="schedule-date-${uniqueId}">
+                                    <option value="today">Hoje</option>
+                                    <option value="tomorrow">Amanhã</option>
+                                </select>
+                            </div>
+                            <div class="time-input-group">
+                                <label>Horário:</label>
+                                <input type="time" class="schedule-time-input" id="schedule-time-${uniqueId}" />
+                            </div>
+                        </div>
+                        <div class="schedule-actions">
+                            <button class="schedule-confirm-btn" id="schedule-confirm-${uniqueId}">
+                                <i class="fas fa-check"></i>
+                                <span>Confirmar</span>
+                            </button>
+                            <button class="schedule-cancel-btn" id="schedule-cancel-${uniqueId}">
+                                <i class="fas fa-times"></i>
+                                <span>Cancelar</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
     
-    // Adicionar imagem se existir
-    if (window.currentImage) {
-        newMessage.image = window.currentImage;
+    // Adicionar nova caixa antes do botão de enviar
+    const sendButtonContainer = document.querySelector('.send-button-container');
+    if (sendButtonContainer) {
+        sendButtonContainer.parentNode.insertBefore(newWhatsAppBox, sendButtonContainer);
+    } else {
+        const messageSender = document.querySelector('.message-sender');
+        if (messageSender) {
+            messageSender.appendChild(newWhatsAppBox);
+        } else {
+            whatsappPreview.parentNode.appendChild(newWhatsAppBox);
+        }
     }
     
-    // Limpar input
-    messageTextInput.textContent = 'Digite sua mensagem aqui...';
+    // Configurar event listeners para a nova caixa
+    setupNewWhatsAppBox(newWhatsAppBox);
     
-    // Remover imagem da mensagem editável
-    const existingImage = document.querySelector('.editable-message .message-image');
-    if (existingImage) {
-        existingImage.remove();
+    // Atualizar contador de mensagens
+    updateMessageCounter();
+    
+    console.log('Nova caixa completa do WhatsApp criada!');
+}
+
+// Atualizar contador de mensagens
+function updateMessageCounter() {
+    const counter = document.getElementById('messageCounter');
+    const allWhatsAppBoxes = document.querySelectorAll('.whatsapp-preview');
+    const count = allWhatsAppBoxes.length;
+    
+    if (counter) {
+        if (count > 1) {
+            counter.style.display = 'block';
+            counter.querySelector('.counter-text').textContent = `${count} mensagens`;
+        } else {
+            counter.style.display = 'none';
+        }
+    }
+}
+
+// Configurar event listeners para nova caixa completa do WhatsApp
+function setupNewWhatsAppBox(whatsappBox) {
+    const messageText = whatsappBox.querySelector('.message-text');
+    const attachBtn = whatsappBox.querySelector('.whatsapp-control-btn[title="Adicionar Imagem"]');
+    const imageInput = whatsappBox.querySelector('input[type="file"]');
+    const scheduleBtn = whatsappBox.querySelector('.whatsapp-control-btn[title="Agendar Mensagem"]');
+    const addBtn = whatsappBox.querySelector('.whatsapp-control-btn[title="Adicionar Mensagem"]');
+    const deleteBtn = whatsappBox.querySelector('.whatsapp-control-btn[title="Deletar Mensagem"]');
+    
+    // Event listener para o texto
+    if (messageText) {
+        messageText.addEventListener('input', function() {
+            detectAndConvertLinks(this);
+            // NÃO chamar updateWhatsAppPreview para não limpar o conteúdo
+        });
+        
+        messageText.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                addMessageFromWhatsAppInput();
+            }
+        });
+        
+        messageText.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text/plain');
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(document.createTextNode(pastedText));
+                range.collapse(false);
+            }
+        });
     }
     
-    // Limpar imagem atual
-    window.currentImage = null;
-    document.getElementById('whatsappImageInput').value = '';
+    // Event listener para anexar imagem
+    if (attachBtn && imageInput) {
+        attachBtn.addEventListener('click', function() {
+            imageInput.click();
+        });
+        
+        imageInput.addEventListener('change', function(e) {
+            handleNewWhatsAppImageUpload(e, whatsappBox);
+        });
+    }
     
+    // Event listener para agendar
+    if (scheduleBtn) {
+        scheduleBtn.addEventListener('click', function() {
+            toggleWhatsAppScheduleForBox(whatsappBox);
+        });
+    }
+    
+    // Event listeners diretos para confirmar e cancelar agendamento
+    setTimeout(() => {
+        const boxId = whatsappBox.id.replace('whatsappBox_', '');
+        const scheduleConfirmBtn = document.getElementById(`schedule-confirm-${boxId}`);
+        const scheduleCancelBtn = document.getElementById(`schedule-cancel-${boxId}`);
+        
+        
+        if (scheduleConfirmBtn) {
+            scheduleConfirmBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                confirmWhatsAppScheduleForBox(whatsappBox);
+            };
+        }
+        
+        if (scheduleCancelBtn) {
+            scheduleCancelBtn.onclick = function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                console.log('Botão cancelar clicado!');
+                cancelWhatsAppScheduleForBox(whatsappBox);
+            };
+        } else {
+            console.log('Botão cancelar NÃO encontrado!');
+        }
+    }, 100);
+    
+    // Event listener para adicionar mensagem
+    if (addBtn) {
+        addBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            duplicateMessageBox();
+        });
+    }
+    
+    // Event listener para deletar
+    if (deleteBtn) {
+        deleteBtn.addEventListener('click', function() {
+            whatsappBox.remove();
+            updateMessageCounter();
+        });
+    }
+}
+
+// Configurar event listeners para nova caixa de mensagem
+function setupNewMessageBox(messageBox) {
+    const messageText = messageBox.querySelector('.message-text');
+    
+    // Event listener para o texto
+    if (messageText) {
+        messageText.addEventListener('input', function() {
+            detectAndConvertLinks(this);
+        });
+        
+        messageText.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                addMessageFromWhatsAppInput();
+            }
+        });
+        
+        messageText.addEventListener('paste', function(e) {
+            e.preventDefault();
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text/plain');
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(document.createTextNode(pastedText));
+                range.collapse(false);
+            }
+        });
+    }
+}
+
+// Adicionar mensagem do input do WhatsApp
+function addMessageFromWhatsAppInput() {
+    console.log('📝 addMessageFromWhatsAppInput chamada!');
+    
+    // Limpar fila anterior para evitar mensagens antigas
+    messageQueue = [];
+    console.log('🧹 Fila limpa para novas mensagens');
+    
+    // Coletar todas as mensagens das caixas
+    const allMessageBoxes = document.querySelectorAll('.whatsapp-message.received.editable-message');
+    console.log('📦 Caixas encontradas:', allMessageBoxes.length);
+    let messagesAdded = 0;
+    
+    allMessageBoxes.forEach((messageBox, index) => {
+        const messageText = messageBox.querySelector('.message-text');
+        const messageImage = messageBox.querySelector('.message-image img');
+        
+        console.log(`📝 Caixa ${index + 1}:`, {
+            text: messageText ? messageText.textContent : 'não encontrado',
+            hasImage: !!messageImage
+        });
+        
+        if (messageText && messageText.textContent.trim() && messageText.textContent.trim() !== 'Digite sua mensagem aqui...') {
+            // Adicionar mensagem à fila diretamente
+            messageCounter++;
+            const messageId = `message_${messageCounter}`;
+            
+            const messageItem = {
+                id: messageId,
+                image: messageImage ? messageImage.src : null,
+                text: messageText.textContent.trim(),
+                schedule: null
+            };
+            
+            console.log('✅ Adicionando mensagem à fila:', messageItem);
+            messageQueue.push(messageItem);
+            messagesAdded++;
+        } else {
+            console.log('❌ Mensagem vazia ou inválida na caixa', index + 1);
+        }
+    });
+    
+    if (messagesAdded === 0) {
+        botManager.showMessage('Digite pelo menos uma mensagem primeiro!', 'error');
+        return;
+    }
+    
+    // Atualizar preview
     updateWhatsAppPreview();
-    botManager.showMessage('Mensagem adicionada à fila!', 'success');
+    botManager.showMessage(`${messagesAdded} mensagem(ns) adicionada(s) à fila!`, 'success');
 }
 
 // Deletar mensagem atual
@@ -543,25 +849,77 @@ function toggleWhatsAppSchedule() {
         // Definir data/hora mínima
         const now = new Date();
         now.setMinutes(now.getMinutes() + 1);
-        const scheduleInput = document.getElementById('whatsappScheduleInput');
-        scheduleInput.min = now.toISOString().slice(0, 16);
+        const dateInput = document.getElementById('schedule-date-main');
+        const timeInput = document.getElementById('schedule-time-main');
+        
+        if (dateInput) {
+            dateInput.min = now.toISOString().slice(0, 10);
+        }
+        if (timeInput) {
+            timeInput.min = now.toTimeString().slice(0, 5);
+        }
     } else {
         scheduleArea.style.display = 'none';
         scheduleBtn.classList.remove('active');
     }
 }
 
+// Alternar agendamento para caixas específicas
+function toggleWhatsAppScheduleForBox(whatsappBox) {
+    const scheduleArea = whatsappBox.querySelector('.whatsapp-schedule-area');
+    const scheduleBtn = whatsappBox.querySelector('.whatsapp-control-btn[title="Agendar Mensagem"]');
+    
+    if (scheduleArea && scheduleBtn) {
+        if (scheduleArea.style.display === 'none' || scheduleArea.style.display === '') {
+            scheduleArea.style.display = 'block';
+            scheduleBtn.classList.add('active');
+            
+            // Definir data/hora mínima
+            const now = new Date();
+            now.setMinutes(now.getMinutes() + 1);
+            const scheduleInput = scheduleArea.querySelector('input[type="datetime-local"]');
+            if (scheduleInput) {
+        scheduleInput.min = now.toISOString().slice(0, 16);
+            }
+    } else {
+        scheduleArea.style.display = 'none';
+        scheduleBtn.classList.remove('active');
+        }
+    }
+}
+
 // Confirmar agendamento
 function confirmWhatsAppSchedule() {
-    const scheduleInput = document.getElementById('whatsappScheduleInput');
-    const scheduleTime = scheduleInput.value;
+    const dateSelect = document.getElementById('schedule-date-main');
+    const timeInput = document.getElementById('schedule-time-main');
     
-    if (!scheduleTime) {
-        botManager.showMessage('Selecione uma data e hora!', 'error');
+    if (!dateSelect || !timeInput) {
+        console.log('Elementos de agendamento não encontrados na primeira caixa!');
         return;
     }
     
+    const dateOption = dateSelect.value;
+    const time = timeInput.value;
+    
+    if (!dateOption || !time) {
+        botManager.showMessage('Selecione quando e que horas!', 'error');
+        return;
+    }
+    
+    // Converter opção para data real
     const now = new Date();
+    let targetDate;
+    
+    if (dateOption === 'today') {
+        targetDate = new Date(now);
+    } else if (dateOption === 'tomorrow') {
+        targetDate = new Date(now);
+        targetDate.setDate(targetDate.getDate() + 1);
+    }
+    
+    // Combinar data e hora
+    const scheduleTime = new Date(`${targetDate.toISOString().split('T')[0]}T${time}`);
+    
     const selectedTime = new Date(scheduleTime);
     
     if (selectedTime <= now) {
@@ -569,15 +927,44 @@ function confirmWhatsAppSchedule() {
         return;
     }
     
-    // Adicionar mensagem agendada
-    addMessageFromWhatsAppInput();
-    
-    const lastMessage = messageQueue[messageQueue.length - 1];
-    lastMessage.schedule = scheduleTime;
+    // Adicionar mensagem agendada da primeira caixa apenas
+    const messageTextInput = document.getElementById('messageTextInput');
+    if (messageTextInput && messageTextInput.textContent.trim() && messageTextInput.textContent.trim() !== 'Digite sua mensagem aqui...') {
+        // Adicionar mensagem à fila diretamente
+        messageCounter++;
+        const messageId = `message_${messageCounter}`;
+        
+        const messageItem = {
+            id: messageId,
+            image: null, // Primeira caixa não tem imagem por padrão
+            text: messageTextInput.textContent.trim(),
+            schedule: scheduleTime
+        };
+        
+        messageQueue.push(messageItem);
+        
+        // NÃO atualizar preview para não limpar a imagem
+        // updateWhatsAppPreview();
+    }
     
     // Fechar área de agendamento
     document.getElementById('whatsappScheduleArea').style.display = 'none';
-    document.getElementById('whatsappScheduleBtn').classList.remove('active');
+    const scheduleBtn = document.getElementById('whatsappScheduleBtn');
+    scheduleBtn.classList.remove('active');
+    
+    // Mudar cor do ícone do relógio para indicar agendamento confirmado
+    const clockIcon = scheduleBtn.querySelector('i');
+    if (clockIcon) {
+        clockIcon.style.color = '#25d366';
+        clockIcon.style.textShadow = '0 0 8px rgba(37, 211, 102, 0.5)';
+    }
+    
+    // Adicionar classe para indicar que está agendado
+    scheduleBtn.classList.add('scheduled');
+    
+    // Forçar aplicação do CSS
+    scheduleBtn.style.background = 'rgba(37, 211, 102, 0.2)';
+    scheduleBtn.style.border = '1px solid #25d366';
     
     botManager.showMessage(`Mensagem agendada para ${selectedTime.toLocaleString('pt-BR')}`, 'success');
 }
@@ -586,6 +973,106 @@ function confirmWhatsAppSchedule() {
 function cancelWhatsAppSchedule() {
     document.getElementById('whatsappScheduleArea').style.display = 'none';
     document.getElementById('whatsappScheduleBtn').classList.remove('active');
+}
+
+// Confirmar agendamento para caixas específicas
+function confirmWhatsAppScheduleForBox(whatsappBox) {
+    // Encontrar o ID único da caixa
+    const boxId = whatsappBox.id.replace('whatsappBox_', '');
+    
+    const dateSelect = document.getElementById(`schedule-date-${boxId}`);
+    const timeInput = document.getElementById(`schedule-time-${boxId}`);
+    
+    if (!dateSelect || !timeInput) {
+        botManager.showMessage('Erro: Elementos de agendamento não encontrados!', 'error');
+        return;
+    }
+    
+    const dateOption = dateSelect.value;
+    const time = timeInput.value;
+    
+    if (!dateOption || !time) {
+        botManager.showMessage('Selecione quando e que horas!', 'error');
+        return;
+    }
+    
+    // Converter opção para data real
+    const now = new Date();
+    let targetDate;
+    
+    if (dateOption === 'today') {
+        targetDate = new Date(now);
+    } else if (dateOption === 'tomorrow') {
+        targetDate = new Date(now);
+        targetDate.setDate(targetDate.getDate() + 1);
+    }
+    
+    // Combinar data e hora
+    const scheduleTime = new Date(`${targetDate.toISOString().split('T')[0]}T${time}`);
+    
+    if (scheduleTime <= now) {
+        botManager.showMessage('A data/hora deve ser no futuro!', 'error');
+        return;
+    }
+    
+    // Adicionar mensagem agendada da caixa específica apenas
+    const messageText = whatsappBox.querySelector('.message-text');
+    const messageImage = whatsappBox.querySelector('.message-image img');
+    
+    if (messageText && messageText.textContent.trim() && messageText.textContent.trim() !== 'Digite sua mensagem aqui...') {
+        // Adicionar mensagem à fila diretamente
+        messageCounter++;
+        const messageId = `message_${messageCounter}`;
+        
+        const messageItem = {
+            id: messageId,
+            image: messageImage ? messageImage.src : null,
+            text: messageText.textContent.trim(),
+            schedule: scheduleTime.toISOString()
+        };
+        
+        messageQueue.push(messageItem);
+        
+        // NÃO atualizar preview para não limpar a imagem
+        // updateWhatsAppPreview();
+    }
+    
+    // Fechar área de agendamento
+    const scheduleArea = whatsappBox.querySelector('.whatsapp-schedule-area');
+    if (scheduleArea) {
+        scheduleArea.style.display = 'none';
+    }
+    const scheduleBtn = whatsappBox.querySelector('.whatsapp-control-btn[title="Agendar Mensagem"]');
+    scheduleBtn.classList.remove('active');
+    
+    // Mudar cor do ícone do relógio para indicar agendamento confirmado
+    const clockIcon = scheduleBtn.querySelector('i');
+    if (clockIcon) {
+        clockIcon.style.color = '#25d366';
+        clockIcon.style.textShadow = '0 0 8px rgba(37, 211, 102, 0.5)';
+    }
+    
+    // Adicionar classe para indicar que está agendado
+    scheduleBtn.classList.add('scheduled');
+    
+    // Forçar aplicação do CSS
+    scheduleBtn.style.background = 'rgba(37, 211, 102, 0.2)';
+    scheduleBtn.style.border = '1px solid #25d366';
+    
+    // Salvar dados do agendamento na caixa
+    whatsappBox.setAttribute('data-scheduled', 'true');
+    whatsappBox.setAttribute('data-schedule-time', scheduleTime.toISOString());
+    
+    botManager.showMessage(`Mensagem agendada para ${scheduleTime.toLocaleString('pt-BR')}`, 'success');
+}
+
+// Cancelar agendamento para caixas específicas
+function cancelWhatsAppScheduleForBox(whatsappBox) {
+    const scheduleArea = whatsappBox.querySelector('.whatsapp-schedule-area');
+    const scheduleBtn = whatsappBox.querySelector('.whatsapp-control-btn[title="Agendar Mensagem"]');
+    
+    scheduleArea.style.display = 'none';
+    scheduleBtn.classList.remove('active');
 }
 
 // Conectar WhatsApp
@@ -598,6 +1085,7 @@ async function connectWhatsApp() {
         
         // Conectar WhatsApp real
         await botManager.connectWhatsApp();
+        console.log('✅ WhatsApp conectado automaticamente!');
         
         // NÃO ESCONDER O QR CODE - DEIXAR NA TELA ATÉ ESCANEAR
         // O QR Code só será escondido quando o WhatsApp realmente conectar
@@ -606,15 +1094,28 @@ async function connectWhatsApp() {
         elements.connectWhatsApp.innerHTML = '<i class="fas fa-qrcode"></i> Conectar WhatsApp';
         elements.connectWhatsApp.disabled = false;
         elements.whatsappQR.style.display = 'none';
+        console.log('❌ Erro ao conectar WhatsApp automaticamente:', error.message);
+        throw error; // Re-throw para que a função autoConnectBots possa capturar
     }
 }
 
 // Conectar Telegram
 async function connectTelegram() {
-    const token = elements.telegramToken.value.trim();
+    // Tentar usar token salvo automaticamente
+    let token = elements.telegramToken.value.trim();
+    
+    // Se não há token no campo, tentar carregar do localStorage
+    if (!token) {
+        const savedToken = localStorage.getItem('telegramToken');
+        if (savedToken) {
+            token = savedToken;
+            elements.telegramToken.value = token;
+            console.log('📱 Token do Telegram carregado automaticamente do localStorage');
+        }
+    }
     
     if (!token) {
-        botManager.showMessage('Digite o token do Telegram Bot', 'error');
+        console.log('⚠️ Nenhum token do Telegram encontrado para conexão automática');
         return;
     }
     
@@ -626,10 +1127,12 @@ async function connectTelegram() {
         
         elements.connectTelegram.innerHTML = '<i class="fas fa-check"></i> Conectado';
         elements.connectTelegram.disabled = false;
-        
+        console.log('✅ Telegram conectado automaticamente!');
     } catch (error) {
         elements.connectTelegram.innerHTML = '<i class="fas fa-link"></i> Conectar';
         elements.connectTelegram.disabled = false;
+        console.log('❌ Erro ao conectar Telegram automaticamente:', error.message);
+        throw error; // Re-throw para que a função autoConnectBots possa capturar
     }
 }
 
@@ -649,9 +1152,18 @@ function saveGroups() {
 
 // Enviar mensagem
 async function sendMessage() {
+    console.log('🚀 Função sendMessage chamada!');
+    console.log('📊 Estado atual:', {
+        messageQueue: messageQueue.length,
+        whatsappConnected: botManager.isConnected.whatsapp,
+        telegramConnected: botManager.isConnected.telegram
+    });
+    
     // Verificar se pelo menos um bot está conectado
     const sendToWhatsApp = elements.sendToWhatsApp.checked;
     const sendToTelegram = elements.sendToTelegram.checked;
+    
+    console.log('📱 Plataformas selecionadas:', { sendToWhatsApp, sendToTelegram });
     
     if (!sendToWhatsApp && !sendToTelegram) {
         botManager.showMessage('Selecione pelo menos uma plataforma!', 'error');
@@ -669,39 +1181,59 @@ async function sendMessage() {
     }
 
     // Verificar se há mensagens na fila
+    console.log('📋 Fila de mensagens:', messageQueue);
+    // Limpar mensagens vazias da fila
+    messageQueue = messageQueue.filter(item => item.text && item.text.trim());
+    console.log('🧹 Fila limpa, mensagens válidas:', messageQueue.length);
+    
     if (messageQueue.length === 0) {
-        botManager.showMessage('Adicione pelo menos uma mensagem na fila!', 'error');
-        return;
+        // Tentar coletar mensagens das caixas do WhatsApp primeiro
+        console.log('⚠️ Nenhuma mensagem na fila, tentando coletar das caixas...');
+        addMessageFromWhatsAppInput();
+        
+        // Se ainda não houver mensagens, mostrar erro
+        if (messageQueue.length === 0) {
+            botManager.showMessage('Digite uma mensagem nas caixas do WhatsApp primeiro!', 'error');
+            return;
+        }
     }
 
     // Verificar se todas as mensagens têm texto
     const emptyMessages = messageQueue.filter(item => !item.text.trim());
     if (emptyMessages.length > 0) {
+        console.log('❌ Mensagens vazias encontradas:', emptyMessages);
         botManager.showMessage('Todas as mensagens devem ter texto!', 'error');
         return;
     }
 
     try {
-        elements.sendMessage.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
+        console.log('🔄 Iniciando envio das mensagens...');
+        elements.sendMessage.classList.add('loading');
+        elements.sendMessage.innerHTML = '<i class="fas fa-spinner fa-spin"></i> <span class="btn-text">Processando...</span>';
         elements.sendMessage.disabled = true;
         
         // Processar fila de mensagens
+        console.log('📤 Chamando processMessageQueue...');
         await processMessageQueue(sendToWhatsApp, sendToTelegram);
+        console.log('✅ processMessageQueue concluído!');
         
     } catch (error) {
         botManager.showMessage('Erro ao enviar mensagens: ' + error.message, 'error');
     } finally {
-        elements.sendMessage.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Mensagens';
+        elements.sendMessage.classList.remove('loading');
+        elements.sendMessage.innerHTML = '<i class="fas fa-paper-plane"></i> <span class="btn-text">Enviar Mensagens</span>';
         elements.sendMessage.disabled = false;
     }
 }
 
 // Processar fila de mensagens
 async function processMessageQueue(sendToWhatsApp, sendToTelegram) {
+    console.log('🔄 processMessageQueue iniciado com:', { sendToWhatsApp, sendToTelegram });
     const platforms = {
         whatsapp: sendToWhatsApp,
         telegram: sendToTelegram
     };
+    console.log('🌐 Plataformas configuradas:', platforms);
     
     let scheduledCount = 0;
     let immediateCount = 0;
@@ -732,7 +1264,9 @@ async function processMessageQueue(sendToWhatsApp, sendToTelegram) {
 
 // Enviar mensagem imediata
 async function sendImmediateMessage(messageItem, platforms) {
+    console.log('📤 sendImmediateMessage chamada com:', { messageItem, platforms });
     const results = await botManager.sendMessage(messageItem.text, messageItem.image, platforms);
+    console.log('📤 Resultados do envio:', results);
     
     const successCount = results.filter(r => r.success).length;
     botManager.showMessage(`Mensagem "${messageItem.text.substring(0, 30)}..." enviada para ${successCount} plataforma(s)`, 'info');
@@ -793,8 +1327,10 @@ function downloadImage() {
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Show de Ofertas Bot carregado!');
     
-    // Focar no campo de mensagem
-    elements.messageInput.focus();
+    // Focar no campo de mensagem e definir placeholder
+    const messageInput = document.getElementById('messageTextInput');
+    if (messageInput) {
+        messageInput.focus();
     
     // Adicionar placeholder dinâmico
     const placeholders = [
@@ -804,14 +1340,70 @@ document.addEventListener('DOMContentLoaded', function() {
     ];
     
     const randomPlaceholder = placeholders[Math.floor(Math.random() * placeholders.length)];
-    elements.messageInput.placeholder = randomPlaceholder;
+        messageInput.placeholder = randomPlaceholder;
+    }
     
     // Inicializar interface de descoberta
     initializeDiscoveryInterface();
     
     // Adicionar salvamento automático dos campos
     setupAutoSave();
+    
+    // Conectar automaticamente WhatsApp e Telegram
+    autoConnectBots();
 });
+
+// Conectar automaticamente os bots
+async function autoConnectBots() {
+    console.log('🔄 Iniciando conexão automática dos bots...');
+    
+    // Mostrar notificação para o usuário
+    botManager.showMessage('🔄 Conectando automaticamente WhatsApp e Telegram...', 'info');
+    
+    // Aguardar um pouco para garantir que tudo carregou
+    setTimeout(async () => {
+        let whatsappConnected = false;
+        let telegramConnected = false;
+        
+        try {
+            // 1. Tentar conectar WhatsApp automaticamente
+            console.log('📱 Tentando conectar WhatsApp automaticamente...');
+            await connectWhatsApp();
+            whatsappConnected = true;
+            botManager.showMessage('✅ WhatsApp conectado automaticamente!', 'success');
+            
+        } catch (error) {
+            console.log('⚠️ WhatsApp não conectou automaticamente:', error.message);
+            botManager.showMessage('⚠️ WhatsApp não conectou automaticamente', 'warning');
+        }
+        
+        // Aguardar um pouco antes de conectar Telegram
+        setTimeout(async () => {
+            try {
+                // 2. Tentar conectar Telegram automaticamente
+                console.log('📱 Tentando conectar Telegram automaticamente...');
+                await connectTelegram();
+                telegramConnected = true;
+                botManager.showMessage('✅ Telegram conectado automaticamente!', 'success');
+                
+            } catch (error) {
+                console.log('⚠️ Telegram não conectou automaticamente:', error.message);
+                botManager.showMessage('⚠️ Telegram não conectou automaticamente', 'warning');
+            }
+            
+            // Resumo final
+            if (whatsappConnected && telegramConnected) {
+                botManager.showMessage('🎉 Ambos os bots conectados automaticamente!', 'success');
+            } else if (whatsappConnected || telegramConnected) {
+                botManager.showMessage('✅ Pelo menos um bot conectado automaticamente!', 'success');
+            } else {
+                botManager.showMessage('⚠️ Nenhum bot conectou automaticamente. Tente conectar manualmente.', 'warning');
+            }
+            
+        }, 2000); // Aguardar 2 segundos entre as conexões
+        
+    }, 1000); // Aguardar 1 segundo antes de começar
+}
 
 // Configurar salvamento automático
 function setupAutoSave() {

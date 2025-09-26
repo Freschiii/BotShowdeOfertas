@@ -9,16 +9,11 @@
     <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
     <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
 </head>
-<body>
+<body class="dark-mode">
     <div class="container">
         <header>
             <h1><i class="fas fa-robot"></i> Show de Ofertas Bot</h1>
             <p>Bot automático para WhatsApp e Telegram</p>
-            <div class="header-controls">
-                <button id="darkModeToggle" class="btn-dark-mode">
-                    <i class="fas fa-moon"></i>
-                </button>
-            </div>
         </header>
 
         <main>
@@ -185,28 +180,51 @@
                                 
                                 <!-- Área de Agendamento -->
                                 <div class="whatsapp-schedule-area" id="whatsappScheduleArea" style="display: none;">
-                                    <div class="schedule-input">
-                                        <label>Agendar para:</label>
-                                        <input type="datetime-local" id="whatsappScheduleInput" />
-                                        <button class="whatsapp-control-btn" id="whatsappScheduleConfirmBtn">
-                                            <i class="fas fa-check"></i>
-                                        </button>
-                                        <button class="whatsapp-control-btn" id="whatsappScheduleCancelBtn">
-                                            <i class="fas fa-times"></i>
-                                        </button>
+                                    <div class="schedule-container">
+                                        <div class="schedule-header">
+                                            <i class="fas fa-clock"></i>
+                                            <span>Agendar Mensagem</span>
+                                        </div>
+                                        <div class="schedule-inputs">
+                                            <div class="date-input-group">
+                                                <label for="schedule-date-main">Quando:</label>
+                                                <select id="schedule-date-main" class="schedule-date-select">
+                                                    <option value="today">Hoje</option>
+                                                    <option value="tomorrow">Amanhã</option>
+                                                </select>
+                                            </div>
+                                            <div class="time-input-group">
+                                                <label for="schedule-time-main">Horário:</label>
+                                                <input type="time" id="schedule-time-main" class="schedule-time-input" />
+                                            </div>
+                                        </div>
+                                        <div class="schedule-actions">
+                                            <button class="schedule-confirm-btn" id="whatsappScheduleConfirmBtn">
+                                                <i class="fas fa-check"></i>
+                                                <span>Confirmar</span>
+                                            </button>
+                                            <button class="schedule-cancel-btn" id="whatsappScheduleCancelBtn">
+                                                <i class="fas fa-times"></i>
+                                                <span>Cancelar</span>
+                                            </button>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                     
-                    <button id="addMessageBtn" class="add-message-btn">
-                        <i class="fas fa-plus"></i> Adicionar Mensagem
-                    </button>
-                    
-                    <button id="sendMessage" class="btn-send">
-                        <i class="fas fa-paper-plane"></i> Enviar Mensagem
-                    </button>
+                    <!-- Botão de Enviar Separado -->
+                    <div class="send-button-container">
+                        <div class="message-counter" id="messageCounter" style="display: none;">
+                            <span class="counter-text">1 mensagem</span>
+                        </div>
+                        <button id="sendMessage" class="btn-send">
+                            <i class="fas fa-paper-plane"></i> 
+                            <span class="btn-text">Enviar Mensagens</span>
+                            <div class="btn-shine"></div>
+                        </button>
+                    </div>
                 </div>
             </div>
 
