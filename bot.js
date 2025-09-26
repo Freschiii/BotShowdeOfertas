@@ -288,6 +288,53 @@ class BotManager {
         }
     }
 
+    // Enviar mensagem com modo específico
+    async sendMessageWithMode(message, whatsappData, telegramData, platforms) {
+        console.log('📤 BotManager.sendMessageWithMode chamado:', {
+            hasMessage: !!message,
+            whatsappData: whatsappData,
+            telegramData: telegramData,
+            platforms: platforms,
+            whatsappConnected: this.isConnected.whatsapp,
+            telegramConnected: this.isConnected.telegram
+        });
+        
+        const results = [];
+        
+        try {
+            // Enviar para WhatsApp
+            if (platforms.whatsapp && this.isConnected.whatsapp && whatsappData) {
+                console.log('📱 Enviando para WhatsApp com dados específicos...');
+                const whatsappResult = await this.sendToWhatsApp(whatsappData.message, whatsappData.image);
+                results.push({
+                    platform: 'WhatsApp',
+                    success: whatsappResult.success,
+                    message: whatsappResult.message
+                });
+            }
+
+            // Enviar para Telegram
+            if (platforms.telegram && this.isConnected.telegram && telegramData) {
+                console.log('📱 Enviando para Telegram com dados específicos...');
+                const telegramResult = await this.sendToTelegram(telegramData.message, telegramData.image);
+                results.push({
+                    platform: 'Telegram',
+                    success: telegramResult.success,
+                    message: telegramResult.message
+                });
+            }
+
+            // Adicionar ao histórico
+            this.addToHistory(message, results);
+            
+            return results;
+            
+        } catch (error) {
+            this.showMessage('Erro ao enviar mensagem: ' + error.message, 'error');
+            return [];
+        }
+    }
+
     // Enviar para WhatsApp (apenas real)
     async sendToWhatsApp(message, image) {
         try {

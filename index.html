@@ -123,6 +123,32 @@
                         </label>
                     </div>
                     
+                    <div class="send-mode">
+                        <h4><i class="fas fa-cog"></i> Modo de Envio</h4>
+                        <div class="mode-options">
+                            <label class="mode-option">
+                                <input type="radio" name="sendMode" value="image" id="modeImage" checked>
+                                <div class="mode-content">
+                                    <i class="fas fa-image"></i>
+                                    <div>
+                                        <strong>Enviar Imagem</strong>
+                                        <p>Telegram: Imagem anexada<br>WhatsApp: Link com preview</p>
+                                    </div>
+                                </div>
+                            </label>
+                            <label class="mode-option">
+                                <input type="radio" name="sendMode" value="both" id="modeBoth">
+                                <div class="mode-content">
+                                    <i class="fas fa-images"></i>
+                                    <div>
+                                        <strong>Enviar Ambos</strong>
+                                        <p>Telegram: Imagem anexada<br>WhatsApp: Imagem anexada</p>
+                                    </div>
+                                </div>
+                            </label>
+                        </div>
+                    </div>
+                    
                     <button id="sendMessage" class="btn-send">
                         <i class="fas fa-paper-plane"></i> Enviar Mensagem
                     </button>

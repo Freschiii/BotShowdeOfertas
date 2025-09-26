@@ -164,47 +164,61 @@ async function sendMessage() {
         elements.sendMessage.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
         elements.sendMessage.disabled = true;
         
+        // Obter modo de envio
+        const sendMode = document.querySelector('input[name="sendMode"]:checked').value;
+        console.log('📤 Modo de envio selecionado:', sendMode);
+        
         // Enviar mensagem
         const platforms = {
             whatsapp: sendToWhatsApp,
             telegram: sendToTelegram
         };
         
-        // Converter imagem para base64 se necessário
-        let imageToSend = null;
-        if (selectedImage) {
-            console.log('🖼️ Processando imagem para envio:', {
-                hasSelectedImage: !!selectedImage,
-                hasImageUrl: !!imageUrl,
-                imageUrlType: imageUrl ? imageUrl.substring(0, 20) + '...' : 'none'
-            });
+        // Preparar dados baseado no modo
+        let whatsappData = null;
+        let telegramData = null;
+        
+        if (sendMode === 'image') {
+            // Modo: Telegram com imagem, WhatsApp com link
+            console.log('📤 Modo IMAGEM: Telegram=imagem, WhatsApp=link');
             
-            if (imageUrl && imageUrl.startsWith('blob:')) {
-                console.log('🖼️ Convertendo blob para base64...');
-                // Converter blob URL para base64
-                try {
-                    const response = await fetch(imageUrl);
-                    const blob = await response.blob();
-                    const base64 = await new Promise((resolve) => {
-                        const reader = new FileReader();
-                        reader.onload = () => resolve(reader.result);
-                        reader.readAsDataURL(blob);
-                    });
-                    imageToSend = base64;
-                    console.log('✅ Imagem convertida para base64:', base64.substring(0, 50) + '...');
-                } catch (error) {
-                    console.error('❌ Erro ao converter imagem:', error);
-                    imageToSend = imageUrl;
-                }
-            } else {
-                imageToSend = imageUrl || selectedImage;
-                console.log('🖼️ Usando imagem direta:', typeof imageToSend);
+            if (sendToTelegram) {
+                // Telegram: enviar imagem anexada
+                telegramData = {
+                    message: message,
+                    image: await prepareImageForSending()
+                };
+            }
+            
+            if (sendToWhatsApp) {
+                // WhatsApp: enviar apenas link (sem imagem)
+                whatsappData = {
+                    message: message,
+                    image: null
+                };
             }
         } else {
-            console.log('❌ Nenhuma imagem selecionada');
+            // Modo: Ambos com imagem
+            console.log('📤 Modo AMBOS: Telegram=imagem, WhatsApp=imagem');
+            
+            const imageData = await prepareImageForSending();
+            
+            if (sendToTelegram) {
+                telegramData = {
+                    message: message,
+                    image: imageData
+                };
+            }
+            
+            if (sendToWhatsApp) {
+                whatsappData = {
+                    message: message,
+                    image: imageData
+                };
+            }
         }
         
-        const results = await botManager.sendMessage(message, imageToSend, platforms);
+        const results = await botManager.sendMessageWithMode(message, whatsappData, telegramData, platforms);
         
         // Mostrar resultados
         const successCount = results.filter(r => r.success).length;
@@ -223,6 +237,42 @@ async function sendMessage() {
     } finally {
         elements.sendMessage.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Mensagem';
         elements.sendMessage.disabled = false;
+    }
+}
+
+// Preparar imagem para envio
+async function prepareImageForSending() {
+    if (!selectedImage) {
+        return null;
+    }
+    
+    console.log('🖼️ Processando imagem para envio:', {
+        hasSelectedImage: !!selectedImage,
+        hasImageUrl: !!imageUrl,
+        imageUrlType: imageUrl ? imageUrl.substring(0, 20) + '...' : 'none'
+    });
+    
+    if (imageUrl && imageUrl.startsWith('blob:')) {
+        console.log('🖼️ Convertendo blob para base64...');
+        // Converter blob URL para base64
+        try {
+            const response = await fetch(imageUrl);
+            const blob = await response.blob();
+            const base64 = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.readAsDataURL(blob);
+            });
+            console.log('✅ Imagem convertida para base64:', base64.substring(0, 50) + '...');
+            return base64;
+        } catch (error) {
+            console.error('❌ Erro ao converter imagem:', error);
+            return imageUrl;
+        }
+    } else {
+        const result = imageUrl || selectedImage;
+        console.log('🖼️ Usando imagem direta:', typeof result);
+        return result;
     }
 }
 
