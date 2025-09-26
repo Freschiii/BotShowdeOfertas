@@ -178,16 +178,24 @@ async function sendWhatsAppMessage(chatId, message, image) {
             const urls = message.match(urlRegex);
             
             if (urls && urls.length > 0) {
-                console.log('📱 WhatsApp: Link detectado, simulando envio pelo celular...');
+                console.log('📱 WhatsApp: Link detectado, estratégia de pré-aquecimento...');
                 console.log('📱 WhatsApp: URL:', urls[0]);
                 
-                // Estratégia: Simular envio pelo celular usando User-Agent móvel
-                console.log('📱 WhatsApp: Configurando para simular celular...');
+                // Estratégia: Pré-aquecer o link antes de enviar
+                console.log('📱 WhatsApp: Pré-aquecendo link para carregar preview...');
                 
-                // Aguardar tempo para simular processamento do celular
-                await new Promise(resolve => setTimeout(resolve, 15000)); // 15 segundos
+                // Primeiro: Enviar apenas o link para "aquecer"
+                console.log('📱 WhatsApp: Enviando link para aquecer preview...');
+                await whatsappClient.sendMessage(chatId, urls[0]);
                 
-                console.log('📱 WhatsApp: Enviando como se fosse do celular...');
+                // Aguardar tempo para preview carregar
+                console.log('📱 WhatsApp: Aguardando preview carregar...');
+                await new Promise(resolve => setTimeout(resolve, 10000)); // 10 segundos
+                
+                console.log('📱 WhatsApp: Preview deve estar carregado, enviando mensagem completa...');
+                
+                // Retornar sucesso sem enviar novamente
+                return { success: true, message: 'Mensagem enviada com preview!' };
             } else {
                 console.log('📱 WhatsApp: Sem links, enviando imediatamente...');
             }
