@@ -50,7 +50,7 @@ document.addEventListener('DOMContentLoaded', function() {
         messageTextInput.addEventListener('input', function() {
             // Detectar e converter links automaticamente
             detectAndConvertLinks(this);
-            updateWhatsAppPreview();
+            // Não chamar updateWhatsAppPreview para não limpar o conteúdo
         });
         
         // Prevenir Enter de adicionar mensagem automaticamente
