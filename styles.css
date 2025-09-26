@@ -286,55 +286,79 @@ body.dark-mode .queue-schedule-controls label {
     color: #ffffff;
 }
 
-/* Status dos Bots - Modo Escuro */
+/* Status dos Bots - Modo Escuro Elegante */
 body.dark-mode .bot-status {
-    background: #0D1117;
+    background: linear-gradient(135deg, #0D1117 0%, #151B23 100%);
+    border: 1px solid #29903B;
+    border-radius: 12px;
+    padding: 20px;
+    box-shadow: 0 4px 20px rgba(41, 144, 59, 0.1);
 }
 
 body.dark-mode .status-item {
-    background: #151B23;
+    background: linear-gradient(135deg, #151B23 0%, #0D1117 100%);
     color: #ffffff;
-    border: 1px solid #151B23;
+    border: 1px solid #29903B;
+    border-radius: 10px;
+    padding: 15px 20px;
+    margin-bottom: 10px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
 }
 
 body.dark-mode .status-item:hover {
-    background: #0D1117;
+    background: linear-gradient(135deg, #29903B 0%, #1e6b2e 100%);
     border-color: #29903B;
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(41, 144, 59, 0.3);
+}
+
+body.dark-mode .status-item:last-child {
+    margin-bottom: 0;
 }
 
 body.dark-mode .status-indicator {
     color: #ffffff;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 body.dark-mode .status-indicator.offline {
-    color: #dc3545;
+    color: #ff6b6b;
+    text-shadow: 0 0 10px rgba(255, 107, 107, 0.3);
 }
 
 body.dark-mode .status-indicator.online {
-    color: #29903B;
+    color: #4ade80;
+    text-shadow: 0 0 10px rgba(74, 222, 128, 0.3);
 }
 
 body.dark-mode .status-indicator.connecting {
-    color: #ffc107;
+    color: #fbbf24;
+    text-shadow: 0 0 10px rgba(251, 191, 36, 0.3);
 }
 
-/* Melhorar legibilidade dos textos */
+/* Ícones e textos elegantes */
 body.dark-mode .status-item span {
     color: #ffffff;
-    font-weight: 500;
+    font-weight: 600;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
 }
 
 body.dark-mode .status-item i {
     color: #ffffff;
-    opacity: 0.9;
+    opacity: 1;
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
 }
 
 body.dark-mode .status-item i.fab.fa-whatsapp {
     color: #25d366;
+    filter: drop-shadow(0 0 8px rgba(37, 211, 102, 0.4));
 }
 
 body.dark-mode .status-item i.fab.fa-telegram {
     color: #0088cc;
+    filter: drop-shadow(0 0 8px rgba(0, 136, 204, 0.4));
 }
 
 .container {
