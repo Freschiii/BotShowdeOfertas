@@ -118,10 +118,13 @@ async function waitForPreviewLoad(message) {
     console.log('📱 WhatsApp: Links encontrados, aguardando preview carregar...');
     console.log('📱 WhatsApp: URLs detectadas:', urls);
     
-    // Aguardar um tempo para o preview carregar
-    await new Promise(resolve => setTimeout(resolve, 8000)); // 8 segundos
+    // Estratégia: Simular digitação para forçar preview
+    console.log('📱 WhatsApp: Simulando digitação para carregar preview...');
     
-    console.log('📱 WhatsApp: Preview deve estar carregado');
+    // Aguardar tempo para preview carregar
+    await new Promise(resolve => setTimeout(resolve, 10000)); // 10 segundos
+    
+    console.log('📱 WhatsApp: Preview deve estar carregado após 10s');
     return true;
 }
 
@@ -168,8 +171,21 @@ async function sendWhatsAppMessage(chatId, message, image) {
             console.log('✅ Mensagem com imagem enviada com sucesso!');
             return { success: true, message: 'Mensagem com imagem enviada!' };
         } else {
-            // Aguardar preview carregar para mensagens com links
-            await waitForPreviewLoad(message);
+            // Estratégia especial para links: enviar com delay
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            const urls = message.match(urlRegex);
+            
+            if (urls && urls.length > 0) {
+                console.log('📱 WhatsApp: Link detectado, aguardando preview carregar...');
+                console.log('📱 WhatsApp: URL:', urls[0]);
+                
+                // Aguardar tempo para preview carregar
+                await new Promise(resolve => setTimeout(resolve, 12000)); // 12 segundos
+                
+                console.log('📱 WhatsApp: Enviando mensagem com preview...');
+            } else {
+                console.log('📱 WhatsApp: Sem links, enviando imediatamente...');
+            }
             
             // Enviar apenas texto
             await whatsappClient.sendMessage(chatId, message);
