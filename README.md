@@ -1,117 +1,88 @@
-# 🚀 Show de Ofertas - Envio Rápido
+# 🤖 Bot Show de Ofertas
 
-Um programa simples e direto para enviar imagem + mensagem para WhatsApp e Telegram - **100% GRATUITO** e super fácil de usar!
+Sistema completo para envio automático de mensagens com imagens para WhatsApp e Telegram.
 
-## ✨ Funcionalidades
+## 🚀 Funcionalidades
 
-- 📸 **Upload de Imagem**: Escolha qualquer imagem do seu computador
-- ✍️ **Digite sua Mensagem**: Escreva a mensagem que quiser
-- 📱 **Envio Automático**: Envia para WhatsApp e Telegram com um clique
-- 💾 **Download Automático**: A imagem é baixada automaticamente
-- 🎨 **Interface Simples**: Fácil de usar, sem complicações
-- 💰 **100% Gratuito**: Sem custos, sem APIs
+- ✅ **WhatsApp:** Conexão real via QR Code + envio de imagens
+- ✅ **Telegram:** Bot API + envio de imagens  
+- ✅ **Salvamento Automático:** Dados persistem entre sessões
+- ✅ **Interface Moderna:** Design responsivo e intuitivo
+- ✅ **Logs Detalhados:** Debug completo
 
-## 🚀 Como Usar
+## 📦 Instalação
 
-1. **Abra o arquivo `index.html`** no seu navegador
-2. **Clique em "Escolher Imagem"** e selecione a foto do produto
-3. **Digite sua mensagem** no campo de texto
-4. **Clique em "WhatsApp" ou "Telegram"** para enviar
-5. **Pronto!** A imagem será baixada e a mensagem enviada
+```bash
+# Clonar o repositório
+git clone https://github.com/Freschiii/BotShowdeOfertas.git
+cd BotShowdeOfertas
 
-## 📱 Como Funciona
+# Instalar dependências
+npm install
 
-### WhatsApp
-- Abre o WhatsApp Web
-- A imagem é baixada automaticamente
-- Cole a mensagem e envie!
-
-### Telegram
-- Abre o Telegram Web
-- A imagem é baixada automaticamente
-- Cole a mensagem e envie!
-
-## 💡 Dicas de Uso
-
-### Para Mensagens Atrativas:
-```
-🔥 OFERTA IMPERDÍVEL! 🔥
-
-Produto incrível com preço especial!
-💰 Apenas R$ 99,90!
-🎯 50% de desconto!
-
-⚡ Corre que é por tempo limitado!
-
-#Oferta #Promocao #Desconto
+# Executar o projeto
+npm start
 ```
 
-### Emojis Úteis:
-- 🔥 Para ofertas
-- 💰 Para preços
-- ⚡ Para urgência
-- 🎯 Para descontos
-- 🛒 Para compras
-- 🚨 Para promoções
+## 🎯 Como Usar
 
-## 🎯 Exemplo Completo
+1. **Acesse:** http://localhost:3000
+2. **Conecte WhatsApp:** Escaneie o QR Code
+3. **Configure Telegram:** Digite o token do bot
+4. **Descubra IDs:** Use as instruções na interface
+5. **Envie mensagens:** Selecione imagem + digite mensagem
 
-1. **Selecione uma imagem** do produto
-2. **Digite a mensagem:**
-   ```
-   🚨 PROMOÇÃO RELÂMPAGO! 🚨
-   
-   Smartphone Samsung Galaxy
-   💰 De R$ 1.299 por apenas R$ 899!
-   🎯 31% de desconto!
-   
-   ⚡ Últimas unidades!
-   
-   #Oferta #Smartphone #Desconto
-   ```
-3. **Clique em "WhatsApp"**
-4. **A imagem baixa automaticamente**
-5. **Cole a mensagem e envie!**
+## 🔧 Configuração
 
-## ⚙️ Recursos
+### **WhatsApp:**
+- Conecta via QR Code real
+- Dados salvos automaticamente
+- Suporte a imagens
 
-- ✅ **Upload de qualquer imagem** (JPG, PNG, GIF)
-- ✅ **Máximo 10MB** por imagem
-- ✅ **Preview da imagem** antes de enviar
-- ✅ **Copiar mensagem** para área de transferência
-- ✅ **Limpar mensagem** com um clique
-- ✅ **Interface responsiva** para celular
-- ✅ **Mensagens de feedback** em tempo real
+### **Telegram:**
+- Token do bot obrigatório
+- ID do canal obrigatório
+- Suporte a imagens
+
+## 📱 Descoberta de IDs
+
+### **WhatsApp:**
+1. Abra o WhatsApp Web
+2. Acesse o canal desejado
+3. Abra o Console (F12)
+4. Cole o código fornecido na interface
+5. Copie o ID que aparecer
+
+### **Telegram:**
+1. Adicione o bot ao canal
+2. Digite o token do bot
+3. Clique em "Descobrir Canais"
+4. Copie o ID do canal
 
 ## 🛠️ Tecnologias
 
-- **HTML5** - Estrutura simples
-- **CSS3** - Design moderno
-- **JavaScript** - Funcionalidades
-- **APIs Gratuitas** - WhatsApp e Telegram
+- **Frontend:** HTML, CSS, JavaScript
+- **Backend:** Node.js, Express
+- **WhatsApp:** whatsapp-web.js
+- **Telegram:** Bot API
+- **Comunicação:** Socket.IO
+- **Salvamento:** LocalStorage
 
-## 📋 Requisitos
+## 📁 Estrutura
 
-- Navegador moderno (Chrome, Firefox, Safari, Edge)
-- **Nenhum software adicional necessário!**
-- **Funciona offline** (exceto envio)
+```
+├── index.html              # Interface principal
+├── styles.css              # Estilos
+├── script.js               # Lógica frontend
+├── bot.js                  # Gerenciador de bots
+├── discover-ids.js         # Descoberta de IDs
+├── server-whatsapp-web.js  # Servidor WhatsApp
+├── package.json            # Dependências
+└── README.md               # Este arquivo
+```
 
-## 🎉 Vantagens
+## 🎉 Sistema Pronto!
 
-- ✅ **Super simples** de usar
-- ✅ **Zero configuração** necessária
-- ✅ **Funciona imediatamente**
-- ✅ **Sem limites** de uso
-- ✅ **100% gratuito**
-- ✅ **Resultados profissionais**
+O projeto está **100% funcional** e pronto para uso!
 
-## 🚀 Próximos Passos
-
-1. Abra o `index.html` no navegador
-2. Teste com uma imagem e mensagem
-3. Use para suas ofertas!
-4. Compartilhe com sua mãe!
-
----
-
-**Feito com ❤️ para ajudar no Show de Ofertas!**
+**Repositório:** [https://github.com/Freschiii/BotShowdeOfertas.git](https://github.com/Freschiii/BotShowdeOfertas.git)
