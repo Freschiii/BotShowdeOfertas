@@ -133,6 +133,19 @@ function renderMessageQueue() {
     messageQueue.forEach((item, index) => {
         const messageElement = createMessageElement(item, index + 1);
         queueContainer.appendChild(messageElement);
+        
+        // Restaurar imagem se existir
+        if (item.image) {
+            const preview = messageElement.querySelector('.queue-image-preview');
+            preview.innerHTML = `<img src="${item.image}" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px;">`;
+            preview.classList.remove('empty');
+        }
+        
+        // Restaurar texto se existir
+        if (item.text) {
+            const textarea = messageElement.querySelector('.queue-message-input');
+            textarea.value = item.text;
+        }
     });
 }
 
