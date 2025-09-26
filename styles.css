@@ -765,11 +765,12 @@ body.dark-mode .whatsapp-attach-btn:hover {
 /* Quando há imagem, ajustar bordas */
 .editable-message:has(.message-image) .message-text {
     border-radius: 0 0 18px 18px;
-    margin-top: -3px;
+    margin-top: -8px;
     border: none;
     position: relative;
     z-index: 2;
     padding: 8px 12px 8px 12px;
+    background: #2A2A2A;
 }
 
 /* Quando não há imagem, bordas normais */
@@ -859,7 +860,7 @@ body.dark-mode .editable-message .message-text:empty:before {
     border: none;
     position: relative;
     z-index: 1;
-    margin-bottom: 0;
+    margin-bottom: -8px;
 }
 
 .editable-message .message-image img {
