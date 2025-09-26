@@ -53,6 +53,14 @@ document.addEventListener('DOMContentLoaded', function() {
             updateWhatsAppPreview();
         });
         
+        // Prevenir Enter de adicionar mensagem automaticamente
+        messageTextInput.addEventListener('keydown', function(e) {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                // Não fazer nada, apenas prevenir o comportamento padrão
+            }
+        });
+        
         // Interceptar colar para preservar espaços
         messageTextInput.addEventListener('paste', function(e) {
             e.preventDefault();
