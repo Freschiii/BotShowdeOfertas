@@ -968,15 +968,53 @@ body.dark-mode .btn-send:hover {
 .schedule-header {
     display: flex;
     align-items: center;
-    gap: 10px;
+    justify-content: space-between;
     margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #333;
+}
+
+.schedule-title {
+    display: flex;
+    align-items: center;
+    gap: 10px;
     color: #25d366;
     font-weight: 600;
     font-size: 16px;
 }
 
-.schedule-header i {
+.schedule-title i {
     font-size: 18px;
+}
+
+.schedule-title span {
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+}
+
+.schedule-reset-icon {
+    background: none;
+    border: none;
+    color: #888;
+    font-size: 16px;
+    padding: 8px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.schedule-reset-icon:hover {
+    background: rgba(255, 255, 255, 0.1);
+    color: #ff6b6b;
+    transform: scale(1.1);
+}
+
+.schedule-reset-icon:active {
+    transform: scale(0.95);
 }
 
 .schedule-inputs {
@@ -1066,6 +1104,7 @@ body.dark-mode .btn-send:hover {
     color: #ffffff;
     transform: translateY(-1px);
 }
+
 
 /* Estado agendado */
 .whatsapp-control-btn.scheduled {
@@ -2164,6 +2203,163 @@ footer {
     margin-top: 30px;
     color: white;
     opacity: 0.8;
+}
+
+/* Histórico de Mensagens - Compacto */
+.message-history {
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.history-item {
+    background: #1a1a1a;
+    border: 1px solid #333;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    padding: 8px 12px;
+    transition: all 0.2s ease;
+    font-size: 13px;
+}
+
+.history-item:hover {
+    border-color: #25d366;
+    box-shadow: 0 1px 5px rgba(37, 211, 102, 0.1);
+}
+
+.history-item.scheduled {
+    border-left: 3px solid #ffa500;
+}
+
+.history-item.sent {
+    border-left: 3px solid #25d366;
+}
+
+.history-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 6px;
+}
+
+.history-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.history-type {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 600;
+    color: #25d366;
+    font-size: 12px;
+}
+
+.history-platforms {
+    color: #888;
+    font-size: 11px;
+}
+
+.history-time {
+    color: #666;
+    font-size: 10px;
+}
+
+.history-status {
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    padding: 2px 6px;
+    border-radius: 8px;
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.history-status.success {
+    background: rgba(37, 211, 102, 0.2);
+    color: #25d366;
+}
+
+.history-status.partial {
+    background: rgba(255, 165, 0, 0.2);
+    color: #ffa500;
+}
+
+.history-content {
+    margin-top: 6px;
+}
+
+.history-message {
+    margin-bottom: 6px;
+}
+
+.history-image {
+    margin-bottom: 4px;
+    display: inline-block;
+}
+
+.history-image img {
+    max-width: 60px;
+    max-height: 60px;
+    border-radius: 3px;
+    object-fit: cover;
+}
+
+.history-text {
+    color: #ccc;
+    line-height: 1.3;
+    font-size: 12px;
+    max-height: 40px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.history-scheduled {
+    color: #ffa500;
+    font-size: 10px;
+    font-style: italic;
+    margin-bottom: 4px;
+}
+
+.history-results {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+    margin-top: 4px;
+}
+
+.result-item {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    padding: 1px 4px;
+    border-radius: 6px;
+    font-size: 9px;
+    font-weight: 500;
+}
+
+.result-item.success {
+    background: rgba(37, 211, 102, 0.2);
+    color: #25d366;
+}
+
+.result-item.error {
+    background: rgba(220, 53, 69, 0.2);
+    color: #dc3545;
+}
+
+.empty-history {
+    text-align: center;
+    color: #666;
+    font-style: italic;
+    padding: 20px 10px;
+    font-size: 12px;
 }
 
 /* Interface de Descoberta de IDs */

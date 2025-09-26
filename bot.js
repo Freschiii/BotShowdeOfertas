@@ -338,15 +338,26 @@ class BotManager {
     // Enviar para WhatsApp (apenas real)
     async sendToWhatsApp(message, image) {
         try {
+            console.log('📱 sendToWhatsApp chamada com:', {
+                message: message,
+                hasImage: !!image,
+                whatsappGroup: this.whatsappGroup,
+                isConnected: this.isConnected.whatsapp,
+                hasSocket: !!this.socket
+            });
+            
             if (!this.whatsappGroup) {
+                console.log('❌ Canal WhatsApp não configurado');
                 throw new Error('Canal WhatsApp não configurado');
             }
 
             if (!this.isConnected.whatsapp) {
+                console.log('❌ WhatsApp não está conectado');
                 throw new Error('WhatsApp não está conectado');
             }
 
             if (!this.socket) {
+                console.log('❌ Servidor não disponível');
                 throw new Error('Servidor não disponível');
             }
 
