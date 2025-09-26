@@ -350,17 +350,7 @@ class BotManager {
                 throw new Error('Servidor não disponível');
             }
 
-            // Estratégia: Aguardar preview carregar antes de enviar
-            if (!image) {
-                console.log('📱 WhatsApp: Aguardando preview carregar antes de enviar...');
-                
-                // Aguardar um tempo para o preview carregar
-                await new Promise(resolve => setTimeout(resolve, 8000)); // 8 segundos
-                
-                console.log('📱 WhatsApp: Preview deve estar carregado, enviando mensagem...');
-            }
-
-            // Enviar via WebSocket real
+            // Enviar mensagem normalmente - WhatsApp carrega preview automaticamente
             console.log('📱 Enviando para WhatsApp via WebSocket:', {
                 chatId: this.whatsappGroup,
                 hasMessage: !!message,
