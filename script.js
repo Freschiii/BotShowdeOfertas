@@ -1075,6 +1075,24 @@ function resetWhatsAppSchedule() {
     messageQueue = messageQueue.filter(item => !item.schedule);
     console.log('🧹 Mensagens agendadas removidas da fila');
     
+    // Limpar conteúdo da primeira caixa
+    const messageText = document.getElementById('messageTextInput');
+    if (messageText) {
+        messageText.textContent = '';
+        messageText.innerHTML = '';
+        console.log('✅ Texto da primeira caixa limpo');
+    }
+    
+    // Remover imagem da primeira caixa
+    const firstMessageBox = document.querySelector('.whatsapp-message.received.editable-message');
+    if (firstMessageBox) {
+        const messageImage = firstMessageBox.querySelector('.message-image');
+        if (messageImage) {
+            messageImage.remove();
+            console.log('✅ Imagem da primeira caixa removida');
+        }
+    }
+    
     botManager.showMessage('🔄 Agendamento resetado!', 'info');
     console.log('✅ Agendamento da primeira caixa resetado');
 }
@@ -1230,6 +1248,21 @@ function resetWhatsAppScheduleForBox(whatsappBox) {
     // Limpar mensagens agendadas da fila
     messageQueue = messageQueue.filter(item => !item.schedule);
     console.log('🧹 Mensagens agendadas removidas da fila');
+    
+    // Limpar conteúdo da caixa específica
+    const messageText = whatsappBox.querySelector('.message-text');
+    if (messageText) {
+        messageText.textContent = '';
+        messageText.innerHTML = '';
+        console.log('✅ Texto da caixa limpo');
+    }
+    
+    // Remover imagem da caixa específica
+    const messageImage = whatsappBox.querySelector('.message-image');
+    if (messageImage) {
+        messageImage.remove();
+        console.log('✅ Imagem da caixa removida');
+    }
     
     botManager.showMessage('🔄 Agendamento resetado!', 'info');
     console.log('✅ Agendamento da caixa', whatsappBox.id, 'resetado');
