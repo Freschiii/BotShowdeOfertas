@@ -157,7 +157,7 @@ function createMessageElement(item, number) {
         
         <div class="message-content">
             <div class="image-upload">
-                <input type="file" class="queue-image-input" data-message-id="${item.id}" accept="image/*" />
+                <input type="file" id="queue-image-${item.id}" class="queue-image-input" data-message-id="${item.id}" accept="image/*" />
                 <label for="queue-image-${item.id}" class="upload-btn">
                     <i class="fas fa-cloud-upload-alt"></i>
                     <span>Escolher Imagem</span>
