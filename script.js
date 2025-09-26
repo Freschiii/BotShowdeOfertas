@@ -147,6 +147,9 @@ function renderMessageQueue() {
             textarea.value = item.text;
         }
     });
+    
+    // Atualizar preview do WhatsApp
+    updateWhatsAppPreview();
 }
 
 // Criar elemento de mensagem
@@ -249,6 +252,7 @@ function updateMessageText(messageId, text) {
     const messageItem = messageQueue.find(item => item.id === messageId);
     if (messageItem) {
         messageItem.text = text;
+        updateWhatsAppPreview();
     }
 }
 
@@ -257,6 +261,51 @@ function updateMessageSchedule(messageId, schedule) {
     const messageItem = messageQueue.find(item => item.id === messageId);
     if (messageItem) {
         messageItem.schedule = schedule;
+    }
+}
+
+// Atualizar preview do WhatsApp
+function updateWhatsAppPreview() {
+    const previewContainer = document.getElementById('whatsappPreview');
+    if (!previewContainer) return;
+    
+    // Limpar preview anterior
+    previewContainer.innerHTML = '';
+    
+    // Adicionar mensagens da fila
+    messageQueue.forEach((item, index) => {
+        if (item.text.trim()) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = 'whatsapp-message received';
+            
+            const now = new Date();
+            const timeString = now.toLocaleTimeString('pt-BR', { 
+                hour: '2-digit', 
+                minute: '2-digit' 
+            });
+            
+            messageDiv.innerHTML = `
+                <div class="message-content">
+                    <div class="message-text">${item.text}</div>
+                </div>
+                <div class="message-time">${timeString}</div>
+            `;
+            
+            previewContainer.appendChild(messageDiv);
+        }
+    });
+    
+    // Se não há mensagens, mostrar placeholder
+    if (previewContainer.children.length === 0) {
+        const placeholderDiv = document.createElement('div');
+        placeholderDiv.className = 'whatsapp-message received';
+        placeholderDiv.innerHTML = `
+            <div class="message-content">
+                <div class="message-text">Digite sua mensagem para ver o preview...</div>
+            </div>
+            <div class="message-time">12:34</div>
+        `;
+        previewContainer.appendChild(placeholderDiv);
     }
 }
 

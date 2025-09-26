@@ -416,6 +416,164 @@ body.dark-mode .info-message {
     box-shadow: 0 2px 10px rgba(41, 144, 59, 0.1);
 }
 
+/* Preview WhatsApp */
+.whatsapp-preview {
+    background: #075e54;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    max-width: 400px;
+    margin: 0 auto;
+}
+
+.whatsapp-chat {
+    background: #e5ddd5;
+    min-height: 300px;
+    position: relative;
+}
+
+.whatsapp-header {
+    background: #075e54;
+    padding: 15px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+.whatsapp-contact {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex: 1;
+}
+
+.whatsapp-avatar {
+    width: 40px;
+    height: 40px;
+    background: #25d366;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+.whatsapp-info {
+    flex: 1;
+}
+
+.whatsapp-name {
+    color: white;
+    font-weight: 600;
+    font-size: 16px;
+    margin-bottom: 2px;
+}
+
+.whatsapp-status {
+    color: #a7a7a7;
+    font-size: 12px;
+}
+
+.whatsapp-messages {
+    padding: 20px;
+    background: #e5ddd5;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23000" opacity="0.1"/><circle cx="75" cy="75" r="1" fill="%23000" opacity="0.1"/><circle cx="50" cy="10" r="0.5" fill="%23000" opacity="0.1"/><circle cx="10" cy="60" r="0.5" fill="%23000" opacity="0.1"/><circle cx="90" cy="40" r="0.5" fill="%23000" opacity="0.1"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+    min-height: 200px;
+}
+
+.whatsapp-message {
+    margin-bottom: 15px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.whatsapp-message.sent {
+    align-items: flex-end;
+}
+
+.whatsapp-message.received {
+    align-items: flex-start;
+}
+
+.message-content {
+    max-width: 80%;
+    position: relative;
+}
+
+.message-text {
+    background: #dcf8c6;
+    padding: 8px 12px;
+    border-radius: 18px;
+    border-bottom-left-radius: 4px;
+    font-size: 14px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.whatsapp-message.sent .message-text {
+    background: #dcf8c6;
+    border-bottom-left-radius: 18px;
+    border-bottom-right-radius: 4px;
+}
+
+.whatsapp-message.received .message-text {
+    background: white;
+    border-bottom-left-radius: 4px;
+    border-bottom-right-radius: 18px;
+}
+
+.message-time {
+    font-size: 11px;
+    color: #999;
+    margin-top: 4px;
+    padding: 0 8px;
+}
+
+.whatsapp-message.sent .message-time {
+    text-align: right;
+}
+
+.whatsapp-message.received .message-time {
+    text-align: left;
+}
+
+/* Modo escuro - Preview WhatsApp */
+body.dark-mode .whatsapp-preview {
+    background: #075e54;
+    border: 1px solid #29903B;
+}
+
+body.dark-mode .whatsapp-chat {
+    background: #0a0a0a;
+}
+
+body.dark-mode .whatsapp-header {
+    background: #075e54;
+}
+
+body.dark-mode .whatsapp-messages {
+    background: #0a0a0a;
+    background-image: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><defs><pattern id="grain" width="100" height="100" patternUnits="userSpaceOnUse"><circle cx="25" cy="25" r="1" fill="%23fff" opacity="0.05"/><circle cx="75" cy="75" r="1" fill="%23fff" opacity="0.05"/><circle cx="50" cy="10" r="0.5" fill="%23fff" opacity="0.05"/><circle cx="10" cy="60" r="0.5" fill="%23fff" opacity="0.05"/><circle cx="90" cy="40" r="0.5" fill="%23fff" opacity="0.05"/></pattern></defs><rect width="100" height="100" fill="url(%23grain)"/></svg>');
+}
+
+body.dark-mode .message-text {
+    background: #dcf8c6;
+    color: #000;
+}
+
+body.dark-mode .whatsapp-message.received .message-text {
+    background: #2a2a2a;
+    color: #ffffff;
+}
+
+body.dark-mode .message-time {
+    color: #999;
+}
+
 /* Conteúdo da Mensagem */
 .message-content {
     display: flex;
