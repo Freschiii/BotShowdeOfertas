@@ -32,17 +32,35 @@ elements.sendMessage.addEventListener('click', sendMessage);
 
 // WhatsApp Input Events
 document.addEventListener('DOMContentLoaded', function() {
-    const whatsappInput = document.getElementById('whatsappMessageInput');
+    const messageTextInput = document.getElementById('messageTextInput');
     const whatsappAttachBtn = document.getElementById('whatsappAttachBtn');
     const whatsappImageInput = document.getElementById('whatsappImageInput');
-    const whatsappSendBtn = document.getElementById('whatsappSendBtn');
+    const whatsappAddBtn = document.getElementById('whatsappAddBtn');
+    const whatsappDeleteBtn = document.getElementById('whatsappDeleteBtn');
+    const whatsappScheduleBtn = document.getElementById('whatsappScheduleBtn');
+    const whatsappScheduleArea = document.getElementById('whatsappScheduleArea');
+    const whatsappScheduleInput = document.getElementById('whatsappScheduleInput');
+    const whatsappScheduleConfirmBtn = document.getElementById('whatsappScheduleConfirmBtn');
+    const whatsappScheduleCancelBtn = document.getElementById('whatsappScheduleCancelBtn');
     
-    if (whatsappInput) {
-        whatsappInput.addEventListener('input', function() {
-            updateWhatsAppPreview();
-            // Auto-resize textarea
-            this.style.height = 'auto';
-            this.style.height = this.scrollHeight + 'px';
+    if (messageTextInput) {
+        messageTextInput.addEventListener('input', function() {
+            // Atualizar placeholder
+            if (this.textContent.trim() === '') {
+                this.textContent = '';
+            }
+        });
+        
+        messageTextInput.addEventListener('focus', function() {
+            if (this.textContent === 'Digite sua mensagem aqui...') {
+                this.textContent = '';
+            }
+        });
+        
+        messageTextInput.addEventListener('blur', function() {
+            if (this.textContent.trim() === '') {
+                this.textContent = 'Digite sua mensagem aqui...';
+            }
         });
     }
     
@@ -58,9 +76,33 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    if (whatsappSendBtn) {
-        whatsappSendBtn.addEventListener('click', function() {
+    if (whatsappAddBtn) {
+        whatsappAddBtn.addEventListener('click', function() {
             addMessageFromWhatsAppInput();
+        });
+    }
+    
+    if (whatsappDeleteBtn) {
+        whatsappDeleteBtn.addEventListener('click', function() {
+            deleteCurrentMessage();
+        });
+    }
+    
+    if (whatsappScheduleBtn) {
+        whatsappScheduleBtn.addEventListener('click', function() {
+            toggleWhatsAppSchedule();
+        });
+    }
+    
+    if (whatsappScheduleConfirmBtn) {
+        whatsappScheduleConfirmBtn.addEventListener('click', function() {
+            confirmWhatsAppSchedule();
+        });
+    }
+    
+    if (whatsappScheduleCancelBtn) {
+        whatsappScheduleCancelBtn.addEventListener('click', function() {
+            cancelWhatsAppSchedule();
         });
     }
 });
@@ -302,7 +344,7 @@ function updateMessageSchedule(messageId, schedule) {
 // Atualizar preview do WhatsApp
 function updateWhatsAppPreview() {
     const previewContainer = document.getElementById('whatsappPreview');
-    const whatsappInput = document.getElementById('whatsappMessageInput');
+    const messageTextInput = document.getElementById('messageTextInput');
     if (!previewContainer) return;
     
     // Limpar preview anterior
@@ -344,12 +386,12 @@ function updateWhatsAppPreview() {
     });
     
     // Mostrar preview do que está sendo digitado
-    if (whatsappInput && whatsappInput.value.trim()) {
+    if (messageTextInput && messageTextInput.value.trim()) {
         const typingDiv = document.createElement('div');
         typingDiv.className = 'whatsapp-message received typing';
         typingDiv.innerHTML = `
             <div class="message-content">
-                <div class="message-text">${whatsappInput.value}</div>
+                <div class="message-text">${messageTextInput.value}</div>
             </div>
             <div class="message-time">Agora</div>
         `;
@@ -392,10 +434,10 @@ function handleWhatsAppImageUpload(event) {
 
 // Adicionar mensagem do input do WhatsApp
 function addMessageFromWhatsAppInput() {
-    const whatsappInput = document.getElementById('whatsappMessageInput');
+    const messageTextInput = document.getElementById('messageTextInput');
     const whatsappImageInput = document.getElementById('whatsappImageInput');
     
-    if (!whatsappInput || !whatsappInput.value.trim()) {
+    if (!messageTextInput || !messageTextInput.textContent.trim() || messageTextInput.textContent.trim() === 'Digite sua mensagem aqui...') {
         botManager.showMessage('Digite uma mensagem primeiro!', 'error');
         return;
     }
@@ -404,7 +446,7 @@ function addMessageFromWhatsAppInput() {
     addMessageToQueue();
     
     const newMessage = messageQueue[messageQueue.length - 1];
-    newMessage.text = whatsappInput.value.trim();
+    newMessage.text = messageTextInput.textContent.trim();
     
     // Adicionar imagem se existir
     if (whatsappImageInput.files.length > 0) {
@@ -417,12 +459,77 @@ function addMessageFromWhatsAppInput() {
     }
     
     // Limpar input
-    whatsappInput.value = '';
-    whatsappInput.style.height = 'auto';
+    messageTextInput.textContent = 'Digite sua mensagem aqui...';
     whatsappImageInput.value = '';
     
     updateWhatsAppPreview();
     botManager.showMessage('Mensagem adicionada à fila!', 'success');
+}
+
+// Deletar mensagem atual
+function deleteCurrentMessage() {
+    if (messageQueue.length > 0) {
+        messageQueue.pop();
+        updateWhatsAppPreview();
+        botManager.showMessage('Mensagem removida!', 'info');
+    }
+}
+
+// Alternar agendamento do WhatsApp
+function toggleWhatsAppSchedule() {
+    const scheduleArea = document.getElementById('whatsappScheduleArea');
+    const scheduleBtn = document.getElementById('whatsappScheduleBtn');
+    
+    if (scheduleArea.style.display === 'none') {
+        scheduleArea.style.display = 'block';
+        scheduleBtn.classList.add('active');
+        
+        // Definir data/hora mínima
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + 1);
+        const scheduleInput = document.getElementById('whatsappScheduleInput');
+        scheduleInput.min = now.toISOString().slice(0, 16);
+    } else {
+        scheduleArea.style.display = 'none';
+        scheduleBtn.classList.remove('active');
+    }
+}
+
+// Confirmar agendamento
+function confirmWhatsAppSchedule() {
+    const scheduleInput = document.getElementById('whatsappScheduleInput');
+    const scheduleTime = scheduleInput.value;
+    
+    if (!scheduleTime) {
+        botManager.showMessage('Selecione uma data e hora!', 'error');
+        return;
+    }
+    
+    const now = new Date();
+    const selectedTime = new Date(scheduleTime);
+    
+    if (selectedTime <= now) {
+        botManager.showMessage('A data/hora deve ser no futuro!', 'error');
+        return;
+    }
+    
+    // Adicionar mensagem agendada
+    addMessageFromWhatsAppInput();
+    
+    const lastMessage = messageQueue[messageQueue.length - 1];
+    lastMessage.schedule = scheduleTime;
+    
+    // Fechar área de agendamento
+    document.getElementById('whatsappScheduleArea').style.display = 'none';
+    document.getElementById('whatsappScheduleBtn').classList.remove('active');
+    
+    botManager.showMessage(`Mensagem agendada para ${selectedTime.toLocaleString('pt-BR')}`, 'success');
+}
+
+// Cancelar agendamento
+function cancelWhatsAppSchedule() {
+    document.getElementById('whatsappScheduleArea').style.display = 'none';
+    document.getElementById('whatsappScheduleBtn').classList.remove('active');
 }
 
 // Conectar WhatsApp

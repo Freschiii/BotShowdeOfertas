@@ -142,7 +142,7 @@
                         </label>
                     </div>
                     
-                    <!-- WhatsApp Preview como Editor -->
+                    <!-- WhatsApp Preview/Editor -->
                     <div class="whatsapp-preview">
                         <div class="whatsapp-chat">
                             <div class="whatsapp-header">
@@ -155,25 +155,46 @@
                                 </div>
                             </div>
                             <div class="whatsapp-messages" id="whatsappPreview">
-                                <div class="whatsapp-message received">
+                                <div class="whatsapp-message received editable-message" id="editableMessage">
                                     <div class="message-content">
-                                        <div class="message-text">Digite sua mensagem para ver o preview...</div>
+                                        <div class="message-text" contenteditable="true" id="messageTextInput" placeholder="Digite sua mensagem aqui...">Digite sua mensagem aqui...</div>
                                     </div>
-                                    <div class="message-time">12:34</div>
+                                    <div class="message-time">Agora</div>
                                 </div>
                             </div>
-                            <div class="whatsapp-input-area">
-                                <div class="whatsapp-input-container">
-                                    <button class="whatsapp-attach-btn" id="whatsappAttachBtn">
-                                        <i class="fas fa-paperclip"></i>
+                            <!-- Controles da Mensagem -->
+                            <div class="whatsapp-controls">
+                                <div class="whatsapp-controls-row">
+                                    <button class="whatsapp-control-btn" id="whatsappAttachBtn" title="Adicionar Imagem">
+                                        <i class="fas fa-image"></i>
                                     </button>
                                     <input type="file" id="whatsappImageInput" accept="image/*" style="display: none;" />
-                                    <div class="whatsapp-input-wrapper">
-                                        <textarea id="whatsappMessageInput" placeholder="Digite uma mensagem..." rows="1"></textarea>
-                                    </div>
-                                    <button class="whatsapp-send-btn" id="whatsappSendBtn">
-                                        <i class="fas fa-paper-plane"></i>
+                                    
+                                    <button class="whatsapp-control-btn" id="whatsappScheduleBtn" title="Agendar Mensagem">
+                                        <i class="fas fa-clock"></i>
                                     </button>
+                                    
+                                    <button class="whatsapp-control-btn" id="whatsappAddBtn" title="Adicionar Mensagem">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                    
+                                    <button class="whatsapp-control-btn whatsapp-delete-btn" id="whatsappDeleteBtn" title="Deletar Mensagem" style="display: none;">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                
+                                <!-- Área de Agendamento -->
+                                <div class="whatsapp-schedule-area" id="whatsappScheduleArea" style="display: none;">
+                                    <div class="schedule-input">
+                                        <label>Agendar para:</label>
+                                        <input type="datetime-local" id="whatsappScheduleInput" />
+                                        <button class="whatsapp-control-btn" id="whatsappScheduleConfirmBtn">
+                                            <i class="fas fa-check"></i>
+                                        </button>
+                                        <button class="whatsapp-control-btn" id="whatsappScheduleCancelBtn">
+                                            <i class="fas fa-times"></i>
+                                        </button>
+                                    </div>
                                 </div>
                             </div>
                         </div>
