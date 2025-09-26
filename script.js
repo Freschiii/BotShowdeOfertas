@@ -62,6 +62,30 @@ document.addEventListener('DOMContentLoaded', function() {
                 this.textContent = 'Digite sua mensagem aqui...';
             }
         });
+        
+        // Interceptar colar para corrigir emojis
+        messageTextInput.addEventListener('paste', function(e) {
+            e.preventDefault();
+            
+            // Obter texto colado
+            const pastedText = (e.clipboardData || window.clipboardData).getData('text/plain');
+            
+            // Inserir texto sem formatação
+            document.execCommand('insertText', false, pastedText);
+            
+            // Forçar tamanho correto após colar
+            setTimeout(() => {
+                this.style.fontSize = '14px';
+                this.style.lineHeight = '1.4';
+                
+                // Resetar todos os elementos filhos
+                const allElements = this.querySelectorAll('*');
+                allElements.forEach(el => {
+                    el.style.fontSize = '14px';
+                    el.style.lineHeight = '1.4';
+                });
+            }, 10);
+        });
     }
     
     if (whatsappAttachBtn) {

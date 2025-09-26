@@ -783,6 +783,37 @@ body.dark-mode .editable-message .message-text:empty:before {
     line-height: 1.4 !important;
 }
 
+/* Corrigir emojis copiados do Telegram */
+.editable-message .message-text {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Resetar emojis quando colados */
+.editable-message .message-text * {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+    font-family: inherit !important;
+}
+
+/* Forçar tamanho de emojis em todos os elementos */
+.editable-message .message-text,
+.editable-message .message-text *,
+.editable-message .message-text span,
+.editable-message .message-text div,
+.editable-message .message-text p {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+}
+
+/* Resetar emojis específicos */
+.editable-message .message-text::before,
+.editable-message .message-text::after {
+    font-size: 14px !important;
+    line-height: 1.4 !important;
+}
+
 /* Imagem na mensagem editável */
 .editable-message .message-image {
     margin-bottom: 8px;
