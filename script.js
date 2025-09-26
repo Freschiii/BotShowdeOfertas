@@ -1571,6 +1571,10 @@ function clearAllMessageBoxes() {
     allWhatsAppBoxes.forEach((whatsappBox, index) => {
         console.log(`🧹 Limpando caixa ${index + 1}:`, whatsappBox.id);
         
+        // Debug: verificar conteúdo antes da limpeza
+        const beforeText = whatsappBox.querySelector('.message-text')?.textContent || '';
+        console.log(`📝 Conteúdo ANTES da limpeza da caixa ${index + 1}:`, beforeText.substring(0, 50));
+        
         // Encontrar a mensagem dentro desta caixa (pode ser .editable-message ou .received)
         let messageBox = whatsappBox.querySelector('.whatsapp-message.received.editable-message');
         if (!messageBox) {
@@ -1608,6 +1612,14 @@ function clearAllMessageBoxes() {
                 mainInput.innerHTML = '';
                 console.log(`✅ Input principal da caixa ${index + 1} limpo`);
             }
+            
+            // Também tentar limpar qualquer texto que possa estar na caixa
+            const allTextElements = whatsappBox.querySelectorAll('.message-text, .whatsapp-message .message-text');
+            allTextElements.forEach((textEl, i) => {
+                textEl.textContent = '';
+                textEl.innerHTML = '';
+                console.log(`✅ Elemento de texto ${i + 1} da caixa ${index + 1} limpo`);
+            });
         }
         
         // Resetar botão de agendamento
@@ -1647,6 +1659,10 @@ function clearAllMessageBoxes() {
             }
             console.log(`✅ Área de agendamento da caixa ${index + 1} fechada`);
         }
+        
+        // Debug: verificar conteúdo após a limpeza
+        const afterText = whatsappBox.querySelector('.message-text')?.textContent || '';
+        console.log(`📝 Conteúdo APÓS a limpeza da caixa ${index + 1}:`, afterText.substring(0, 50));
         
         console.log(`✅ Caixa ${index + 1} completamente limpa`);
     });
