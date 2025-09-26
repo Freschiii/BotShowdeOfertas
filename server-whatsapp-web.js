@@ -132,11 +132,6 @@ async function sendWhatsAppMessage(chatId, message, image) {
             throw new Error('WhatsApp não está conectado');
         }
 
-        // Aguardar preview carregar se não há imagem
-        if (!image) {
-            await waitForPreviewLoad(message);
-        }
-
         if (image) {
             console.log('🖼️ Processando imagem WhatsApp:', {
                 imageLength: image.length,
@@ -173,6 +168,9 @@ async function sendWhatsAppMessage(chatId, message, image) {
             console.log('✅ Mensagem com imagem enviada com sucesso!');
             return { success: true, message: 'Mensagem com imagem enviada!' };
         } else {
+            // Aguardar preview carregar para mensagens com links
+            await waitForPreviewLoad(message);
+            
             // Enviar apenas texto
             await whatsappClient.sendMessage(chatId, message);
             return { success: true, message: 'Mensagem enviada!' };
