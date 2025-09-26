@@ -800,9 +800,10 @@ body.dark-mode .whatsapp-attach-btn:hover {
 }
 
 body.dark-mode .editable-message .message-text:focus {
-    border-color: #29903B;
-    box-shadow: 0 0 0 3px rgba(41, 144, 59, 0.1);
+    border: none;
+    box-shadow: none;
     background: #2A2A2A;
+    outline: none;
 }
 
 body.dark-mode .editable-message .message-text:empty:before {
