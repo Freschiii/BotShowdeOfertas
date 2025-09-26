@@ -179,26 +179,20 @@ async function sendWhatsAppMessage(chatId, message, image) {
                 console.log('📱 WhatsApp: Link detectado, simulando envio pelo celular...');
                 console.log('📱 WhatsApp: URL:', urls[0]);
                 
-                // Estratégia: Simular envio pelo celular para forçar preview com imagem
-                console.log('📱 WhatsApp: Simulando envio pelo celular para preview com imagem...');
+                // Estratégia: Aguardar mais tempo para preview com imagem carregar
+                console.log('📱 WhatsApp: Aguardando preview com imagem do produto carregar...');
+                console.log('📱 WhatsApp: Isso pode levar até 20 segundos...');
                 
-                // Primeiro: Enviar mensagem para "aquecer" o preview
-                console.log('📱 WhatsApp: Enviando mensagem para aquecer preview...');
-                await whatsappClient.sendMessage(chatId, message);
-                
-                // Aguardar tempo para preview com imagem carregar
-                console.log('📱 WhatsApp: Aguardando preview com imagem carregar...');
-                await new Promise(resolve => setTimeout(resolve, 10000)); // 10 segundos
+                // Aguardar tempo suficiente para preview com imagem carregar
+                await new Promise(resolve => setTimeout(resolve, 20000)); // 20 segundos
                 
                 console.log('📱 WhatsApp: Preview com imagem deve estar carregado...');
-                
-                // Retornar sucesso sem enviar novamente
-                return { success: true, message: 'Mensagem enviada com preview!' };
             } else {
                 console.log('📱 WhatsApp: Sem links, enviando imediatamente...');
             }
             
-            // Enviar apenas texto
+            // Enviar mensagem
+            console.log('📱 WhatsApp: Enviando mensagem final...');
             await whatsappClient.sendMessage(chatId, message);
             return { success: true, message: 'Mensagem enviada!' };
         }
