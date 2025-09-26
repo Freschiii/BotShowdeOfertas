@@ -44,7 +44,9 @@ async function connectWhatsApp() {
                     '--no-zygote',
                     '--single-process',
                     '--disable-gpu'
-                ]
+                ],
+                // Simular dispositivo móvel para forçar preview com imagem
+                userAgent: 'Mozilla/5.0 (iPhone; CPU iPhone OS 14_0 like Mac OS X) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/14.0 Mobile/15E148 Safari/604.1'
             }
         });
 
@@ -179,14 +181,13 @@ async function sendWhatsAppMessage(chatId, message, image) {
                 console.log('📱 WhatsApp: Link detectado, simulando envio pelo celular...');
                 console.log('📱 WhatsApp: URL:', urls[0]);
                 
-                // Estratégia: Aguardar mais tempo para preview com imagem carregar
-                console.log('📱 WhatsApp: Aguardando preview com imagem do produto carregar...');
-                console.log('📱 WhatsApp: Isso pode levar até 20 segundos...');
+                // Estratégia: Simular envio pelo celular usando User-Agent móvel
+                console.log('📱 WhatsApp: Configurando para simular celular...');
                 
-                // Aguardar tempo suficiente para preview com imagem carregar
-                await new Promise(resolve => setTimeout(resolve, 20000)); // 20 segundos
+                // Aguardar tempo para simular processamento do celular
+                await new Promise(resolve => setTimeout(resolve, 15000)); // 15 segundos
                 
-                console.log('📱 WhatsApp: Preview com imagem deve estar carregado...');
+                console.log('📱 WhatsApp: Enviando como se fosse do celular...');
             } else {
                 console.log('📱 WhatsApp: Sem links, enviando imediatamente...');
             }
