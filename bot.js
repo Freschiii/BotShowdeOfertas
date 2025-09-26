@@ -352,9 +352,24 @@ class BotManager {
 
             // Delay para carregar preview do link (apenas quando não há imagem)
             if (!image) {
+                console.log('📱 WhatsApp: Digitando mensagem para carregar preview...');
+                
+                // Primeiro, enviar a mensagem para que o WhatsApp "digite" e carregue o preview
+                this.socket.emit('send-whatsapp', {
+                    chatId: this.whatsappGroup,
+                    message: message,
+                    image: null
+                });
+                
                 console.log('📱 WhatsApp: Aguardando delay para carregar preview do link...');
-                await new Promise(resolve => setTimeout(resolve, 3000)); // 3 segundos de delay
-                console.log('📱 WhatsApp: Delay concluído, enviando mensagem...');
+                await new Promise(resolve => setTimeout(resolve, 5000)); // 5 segundos de delay
+                console.log('📱 WhatsApp: Delay concluído, preview deve estar carregado!');
+                
+                // Retornar sucesso sem enviar novamente
+                return {
+                    success: true,
+                    message: `Mensagem enviada para o canal WhatsApp: ${this.whatsappGroup} (com preview)`
+                };
             }
 
             // Enviar via WebSocket real
