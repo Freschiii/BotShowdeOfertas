@@ -487,18 +487,20 @@ function addMessageFromWhatsAppInput() {
     }
     
     // Adicionar mensagem à fila
-    addMessageToQueue();
+    messageCounter++;
+    const messageId = `message_${messageCounter}`;
     
-    const newMessage = messageQueue[messageQueue.length - 1];
-    newMessage.text = messageTextInput.textContent.trim();
+    const messageItem = {
+        id: messageId,
+        image: window.currentImage,
+        text: messageTextInput.textContent.trim(),
+        schedule: null
+    };
     
-    // Adicionar imagem se existir
-    if (window.currentImage) {
-        newMessage.image = window.currentImage;
-    }
+    messageQueue.push(messageItem);
     
     // Limpar input
-    messageTextInput.textContent = 'Digite sua mensagem aqui...';
+    messageTextInput.textContent = '';
     
     // Remover imagem da mensagem editável
     const existingImage = document.querySelector('.editable-message .message-image');
