@@ -1562,12 +1562,19 @@ function clearAllMessageBoxes() {
     const allWhatsAppBoxes = document.querySelectorAll('.whatsapp-preview');
     console.log('📦 Caixas completas do WhatsApp encontradas:', allWhatsAppBoxes.length);
     
+    // Debug: listar todas as caixas encontradas
+    allWhatsAppBoxes.forEach((box, i) => {
+        console.log(`📦 Caixa ${i + 1}:`, box.id, box.className);
+    });
+    
     // Limpar todas as caixas completas do WhatsApp
     allWhatsAppBoxes.forEach((whatsappBox, index) => {
         console.log(`🧹 Limpando caixa ${index + 1}:`, whatsappBox.id);
         
         // Encontrar a mensagem dentro desta caixa
         const messageBox = whatsappBox.querySelector('.whatsapp-message.received.editable-message');
+        console.log(`🔍 Mensagem encontrada na caixa ${index + 1}:`, !!messageBox);
+        
         if (messageBox) {
             const messageText = messageBox.querySelector('.message-text');
             const messageImage = messageBox.querySelector('.message-image');
