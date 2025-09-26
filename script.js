@@ -1686,13 +1686,19 @@ function clearAllMessageBoxes() {
                 mainInput.value = '';
             }
             
-            // Remover mensagens recebidas se existirem
-            const allReceivedMessages = whatsappBox.querySelectorAll('.whatsapp-message.received');
+            // Remover apenas mensagens recebidas (não o input principal)
+            const allReceivedMessages = whatsappBox.querySelectorAll('.whatsapp-message.received.editable-message');
             allReceivedMessages.forEach(msg => {
                 msg.remove();
             });
             
-            console.log(`✅ Caixa ${index + 1} limpa (mantendo estrutura)`);
+            // Garantir que o input principal está visível
+            if (mainInput) {
+                mainInput.style.display = 'block';
+                mainInput.placeholder = 'Digite sua mensagem aqui...';
+            }
+            
+            console.log(`✅ Caixa ${index + 1} limpa (mantendo estrutura e input)`);
         } else {
             // Para caixas duplicadas, DELETAR completamente
             console.log(`🗑️ Deletando caixa duplicada ${index + 1}...`);
