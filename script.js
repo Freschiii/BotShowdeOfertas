@@ -1558,25 +1558,36 @@ function clearAllMessageBoxes() {
     const allMessageBoxes = document.querySelectorAll('.whatsapp-message.received.editable-message');
     console.log('📦 Caixas encontradas para limpeza:', allMessageBoxes.length);
     
-    // Limpar todas as caixas do WhatsApp
-    allMessageBoxes.forEach((messageBox, index) => {
-        const messageText = messageBox.querySelector('.message-text');
-        const messageImage = messageBox.querySelector('.message-image');
+    // Verificar também as caixas completas do WhatsApp
+    const allWhatsAppBoxes = document.querySelectorAll('.whatsapp-preview');
+    console.log('📦 Caixas completas do WhatsApp encontradas:', allWhatsAppBoxes.length);
+    
+    // Limpar todas as caixas completas do WhatsApp
+    allWhatsAppBoxes.forEach((whatsappBox, index) => {
+        console.log(`🧹 Limpando caixa ${index + 1}:`, whatsappBox.id);
         
-        // Limpar texto
-        if (messageText) {
-            messageText.textContent = '';
-            messageText.innerHTML = '';
-        }
-        
-        // Remover imagem
-        if (messageImage) {
-            messageImage.remove();
+        // Encontrar a mensagem dentro desta caixa
+        const messageBox = whatsappBox.querySelector('.whatsapp-message.received.editable-message');
+        if (messageBox) {
+            const messageText = messageBox.querySelector('.message-text');
+            const messageImage = messageBox.querySelector('.message-image');
+            
+            // Limpar texto
+            if (messageText) {
+                messageText.textContent = '';
+                messageText.innerHTML = '';
+                console.log(`✅ Texto da caixa ${index + 1} limpo`);
+            }
+            
+            // Remover imagem
+            if (messageImage) {
+                messageImage.remove();
+                console.log(`✅ Imagem da caixa ${index + 1} removida`);
+            }
         }
         
         // Resetar botão de agendamento
-        const whatsappBox = messageBox.closest('.whatsapp-preview');
-        const scheduleBtn = whatsappBox?.querySelector('.whatsapp-control-btn[title="Agendar Mensagem"]');
+        const scheduleBtn = whatsappBox.querySelector('.whatsapp-control-btn[title="Agendar Mensagem"]');
         if (scheduleBtn) {
             scheduleBtn.classList.remove('active', 'scheduled');
             scheduleBtn.style.background = '';
@@ -1588,16 +1599,15 @@ function clearAllMessageBoxes() {
                 clockIcon.style.color = '';
                 clockIcon.style.textShadow = '';
             }
+            console.log(`✅ Botão de agendamento da caixa ${index + 1} resetado`);
         }
         
         // Remover atributos de agendamento da caixa
-        if (whatsappBox) {
-            whatsappBox.removeAttribute('data-scheduled');
-            whatsappBox.removeAttribute('data-schedule-time');
-        }
+        whatsappBox.removeAttribute('data-scheduled');
+        whatsappBox.removeAttribute('data-schedule-time');
         
         // Fechar área de agendamento se estiver aberta
-        const scheduleArea = messageBox.closest('.whatsapp-preview')?.querySelector('.whatsapp-schedule-area');
+        const scheduleArea = whatsappBox.querySelector('.whatsapp-schedule-area');
         if (scheduleArea) {
             scheduleArea.style.display = 'none';
             
@@ -1611,9 +1621,10 @@ function clearAllMessageBoxes() {
             if (timeInput) {
                 timeInput.value = ''; // Limpar horário
             }
+            console.log(`✅ Área de agendamento da caixa ${index + 1} fechada`);
         }
         
-        console.log(`🧹 Caixa ${index + 1} limpa`);
+        console.log(`✅ Caixa ${index + 1} completamente limpa`);
     });
     
     // Limpar input principal se existir
