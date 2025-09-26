@@ -48,6 +48,8 @@ document.addEventListener('DOMContentLoaded', function() {
         messageTextInput.textContent = '';
         
         messageTextInput.addEventListener('input', function() {
+            // Detectar e converter links automaticamente
+            detectAndConvertLinks(this);
             updateWhatsAppPreview();
         });
         
@@ -361,6 +363,35 @@ function updateMessageSchedule(messageId, schedule) {
     const messageItem = messageQueue.find(item => item.id === messageId);
     if (messageItem) {
         messageItem.schedule = schedule;
+    }
+}
+
+// Detectar e converter links automaticamente
+function detectAndConvertLinks(element) {
+    const text = element.textContent;
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const urls = text.match(urlRegex);
+    
+    if (urls && urls.length > 0) {
+        let html = text;
+        
+        // Converter URLs para links
+        urls.forEach(url => {
+            html = html.replace(url, `<a href="${url}" target="_blank" style="color: #25d366; text-decoration: none;">${url}</a>`);
+        });
+        
+        // Atualizar HTML se houver mudanças
+        if (html !== element.innerHTML) {
+            element.innerHTML = html;
+            
+            // Manter cursor no final
+            const range = document.createRange();
+            const sel = window.getSelection();
+            range.selectNodeContents(element);
+            range.collapse(false);
+            sel.removeAllRanges();
+            sel.addRange(range);
+        }
     }
 }
 

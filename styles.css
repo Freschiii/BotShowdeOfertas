@@ -699,12 +699,13 @@ body.dark-mode .whatsapp-attach-btn:hover {
 }
 
 .editable-message .message-text a {
-    color: #25d366;
-    text-decoration: none;
+    color: #25d366 !important;
+    text-decoration: none !important;
 }
 
 .editable-message .message-text a:hover {
-    text-decoration: underline;
+    text-decoration: underline !important;
+    color: #1ea952 !important;
 }
 
 /* Forçar tamanho normal para emojis */
@@ -822,11 +823,13 @@ body.dark-mode .editable-message .message-text:empty:before {
 
 .editable-message .message-image img {
     max-width: 100%;
+    width: 100%;
     height: auto;
-    max-height: 300px;
+    max-height: 400px;
+    min-height: 200px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    object-fit: contain;
+    object-fit: cover;
     display: block;
 }
 
