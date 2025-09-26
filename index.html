@@ -153,42 +153,14 @@
                         </label>
                     </div>
                     
-                    <div class="send-mode-options">
-                        <div class="mode-selector">
-                            <label class="mode-option">
-                                <input type="radio" name="sendMode" value="single" id="modeSingle" checked>
-                                <span><i class="fas fa-paper-plane"></i> Envio Único</span>
-                            </label>
-                            <label class="mode-option">
-                                <input type="radio" name="sendMode" value="sequence" id="modeSequence">
-                                <span><i class="fas fa-list"></i> Sequência</span>
-                            </label>
-                            <label class="mode-option">
-                                <input type="radio" name="sendMode" value="schedule" id="modeSchedule">
-                                <span><i class="fas fa-clock"></i> Agendar</span>
-                            </label>
-                        </div>
+                    <!-- Fila de Mensagens -->
+                    <div class="message-queue" id="messageQueue">
+                        <!-- Mensagem inicial será adicionada aqui -->
                     </div>
                     
-                    <!-- Controles de Sequência -->
-                    <div id="sequenceControls" class="sequence-controls" style="display: none;">
-                        <div class="sequence-input">
-                            <label>Quantidade de mensagens:</label>
-                            <input type="number" id="sequenceCount" min="1" max="10" value="3" />
-                        </div>
-                        <div class="sequence-input">
-                            <label>Intervalo entre mensagens (segundos):</label>
-                            <input type="number" id="sequenceInterval" min="5" max="300" value="30" />
-                        </div>
-                    </div>
-                    
-                    <!-- Controles de Agendamento -->
-                    <div id="scheduleControls" class="schedule-controls" style="display: none;">
-                        <div class="schedule-input">
-                            <label>Data e hora:</label>
-                            <input type="datetime-local" id="scheduleDateTime" />
-                        </div>
-                    </div>
+                    <button id="addMessageBtn" class="add-message-btn">
+                        <i class="fas fa-plus"></i> Adicionar Mensagem
+                    </button>
                     
                     <button id="sendMessage" class="btn-send">
                         <i class="fas fa-paper-plane"></i> Enviar Mensagem

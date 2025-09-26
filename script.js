@@ -26,6 +26,8 @@ const elements = {
 // Estado da aplicação
 let selectedImage = null;
 let imageUrl = null;
+let messageQueue = [];
+let messageCounter = 0;
 
 // Event Listeners
 elements.connectWhatsApp.addEventListener('click', connectWhatsApp);
@@ -33,6 +35,7 @@ elements.connectTelegram.addEventListener('click', connectTelegram);
 elements.saveGroups.addEventListener('click', saveGroups);
 elements.imageInput.addEventListener('change', handleImageUpload);
 elements.sendMessage.addEventListener('click', sendMessage);
+document.getElementById('addMessageBtn').addEventListener('click', addMessageToQueue);
 
 // Sistema de Abas
 document.addEventListener('DOMContentLoaded', function() {
@@ -75,30 +78,154 @@ document.addEventListener('DOMContentLoaded', function() {
         darkModeToggle.innerHTML = isDark ? '<i class="fas fa-sun"></i>' : '<i class="fas fa-moon"></i>';
     });
 
-    // Controles de Modo de Envio
-    const modeRadios = document.querySelectorAll('input[name="sendMode"]');
-    const sequenceControls = document.getElementById('sequenceControls');
-    const scheduleControls = document.getElementById('scheduleControls');
-
-    modeRadios.forEach(radio => {
-        radio.addEventListener('change', () => {
-            // Esconder todos os controles
-            sequenceControls.style.display = 'none';
-            scheduleControls.style.display = 'none';
-
-            // Mostrar controles baseado no modo selecionado
-            if (radio.value === 'sequence') {
-                sequenceControls.style.display = 'block';
-            } else if (radio.value === 'schedule') {
-                scheduleControls.style.display = 'block';
-                // Definir data/hora mínima como agora
-                const now = new Date();
-                now.setMinutes(now.getMinutes() + 1); // Mínimo 1 minuto no futuro
-                document.getElementById('scheduleDateTime').min = now.toISOString().slice(0, 16);
-            }
-        });
-    });
+    // Inicializar primeira mensagem na fila
+    initializeMessageQueue();
 });
+
+// Inicializar fila de mensagens
+function initializeMessageQueue() {
+    addMessageToQueue();
+}
+
+// Adicionar mensagem à fila
+function addMessageToQueue() {
+    messageCounter++;
+    const messageId = `message_${messageCounter}`;
+    
+    const messageItem = {
+        id: messageId,
+        image: null,
+        text: '',
+        schedule: null
+    };
+    
+    messageQueue.push(messageItem);
+    renderMessageQueue();
+}
+
+// Remover mensagem da fila
+function removeMessageFromQueue(messageId) {
+    messageQueue = messageQueue.filter(item => item.id !== messageId);
+    renderMessageQueue();
+}
+
+// Renderizar fila de mensagens
+function renderMessageQueue() {
+    const queueContainer = document.getElementById('messageQueue');
+    queueContainer.innerHTML = '';
+    
+    messageQueue.forEach((item, index) => {
+        const messageElement = createMessageElement(item, index + 1);
+        queueContainer.appendChild(messageElement);
+    });
+}
+
+// Criar elemento de mensagem
+function createMessageElement(item, number) {
+    const div = document.createElement('div');
+    div.className = 'message-queue-item';
+    div.id = item.id;
+    
+    div.innerHTML = `
+        <div class="queue-item-header">
+            <div class="queue-item-number">Mensagem ${number}</div>
+            <div class="queue-item-controls">
+                <button class="queue-schedule-toggle" onclick="toggleSchedule('${item.id}')">
+                    <i class="fas fa-clock"></i> Agendar
+                </button>
+                ${messageQueue.length > 1 ? `<button class="queue-remove-btn" onclick="removeMessageFromQueue('${item.id}')">
+                    <i class="fas fa-trash"></i> Remover
+                </button>` : ''}
+            </div>
+        </div>
+        
+        <div class="image-upload">
+            <input type="file" class="queue-image-input" data-message-id="${item.id}" accept="image/*" />
+            <label for="queue-image-${item.id}" class="upload-btn">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <span>Escolher Imagem</span>
+            </label>
+            <div class="image-preview queue-image-preview" data-message-id="${item.id}"></div>
+        </div>
+        
+        <textarea class="queue-message-input" data-message-id="${item.id}" placeholder="Digite sua mensagem aqui..."></textarea>
+        
+        <div class="queue-schedule-controls" id="schedule-${item.id}">
+            <div class="schedule-input">
+                <label>Data e hora:</label>
+                <input type="datetime-local" class="queue-schedule-input" data-message-id="${item.id}" />
+            </div>
+        </div>
+    `;
+    
+    // Adicionar event listeners
+    const imageInput = div.querySelector('.queue-image-input');
+    const messageInput = div.querySelector('.queue-message-input');
+    const scheduleInput = div.querySelector('.queue-schedule-input');
+    
+    imageInput.addEventListener('change', (e) => handleQueueImageUpload(e, item.id));
+    messageInput.addEventListener('input', (e) => updateMessageText(item.id, e.target.value));
+    scheduleInput.addEventListener('change', (e) => updateMessageSchedule(item.id, e.target.value));
+    
+    return div;
+}
+
+// Alternar agendamento
+function toggleSchedule(messageId) {
+    const scheduleControls = document.getElementById(`schedule-${messageId}`);
+    const toggleBtn = document.querySelector(`[onclick="toggleSchedule('${messageId}')"]`);
+    
+    if (scheduleControls.classList.contains('active')) {
+        scheduleControls.classList.remove('active');
+        toggleBtn.classList.remove('active');
+        updateMessageSchedule(messageId, null);
+    } else {
+        scheduleControls.classList.add('active');
+        toggleBtn.classList.add('active');
+        
+        // Definir data/hora mínima
+        const now = new Date();
+        now.setMinutes(now.getMinutes() + 1);
+        const scheduleInput = scheduleControls.querySelector('.queue-schedule-input');
+        scheduleInput.min = now.toISOString().slice(0, 16);
+    }
+}
+
+// Manipular upload de imagem na fila
+function handleQueueImageUpload(event, messageId) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const messageItem = messageQueue.find(item => item.id === messageId);
+        if (messageItem) {
+            messageItem.image = e.target.result;
+        }
+        
+        // Atualizar preview
+        const preview = document.querySelector(`.queue-image-preview[data-message-id="${messageId}"]`);
+        preview.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px;">`;
+        preview.classList.remove('empty');
+    };
+    reader.readAsDataURL(file);
+}
+
+// Atualizar texto da mensagem
+function updateMessageText(messageId, text) {
+    const messageItem = messageQueue.find(item => item.id === messageId);
+    if (messageItem) {
+        messageItem.text = text;
+    }
+}
+
+// Atualizar agendamento da mensagem
+function updateMessageSchedule(messageId, schedule) {
+    const messageItem = messageQueue.find(item => item.id === messageId);
+    if (messageItem) {
+        messageItem.schedule = schedule;
+    }
+}
 
 // Conectar WhatsApp
 async function connectWhatsApp() {
@@ -195,18 +322,6 @@ function handleImageUpload(event) {
 
 // Enviar mensagem
 async function sendMessage() {
-    const message = elements.messageInput.value.trim();
-    
-    if (!message) {
-        botManager.showMessage('Digite uma mensagem primeiro!', 'error');
-        return;
-    }
-
-    if (!selectedImage) {
-        botManager.showMessage('Selecione uma imagem primeiro!', 'error');
-        return;
-    }
-
     // Verificar se pelo menos um bot está conectado
     const sendToWhatsApp = elements.sendToWhatsApp.checked;
     const sendToTelegram = elements.sendToTelegram.checked;
@@ -226,93 +341,79 @@ async function sendMessage() {
         return;
     }
 
-    // Obter modo de envio
-    const sendMode = document.querySelector('input[name="sendMode"]:checked').value;
-    
+    // Verificar se há mensagens na fila
+    if (messageQueue.length === 0) {
+        botManager.showMessage('Adicione pelo menos uma mensagem na fila!', 'error');
+        return;
+    }
+
+    // Verificar se todas as mensagens têm texto
+    const emptyMessages = messageQueue.filter(item => !item.text.trim());
+    if (emptyMessages.length > 0) {
+        botManager.showMessage('Todas as mensagens devem ter texto!', 'error');
+        return;
+    }
+
     try {
-        elements.sendMessage.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Enviando...';
+        elements.sendMessage.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processando...';
         elements.sendMessage.disabled = true;
         
-        // Preparar imagem para envio
-        const imageData = await prepareImageForSending();
-        
-        if (sendMode === 'single') {
-            // Envio único
-            await sendSingleMessage(message, imageData, sendToWhatsApp, sendToTelegram);
-        } else if (sendMode === 'sequence') {
-            // Envio em sequência
-            await sendSequenceMessages(message, imageData, sendToWhatsApp, sendToTelegram);
-        } else if (sendMode === 'schedule') {
-            // Agendamento
-            await scheduleMessage(message, imageData, sendToWhatsApp, sendToTelegram);
-        }
+        // Processar fila de mensagens
+        await processMessageQueue(sendToWhatsApp, sendToTelegram);
         
     } catch (error) {
-        botManager.showMessage('Erro ao enviar mensagem: ' + error.message, 'error');
+        botManager.showMessage('Erro ao enviar mensagens: ' + error.message, 'error');
     } finally {
-        elements.sendMessage.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Mensagem';
+        elements.sendMessage.innerHTML = '<i class="fas fa-paper-plane"></i> Enviar Mensagens';
         elements.sendMessage.disabled = false;
     }
 }
 
-// Envio único
-async function sendSingleMessage(message, imageData, sendToWhatsApp, sendToTelegram) {
+// Processar fila de mensagens
+async function processMessageQueue(sendToWhatsApp, sendToTelegram) {
     const platforms = {
         whatsapp: sendToWhatsApp,
         telegram: sendToTelegram
     };
     
-    const results = await botManager.sendMessage(message, imageData, platforms);
+    let scheduledCount = 0;
+    let immediateCount = 0;
     
-    // Mostrar resultados
-    const successCount = results.filter(r => r.success).length;
-    const totalCount = results.length;
-    
-    if (successCount === totalCount) {
-        botManager.showMessage(`Mensagem enviada com sucesso para ${successCount} plataforma(s)!`, 'success');
-    } else if (successCount > 0) {
-        botManager.showMessage(`Mensagem enviada para ${successCount} de ${totalCount} plataforma(s)`, 'success');
-    } else {
-        botManager.showMessage('Erro ao enviar mensagem para todas as plataformas', 'error');
-    }
-}
-
-// Envio em sequência
-async function sendSequenceMessages(message, imageData, sendToWhatsApp, sendToTelegram) {
-    const count = parseInt(document.getElementById('sequenceCount').value);
-    const interval = parseInt(document.getElementById('sequenceInterval').value) * 1000; // Converter para ms
-    
-    botManager.showMessage(`Iniciando sequência de ${count} mensagens...`, 'info');
-    
-    for (let i = 1; i <= count; i++) {
-        botManager.showMessage(`Enviando mensagem ${i} de ${count}...`, 'info');
-        
-        const platforms = {
-            whatsapp: sendToWhatsApp,
-            telegram: sendToTelegram
-        };
-        
-        await botManager.sendMessage(`${message} (${i}/${count})`, imageData, platforms);
-        
-        if (i < count) {
-            botManager.showMessage(`Aguardando ${interval/1000}s antes da próxima mensagem...`, 'info');
-            await new Promise(resolve => setTimeout(resolve, interval));
+    for (const messageItem of messageQueue) {
+        if (messageItem.schedule) {
+            // Mensagem agendada
+            await scheduleQueueMessage(messageItem, platforms);
+            scheduledCount++;
+        } else {
+            // Mensagem imediata
+            await sendImmediateMessage(messageItem, platforms);
+            immediateCount++;
         }
     }
     
-    botManager.showMessage(`Sequência de ${count} mensagens concluída!`, 'success');
-}
-
-// Agendamento
-async function scheduleMessage(message, imageData, sendToWhatsApp, sendToTelegram) {
-    const scheduleDateTime = document.getElementById('scheduleDateTime').value;
-    
-    if (!scheduleDateTime) {
-        botManager.showMessage('Selecione uma data e hora para agendamento!', 'error');
-        return;
+    // Mostrar resumo
+    let summary = '';
+    if (immediateCount > 0) {
+        summary += `${immediateCount} mensagem(ns) enviada(s) imediatamente. `;
+    }
+    if (scheduledCount > 0) {
+        summary += `${scheduledCount} mensagem(ns) agendada(s).`;
     }
     
-    const scheduleTime = new Date(scheduleDateTime).getTime();
+    botManager.showMessage(summary, 'success');
+}
+
+// Enviar mensagem imediata
+async function sendImmediateMessage(messageItem, platforms) {
+    const results = await botManager.sendMessage(messageItem.text, messageItem.image, platforms);
+    
+    const successCount = results.filter(r => r.success).length;
+    botManager.showMessage(`Mensagem "${messageItem.text.substring(0, 30)}..." enviada para ${successCount} plataforma(s)`, 'info');
+}
+
+// Agendar mensagem da fila
+async function scheduleQueueMessage(messageItem, platforms) {
+    const scheduleTime = new Date(messageItem.schedule).getTime();
     const now = new Date().getTime();
     
     if (scheduleTime <= now) {
@@ -328,17 +429,13 @@ async function scheduleMessage(message, imageData, sendToWhatsApp, sendToTelegra
     setTimeout(async () => {
         botManager.showMessage('Enviando mensagem agendada...', 'info');
         
-        const platforms = {
-            whatsapp: sendToWhatsApp,
-            telegram: sendToTelegram
-        };
-        
-        const results = await botManager.sendMessage(message, imageData, platforms);
+        const results = await botManager.sendMessage(messageItem.text, messageItem.image, platforms);
         
         const successCount = results.filter(r => r.success).length;
         botManager.showMessage(`Mensagem agendada enviada para ${successCount} plataforma(s)!`, 'success');
     }, delay);
 }
+
 
 // Preparar imagem para envio
 async function prepareImageForSending() {
