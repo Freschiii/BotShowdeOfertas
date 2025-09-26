@@ -146,12 +146,12 @@ function createMessageElement(item, number) {
         <div class="queue-item-header">
             <div class="queue-item-number">Mensagem ${number}</div>
             <div class="queue-item-controls">
-                <button class="queue-schedule-toggle" onclick="toggleSchedule('${item.id}')" title="Agendar mensagem">
-                    <i class="fas fa-clock"></i>
-                </button>
                 ${messageQueue.length > 1 ? `<button class="queue-remove-btn" onclick="removeMessageFromQueue('${item.id}')" title="Remover mensagem">
                     <i class="fas fa-trash"></i>
                 </button>` : ''}
+                <button class="queue-schedule-toggle" onclick="toggleSchedule('${item.id}')" title="Agendar mensagem">
+                    <i class="fas fa-clock"></i>
+                </button>
             </div>
         </div>
         
