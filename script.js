@@ -15,17 +15,12 @@ const elements = {
     qrCode: document.getElementById('qrCode'),
     
     // Envio de mensagens
-    imageInput: document.getElementById('imageInput'),
-    imagePreview: document.getElementById('imagePreview'),
-    messageInput: document.getElementById('messageInput'),
     sendToWhatsApp: document.getElementById('sendToWhatsApp'),
     sendToTelegram: document.getElementById('sendToTelegram'),
     sendMessage: document.getElementById('sendMessage')
 };
 
 // Estado da aplicação
-let selectedImage = null;
-let imageUrl = null;
 let messageQueue = [];
 let messageCounter = 0;
 
@@ -33,9 +28,7 @@ let messageCounter = 0;
 elements.connectWhatsApp.addEventListener('click', connectWhatsApp);
 elements.connectTelegram.addEventListener('click', connectTelegram);
 elements.saveGroups.addEventListener('click', saveGroups);
-elements.imageInput.addEventListener('change', handleImageUpload);
 elements.sendMessage.addEventListener('click', sendMessage);
-document.getElementById('addMessageBtn').addEventListener('click', addMessageToQueue);
 
 // Sistema de Abas
 document.addEventListener('DOMContentLoaded', function() {
@@ -101,12 +94,35 @@ function addMessageToQueue() {
     
     messageQueue.push(messageItem);
     renderMessageQueue();
+    
+    // Atualizar botão de adicionar mensagem
+    updateAddMessageButton();
 }
 
 // Remover mensagem da fila
 function removeMessageFromQueue(messageId) {
     messageQueue = messageQueue.filter(item => item.id !== messageId);
     renderMessageQueue();
+    updateAddMessageButton();
+}
+
+// Atualizar botão de adicionar mensagem
+function updateAddMessageButton() {
+    const addBtn = document.getElementById('addMessageBtn');
+    if (addBtn) {
+        addBtn.remove();
+    }
+    
+    // Criar novo botão
+    const newBtn = document.createElement('button');
+    newBtn.id = 'addMessageBtn';
+    newBtn.className = 'add-message-btn';
+    newBtn.innerHTML = '<i class="fas fa-plus"></i> Adicionar Mensagem';
+    newBtn.addEventListener('click', addMessageToQueue);
+    
+    // Inserir após a fila de mensagens
+    const messageQueue = document.getElementById('messageQueue');
+    messageQueue.parentNode.insertBefore(newBtn, messageQueue.nextSibling);
 }
 
 // Renderizar fila de mensagens
@@ -285,40 +301,6 @@ function saveGroups() {
     botManager.setGroups(whatsappGroup, telegramGroup);
 }
 
-// Upload de imagem
-function handleImageUpload(event) {
-    const file = event.target.files[0];
-    
-    if (!file) {
-        return;
-    }
-
-    // Verificar se é uma imagem
-    if (!file.type.startsWith('image/')) {
-        botManager.showMessage('Por favor, selecione apenas arquivos de imagem', 'error');
-        return;
-    }
-
-    // Verificar tamanho (máximo 10MB)
-    if (file.size > 10 * 1024 * 1024) {
-        botManager.showMessage('A imagem é muito grande. Máximo 10MB', 'error');
-        return;
-    }
-
-    selectedImage = file;
-    
-    // Criar URL para preview
-    if (imageUrl) {
-        URL.revokeObjectURL(imageUrl);
-    }
-    imageUrl = URL.createObjectURL(file);
-    
-    // Mostrar preview
-    elements.imagePreview.innerHTML = `<img src="${imageUrl}" alt="Preview da imagem">`;
-    elements.imagePreview.classList.remove('empty');
-    
-    botManager.showMessage('Imagem carregada com sucesso!', 'success');
-}
 
 // Enviar mensagem
 async function sendMessage() {
@@ -437,41 +419,6 @@ async function scheduleQueueMessage(messageItem, platforms) {
 }
 
 
-// Preparar imagem para envio
-async function prepareImageForSending() {
-    if (!selectedImage) {
-        return null;
-    }
-    
-    console.log('🖼️ Processando imagem para envio:', {
-        hasSelectedImage: !!selectedImage,
-        hasImageUrl: !!imageUrl,
-        imageUrlType: imageUrl ? imageUrl.substring(0, 20) + '...' : 'none'
-    });
-    
-    if (imageUrl && imageUrl.startsWith('blob:')) {
-        console.log('🖼️ Convertendo blob para base64...');
-        // Converter blob URL para base64
-        try {
-            const response = await fetch(imageUrl);
-            const blob = await response.blob();
-            const base64 = await new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.onload = () => resolve(reader.result);
-                reader.readAsDataURL(blob);
-            });
-            console.log('✅ Imagem convertida para base64:', base64.substring(0, 50) + '...');
-            return base64;
-        } catch (error) {
-            console.error('❌ Erro ao converter imagem:', error);
-            return imageUrl;
-        }
-    } else {
-        const result = imageUrl || selectedImage;
-        console.log('🖼️ Usando imagem direta:', typeof result);
-        return result;
-    }
-}
 
 // Baixar imagem automaticamente
 function downloadImage() {
