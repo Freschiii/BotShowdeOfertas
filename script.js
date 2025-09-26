@@ -1674,15 +1674,9 @@ function clearAllMessageBoxes() {
             console.log(`✅ Área de agendamento da caixa ${index + 1} fechada`);
         }
         
-        // Para a primeira caixa, restaurar ao estado inicial
+        // Para a primeira caixa, apenas limpar conteúdo mas manter estrutura
         if (index === 0) {
-            console.log(`🔄 Restaurando caixa ${index + 1} ao estado inicial...`);
-            
-            // Remover todas as mensagens recebidas
-            const allReceivedMessages = whatsappBox.querySelectorAll('.whatsapp-message.received');
-            allReceivedMessages.forEach(msg => {
-                msg.remove();
-            });
+            console.log(`🔄 Limpando conteúdo da caixa ${index + 1} (primeira caixa)...`);
             
             // Limpar input principal
             const mainInput = whatsappBox.querySelector('#messageTextInput');
@@ -1692,25 +1686,18 @@ function clearAllMessageBoxes() {
                 mainInput.value = '';
             }
             
-            console.log(`✅ Caixa ${index + 1} restaurada ao estado inicial`);
-        } else {
-            // Para caixas duplicadas, limpeza normal
-            const allRemainingText = whatsappBox.querySelectorAll('*');
-            allRemainingText.forEach((element) => {
-                if (element.textContent && element.textContent.trim() && 
-                    (element.classList.contains('message-text') || 
-                     element.textContent.includes('{"ok":true') ||
-                     element.textContent.includes('result'))) {
-                    element.textContent = '';
-                    element.innerHTML = '';
-                }
+            // Remover mensagens recebidas se existirem
+            const allReceivedMessages = whatsappBox.querySelectorAll('.whatsapp-message.received');
+            allReceivedMessages.forEach(msg => {
+                msg.remove();
             });
             
-            // Remover qualquer imagem restante
-            const allRemainingImages = whatsappBox.querySelectorAll('img');
-            allRemainingImages.forEach((img) => {
-                img.remove();
-            });
+            console.log(`✅ Caixa ${index + 1} limpa (mantendo estrutura)`);
+        } else {
+            // Para caixas duplicadas, DELETAR completamente
+            console.log(`🗑️ Deletando caixa duplicada ${index + 1}...`);
+            whatsappBox.remove();
+            console.log(`✅ Caixa duplicada ${index + 1} deletada`);
         }
         
         // Debug: verificar conteúdo após a limpeza
