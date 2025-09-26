@@ -142,9 +142,41 @@
                         </label>
                     </div>
                     
-                    <!-- Fila de Mensagens -->
-                    <div class="message-queue" id="messageQueue">
-                        <!-- Mensagem inicial será adicionada aqui -->
+                    <!-- WhatsApp Preview como Editor -->
+                    <div class="whatsapp-preview">
+                        <div class="whatsapp-chat">
+                            <div class="whatsapp-header">
+                                <div class="whatsapp-contact">
+                                    <div class="whatsapp-avatar"></div>
+                                    <div class="whatsapp-info">
+                                        <div class="whatsapp-name">Canal de Ofertas</div>
+                                        <div class="whatsapp-status">online</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="whatsapp-messages" id="whatsappPreview">
+                                <div class="whatsapp-message received">
+                                    <div class="message-content">
+                                        <div class="message-text">Digite sua mensagem para ver o preview...</div>
+                                    </div>
+                                    <div class="message-time">12:34</div>
+                                </div>
+                            </div>
+                            <div class="whatsapp-input-area">
+                                <div class="whatsapp-input-container">
+                                    <button class="whatsapp-attach-btn" id="whatsappAttachBtn">
+                                        <i class="fas fa-paperclip"></i>
+                                    </button>
+                                    <input type="file" id="whatsappImageInput" accept="image/*" style="display: none;" />
+                                    <div class="whatsapp-input-wrapper">
+                                        <textarea id="whatsappMessageInput" placeholder="Digite uma mensagem..." rows="1"></textarea>
+                                    </div>
+                                    <button class="whatsapp-send-btn" id="whatsappSendBtn">
+                                        <i class="fas fa-paper-plane"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                     
                     <button id="addMessageBtn" class="add-message-btn">
@@ -154,32 +186,6 @@
                     <button id="sendMessage" class="btn-send">
                         <i class="fas fa-paper-plane"></i> Enviar Mensagem
                     </button>
-                </div>
-            </div>
-
-            <!-- Preview WhatsApp -->
-            <div class="card">
-                <h2><i class="fab fa-whatsapp"></i> Preview WhatsApp</h2>
-                <div class="whatsapp-preview">
-                    <div class="whatsapp-chat">
-                        <div class="whatsapp-header">
-                            <div class="whatsapp-contact">
-                                <div class="whatsapp-avatar"></div>
-                                <div class="whatsapp-info">
-                                    <div class="whatsapp-name">Canal de Ofertas</div>
-                                    <div class="whatsapp-status">online</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="whatsapp-messages" id="whatsappPreview">
-                            <div class="whatsapp-message received">
-                                <div class="message-content">
-                                    <div class="message-text">Digite sua mensagem para ver o preview...</div>
-                                </div>
-                                <div class="message-time">12:34</div>
-                            </div>
-                        </div>
-                    </div>
                 </div>
             </div>
 

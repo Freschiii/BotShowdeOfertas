@@ -30,6 +30,41 @@ elements.connectTelegram.addEventListener('click', connectTelegram);
 elements.saveGroups.addEventListener('click', saveGroups);
 elements.sendMessage.addEventListener('click', sendMessage);
 
+// WhatsApp Input Events
+document.addEventListener('DOMContentLoaded', function() {
+    const whatsappInput = document.getElementById('whatsappMessageInput');
+    const whatsappAttachBtn = document.getElementById('whatsappAttachBtn');
+    const whatsappImageInput = document.getElementById('whatsappImageInput');
+    const whatsappSendBtn = document.getElementById('whatsappSendBtn');
+    
+    if (whatsappInput) {
+        whatsappInput.addEventListener('input', function() {
+            updateWhatsAppPreview();
+            // Auto-resize textarea
+            this.style.height = 'auto';
+            this.style.height = this.scrollHeight + 'px';
+        });
+    }
+    
+    if (whatsappAttachBtn) {
+        whatsappAttachBtn.addEventListener('click', function() {
+            whatsappImageInput.click();
+        });
+    }
+    
+    if (whatsappImageInput) {
+        whatsappImageInput.addEventListener('change', function(e) {
+            handleWhatsAppImageUpload(e);
+        });
+    }
+    
+    if (whatsappSendBtn) {
+        whatsappSendBtn.addEventListener('click', function() {
+            addMessageFromWhatsAppInput();
+        });
+    }
+});
+
 // Sistema de Abas
 document.addEventListener('DOMContentLoaded', function() {
     const tabButtons = document.querySelectorAll('.tab-button');
@@ -267,6 +302,7 @@ function updateMessageSchedule(messageId, schedule) {
 // Atualizar preview do WhatsApp
 function updateWhatsAppPreview() {
     const previewContainer = document.getElementById('whatsappPreview');
+    const whatsappInput = document.getElementById('whatsappMessageInput');
     if (!previewContainer) return;
     
     // Limpar preview anterior
@@ -284,9 +320,21 @@ function updateWhatsAppPreview() {
                 minute: '2-digit' 
             });
             
+            let messageContent = `<div class="message-text">${item.text}</div>`;
+            
+            // Adicionar imagem se existir
+            if (item.image) {
+                messageContent = `
+                    <div class="message-image">
+                        <img src="${item.image}" alt="Imagem" style="max-width: 200px; border-radius: 8px; margin-bottom: 8px;">
+                    </div>
+                    ${messageContent}
+                `;
+            }
+            
             messageDiv.innerHTML = `
                 <div class="message-content">
-                    <div class="message-text">${item.text}</div>
+                    ${messageContent}
                 </div>
                 <div class="message-time">${timeString}</div>
             `;
@@ -294,6 +342,19 @@ function updateWhatsAppPreview() {
             previewContainer.appendChild(messageDiv);
         }
     });
+    
+    // Mostrar preview do que está sendo digitado
+    if (whatsappInput && whatsappInput.value.trim()) {
+        const typingDiv = document.createElement('div');
+        typingDiv.className = 'whatsapp-message received typing';
+        typingDiv.innerHTML = `
+            <div class="message-content">
+                <div class="message-text">${whatsappInput.value}</div>
+            </div>
+            <div class="message-time">Agora</div>
+        `;
+        previewContainer.appendChild(typingDiv);
+    }
     
     // Se não há mensagens, mostrar placeholder
     if (previewContainer.children.length === 0) {
@@ -307,6 +368,61 @@ function updateWhatsAppPreview() {
         `;
         previewContainer.appendChild(placeholderDiv);
     }
+}
+
+// Manipular upload de imagem do WhatsApp
+function handleWhatsAppImageUpload(event) {
+    const file = event.target.files[0];
+    if (!file) return;
+    
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        // Adicionar imagem à primeira mensagem da fila ou criar nova
+        if (messageQueue.length === 0) {
+            addMessageToQueue();
+        }
+        
+        const firstMessage = messageQueue[0];
+        firstMessage.image = e.target.result;
+        
+        updateWhatsAppPreview();
+    };
+    reader.readAsDataURL(file);
+}
+
+// Adicionar mensagem do input do WhatsApp
+function addMessageFromWhatsAppInput() {
+    const whatsappInput = document.getElementById('whatsappMessageInput');
+    const whatsappImageInput = document.getElementById('whatsappImageInput');
+    
+    if (!whatsappInput || !whatsappInput.value.trim()) {
+        botManager.showMessage('Digite uma mensagem primeiro!', 'error');
+        return;
+    }
+    
+    // Adicionar mensagem à fila
+    addMessageToQueue();
+    
+    const newMessage = messageQueue[messageQueue.length - 1];
+    newMessage.text = whatsappInput.value.trim();
+    
+    // Adicionar imagem se existir
+    if (whatsappImageInput.files.length > 0) {
+        const reader = new FileReader();
+        reader.onload = (e) => {
+            newMessage.image = e.target.result;
+            updateWhatsAppPreview();
+        };
+        reader.readAsDataURL(whatsappImageInput.files[0]);
+    }
+    
+    // Limpar input
+    whatsappInput.value = '';
+    whatsappInput.style.height = 'auto';
+    whatsappImageInput.value = '';
+    
+    updateWhatsAppPreview();
+    botManager.showMessage('Mensagem adicionada à fila!', 'success');
 }
 
 // Conectar WhatsApp
