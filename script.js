@@ -377,7 +377,7 @@ function detectAndConvertLinks(element) {
         
         // Converter URLs para links
         urls.forEach(url => {
-            html = html.replace(url, `<a href="${url}" target="_blank" style="color: #25d366; text-decoration: none;">${url}</a>`);
+            html = html.replace(url, `<a href="${url}" target="_blank" style="color: #25d366 !important; text-decoration: none !important;">${url}</a>`);
         });
         
         // Atualizar HTML se houver mudanças

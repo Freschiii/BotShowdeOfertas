@@ -696,6 +696,7 @@ body.dark-mode .whatsapp-attach-btn:hover {
     font-size: 14px;
     line-height: 1.4;
     font-family: inherit;
+    background: #dcf8c6;
 }
 
 .editable-message .message-text a {
@@ -740,7 +741,7 @@ body.dark-mode .whatsapp-attach-btn:hover {
 .editable-message .message-text:focus {
     border-color: #25d366;
     box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
-    background: #f8f9fa;
+    background: #dcf8c6;
 }
 
 .editable-message .message-text:empty:before {
