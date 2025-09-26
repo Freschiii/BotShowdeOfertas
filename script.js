@@ -191,7 +191,8 @@ async function sendMessage() {
             }
             
             if (sendToWhatsApp) {
-                // WhatsApp: enviar apenas link (sem imagem)
+                // WhatsApp: enviar apenas link (sem imagem) - com delay para preview
+                console.log('📱 WhatsApp: Modo link com preview - será aplicado delay de 3s');
                 whatsappData = {
                     message: message,
                     image: null

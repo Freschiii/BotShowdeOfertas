@@ -350,6 +350,13 @@ class BotManager {
                 throw new Error('Servidor não disponível');
             }
 
+            // Delay para carregar preview do link (apenas quando não há imagem)
+            if (!image) {
+                console.log('📱 WhatsApp: Aguardando delay para carregar preview do link...');
+                await new Promise(resolve => setTimeout(resolve, 3000)); // 3 segundos de delay
+                console.log('📱 WhatsApp: Delay concluído, enviando mensagem...');
+            }
+
             // Enviar via WebSocket real
             console.log('📱 Enviando para WhatsApp via WebSocket:', {
                 chatId: this.whatsappGroup,
