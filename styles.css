@@ -698,6 +698,24 @@ body.dark-mode .whatsapp-attach-btn:hover {
     font-family: inherit;
 }
 
+.editable-message .message-text a {
+    color: #25d366;
+    text-decoration: none;
+}
+
+.editable-message .message-text a:hover {
+    text-decoration: underline;
+}
+
+/* Emojis com tamanho normal */
+.editable-message .message-text {
+    font-size: 14px;
+}
+
+.editable-message .message-text * {
+    font-size: inherit;
+}
+
 .editable-message .message-text:focus {
     border-color: #25d366;
     box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);

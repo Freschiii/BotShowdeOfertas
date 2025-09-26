@@ -78,8 +78,11 @@ document.addEventListener('DOMContentLoaded', function() {
     
     if (whatsappAddBtn) {
         whatsappAddBtn.addEventListener('click', function() {
+            console.log('Botão adicionar clicado!');
             addMessageFromWhatsAppInput();
         });
+    } else {
+        console.log('Botão whatsappAddBtn não encontrado!');
     }
     
     if (whatsappDeleteBtn) {
@@ -425,12 +428,18 @@ function handleWhatsAppImageUpload(event) {
 
 // Adicionar mensagem do input do WhatsApp
 function addMessageFromWhatsAppInput() {
+    console.log('Função addMessageFromWhatsAppInput chamada');
     const messageTextInput = document.getElementById('messageTextInput');
+    
+    console.log('messageTextInput:', messageTextInput);
+    console.log('textContent:', messageTextInput ? messageTextInput.textContent : 'não encontrado');
     
     if (!messageTextInput || !messageTextInput.textContent.trim() || messageTextInput.textContent.trim() === 'Digite sua mensagem aqui...') {
         botManager.showMessage('Digite uma mensagem primeiro!', 'error');
         return;
     }
+    
+    console.log('Adicionando mensagem à fila...');
     
     // Adicionar mensagem à fila
     addMessageToQueue();
