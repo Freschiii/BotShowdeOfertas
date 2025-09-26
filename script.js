@@ -1571,8 +1571,15 @@ function clearAllMessageBoxes() {
     allWhatsAppBoxes.forEach((whatsappBox, index) => {
         console.log(`🧹 Limpando caixa ${index + 1}:`, whatsappBox.id);
         
-        // Encontrar a mensagem dentro desta caixa
-        const messageBox = whatsappBox.querySelector('.whatsapp-message.received.editable-message');
+        // Encontrar a mensagem dentro desta caixa (pode ser .editable-message ou .received)
+        let messageBox = whatsappBox.querySelector('.whatsapp-message.received.editable-message');
+        if (!messageBox) {
+            messageBox = whatsappBox.querySelector('.whatsapp-message.received');
+        }
+        if (!messageBox) {
+            messageBox = whatsappBox.querySelector('.whatsapp-message');
+        }
+        
         console.log(`🔍 Mensagem encontrada na caixa ${index + 1}:`, !!messageBox);
         
         if (messageBox) {
@@ -1590,6 +1597,16 @@ function clearAllMessageBoxes() {
             if (messageImage) {
                 messageImage.remove();
                 console.log(`✅ Imagem da caixa ${index + 1} removida`);
+            }
+        } else {
+            console.log(`⚠️ Nenhuma mensagem encontrada na caixa ${index + 1}, tentando limpar input principal`);
+            
+            // Se não encontrar mensagem, tentar limpar o input principal desta caixa
+            const mainInput = whatsappBox.querySelector('#messageTextInput');
+            if (mainInput) {
+                mainInput.textContent = '';
+                mainInput.innerHTML = '';
+                console.log(`✅ Input principal da caixa ${index + 1} limpo`);
             }
         }
         
