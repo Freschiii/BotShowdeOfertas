@@ -858,7 +858,7 @@ body.dark-mode .editable-message .message-text:empty:before {
     margin: 0;
     padding: 8px 8px 0 8px;
     background: #2A2A2A;
-    border-radius: 18px 18px 18px 18px;
+    border-radius: 18px 18px 0 0;
     overflow: hidden;
     border: none;
     position: relative;
@@ -872,7 +872,7 @@ body.dark-mode .editable-message .message-text:empty:before {
     height: auto;
     max-height: 300px;
     min-height: 150px;
-    border-radius: 18px 18px 18px 18px;
+    border-radius: 18px 18px 0 0;
     box-shadow: none;
     object-fit: cover;
     display: block;

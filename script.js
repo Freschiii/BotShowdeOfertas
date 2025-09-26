@@ -479,42 +479,26 @@ function handleWhatsAppImageUpload(event) {
 
 // Adicionar mensagem do input do WhatsApp
 function addMessageFromWhatsAppInput() {
-    console.log('addMessageFromWhatsAppInput chamada!');
+    const messageTextInput = document.getElementById('messageTextInput');
     
-    // Verificar se já tem 10 mensagens
-    if (messageQueue.length >= 10) {
-        botManager.showMessage('Máximo de 10 mensagens permitidas!', 'error');
+    if (!messageTextInput || !messageTextInput.textContent.trim() || messageTextInput.textContent.trim() === 'Digite sua mensagem aqui...') {
+        botManager.showMessage('Digite uma mensagem primeiro!', 'error');
         return;
     }
     
-    const messageTextInput = document.getElementById('messageTextInput');
-    
-    // Se não tem texto, criar mensagem vazia
-    let messageText = '';
-    if (messageTextInput && messageTextInput.textContent.trim() && messageTextInput.textContent.trim() !== 'Digite sua mensagem aqui...') {
-        messageText = messageTextInput.textContent.trim();
-    }
-    
-    console.log('Criando nova mensagem...');
-    
     // Adicionar mensagem à fila
-    messageCounter++;
-    const messageId = `message_${messageCounter}`;
+    addMessageToQueue();
     
-    const messageItem = {
-        id: messageId,
-        image: window.currentImage,
-        text: messageText,
-        schedule: null
-    };
+    const newMessage = messageQueue[messageQueue.length - 1];
+    newMessage.text = messageTextInput.textContent.trim();
     
-    messageQueue.push(messageItem);
-    console.log('Mensagem adicionada! Fila agora tem:', messageQueue.length, 'mensagens');
+    // Adicionar imagem se existir
+    if (window.currentImage) {
+        newMessage.image = window.currentImage;
+    }
     
     // Limpar input
-    if (messageTextInput) {
-        messageTextInput.textContent = '';
-    }
+    messageTextInput.textContent = 'Digite sua mensagem aqui...';
     
     // Remover imagem da mensagem editável
     const existingImage = document.querySelector('.editable-message .message-image');
@@ -527,7 +511,7 @@ function addMessageFromWhatsAppInput() {
     document.getElementById('whatsappImageInput').value = '';
     
     updateWhatsAppPreview();
-    botManager.showMessage('Nova mensagem criada!', 'success');
+    botManager.showMessage('Mensagem adicionada à fila!', 'success');
 }
 
 // Deletar mensagem atual
