@@ -362,7 +362,7 @@ class BotManager {
                 });
                 
                 console.log('📱 WhatsApp: Aguardando delay para carregar preview do link...');
-                await new Promise(resolve => setTimeout(resolve, 5000)); // 5 segundos de delay
+                await new Promise(resolve => setTimeout(resolve, 10000)); // 10 segundos de delay
                 console.log('📱 WhatsApp: Delay concluído, preview deve estar carregado!');
                 
                 // Retornar sucesso sem enviar novamente
