@@ -402,6 +402,27 @@ body.dark-mode .upload-btn:hover {
     box-shadow: 0 4px 15px rgba(41, 144, 59, 0.4);
 }
 
+/* Preview da imagem melhorado */
+.image-preview {
+    margin-top: 15px;
+    text-align: center;
+}
+
+.image-preview img {
+    max-width: 200px;
+    max-height: 200px;
+    width: auto;
+    height: auto;
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+    object-fit: cover;
+    aspect-ratio: 1;
+}
+
+.image-preview.empty {
+    display: none;
+}
+
 /* Status dos Bots - Modo Escuro Elegante */
 body.dark-mode .bot-status {
     background: linear-gradient(135deg, #0D1117 0%, #151B23 100%);

@@ -137,7 +137,7 @@ function renderMessageQueue() {
         // Restaurar imagem se existir
         if (item.image) {
             const preview = messageElement.querySelector('.queue-image-preview');
-            preview.innerHTML = `<img src="${item.image}" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px;">`;
+            preview.innerHTML = `<img src="${item.image}" alt="Preview">`;
             preview.classList.remove('empty');
         }
         
@@ -238,7 +238,7 @@ function handleQueueImageUpload(event, messageId) {
         
         // Atualizar preview
         const preview = document.querySelector(`.queue-image-preview[data-message-id="${messageId}"]`);
-        preview.innerHTML = `<img src="${e.target.result}" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px;">`;
+        preview.innerHTML = `<img src="${e.target.result}" alt="Preview">`;
         preview.classList.remove('empty');
     };
     reader.readAsDataURL(file);
