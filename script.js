@@ -344,7 +344,6 @@ function updateMessageSchedule(messageId, schedule) {
 // Atualizar preview do WhatsApp
 function updateWhatsAppPreview() {
     const previewContainer = document.getElementById('whatsappPreview');
-    const messageTextInput = document.getElementById('messageTextInput');
     if (!previewContainer) return;
     
     // Limpar preview anterior
@@ -368,7 +367,7 @@ function updateWhatsAppPreview() {
             if (item.image) {
                 messageContent = `
                     <div class="message-image">
-                        <img src="${item.image}" alt="Imagem" style="max-width: 200px; border-radius: 8px; margin-bottom: 8px;">
+                        <img src="${item.image}" alt="Imagem">
                     </div>
                     ${messageContent}
                 `;
@@ -385,30 +384,10 @@ function updateWhatsAppPreview() {
         }
     });
     
-    // Mostrar preview do que está sendo digitado
-    if (messageTextInput && messageTextInput.value.trim()) {
-        const typingDiv = document.createElement('div');
-        typingDiv.className = 'whatsapp-message received typing';
-        typingDiv.innerHTML = `
-            <div class="message-content">
-                <div class="message-text">${messageTextInput.value}</div>
-            </div>
-            <div class="message-time">Agora</div>
-        `;
-        previewContainer.appendChild(typingDiv);
-    }
-    
-    // Se não há mensagens, mostrar placeholder
-    if (previewContainer.children.length === 0) {
-        const placeholderDiv = document.createElement('div');
-        placeholderDiv.className = 'whatsapp-message received';
-        placeholderDiv.innerHTML = `
-            <div class="message-content">
-                <div class="message-text">Digite sua mensagem para ver o preview...</div>
-            </div>
-            <div class="message-time">12:34</div>
-        `;
-        previewContainer.appendChild(placeholderDiv);
+    // Adicionar mensagem editável no final
+    const editableMessage = document.getElementById('editableMessage');
+    if (editableMessage) {
+        previewContainer.appendChild(editableMessage);
     }
 }
 
@@ -419,15 +398,27 @@ function handleWhatsAppImageUpload(event) {
     
     const reader = new FileReader();
     reader.onload = (e) => {
-        // Adicionar imagem à primeira mensagem da fila ou criar nova
-        if (messageQueue.length === 0) {
-            addMessageToQueue();
+        // Mostrar imagem na mensagem editável
+        const editableMessage = document.getElementById('editableMessage');
+        const messageContent = editableMessage.querySelector('.message-content');
+        
+        // Remover imagem anterior se existir
+        const existingImage = messageContent.querySelector('.message-image');
+        if (existingImage) {
+            existingImage.remove();
         }
         
-        const firstMessage = messageQueue[0];
-        firstMessage.image = e.target.result;
+        // Adicionar nova imagem
+        const imageDiv = document.createElement('div');
+        imageDiv.className = 'message-image';
+        imageDiv.innerHTML = `<img src="${e.target.result}" alt="Imagem">`;
         
-        updateWhatsAppPreview();
+        // Inserir imagem antes do texto
+        const messageText = messageContent.querySelector('.message-text');
+        messageContent.insertBefore(imageDiv, messageText);
+        
+        // Salvar imagem para quando adicionar à fila
+        window.currentImage = e.target.result;
     };
     reader.readAsDataURL(file);
 }
@@ -435,7 +426,6 @@ function handleWhatsAppImageUpload(event) {
 // Adicionar mensagem do input do WhatsApp
 function addMessageFromWhatsAppInput() {
     const messageTextInput = document.getElementById('messageTextInput');
-    const whatsappImageInput = document.getElementById('whatsappImageInput');
     
     if (!messageTextInput || !messageTextInput.textContent.trim() || messageTextInput.textContent.trim() === 'Digite sua mensagem aqui...') {
         botManager.showMessage('Digite uma mensagem primeiro!', 'error');
@@ -449,18 +439,22 @@ function addMessageFromWhatsAppInput() {
     newMessage.text = messageTextInput.textContent.trim();
     
     // Adicionar imagem se existir
-    if (whatsappImageInput.files.length > 0) {
-        const reader = new FileReader();
-        reader.onload = (e) => {
-            newMessage.image = e.target.result;
-            updateWhatsAppPreview();
-        };
-        reader.readAsDataURL(whatsappImageInput.files[0]);
+    if (window.currentImage) {
+        newMessage.image = window.currentImage;
     }
     
     // Limpar input
     messageTextInput.textContent = 'Digite sua mensagem aqui...';
-    whatsappImageInput.value = '';
+    
+    // Remover imagem da mensagem editável
+    const existingImage = document.querySelector('.editable-message .message-image');
+    if (existingImage) {
+        existingImage.remove();
+    }
+    
+    // Limpar imagem atual
+    window.currentImage = null;
+    document.getElementById('whatsappImageInput').value = '';
     
     updateWhatsAppPreview();
     botManager.showMessage('Mensagem adicionada à fila!', 'success');

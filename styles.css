@@ -693,6 +693,9 @@ body.dark-mode .whatsapp-attach-btn:hover {
     outline: none;
     word-wrap: break-word;
     white-space: pre-wrap;
+    font-size: 14px;
+    line-height: 1.4;
+    font-family: inherit;
 }
 
 .editable-message .message-text:focus {
@@ -719,6 +722,20 @@ body.dark-mode .editable-message .message-text:focus {
 
 body.dark-mode .editable-message .message-text:empty:before {
     color: #666;
+}
+
+/* Imagem na mensagem editável */
+.editable-message .message-image {
+    margin-bottom: 8px;
+    text-align: center;
+}
+
+.editable-message .message-image img {
+    max-width: 200px;
+    max-height: 200px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    object-fit: contain;
 }
 
 /* Controles do WhatsApp */
