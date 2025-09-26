@@ -688,7 +688,7 @@ body.dark-mode .whatsapp-attach-btn:hover {
     min-height: 40px;
     padding: 8px 12px;
     border: 2px solid transparent;
-    border-radius: 18px;
+    border-radius: 0 0 18px 18px;
     transition: all 0.3s ease;
     outline: none;
     word-wrap: break-word;
@@ -697,6 +697,7 @@ body.dark-mode .whatsapp-attach-btn:hover {
     line-height: 1.4;
     font-family: inherit;
     background: #dcf8c6;
+    margin-top: 0;
 }
 
 .editable-message .message-text a {
@@ -755,6 +756,17 @@ body.dark-mode .whatsapp-attach-btn:hover {
     border-color: #25d366;
     box-shadow: 0 0 0 3px rgba(37, 211, 102, 0.1);
     background: #dcf8c6;
+}
+
+/* Quando há imagem, ajustar bordas */
+.editable-message:has(.message-image) .message-text {
+    border-radius: 0 0 18px 18px;
+    margin-top: 0;
+}
+
+/* Quando não há imagem, bordas normais */
+.editable-message:not(:has(.message-image)) .message-text {
+    border-radius: 18px;
 }
 
 .editable-message .message-text:empty:before {
@@ -831,10 +843,10 @@ body.dark-mode .editable-message .message-text:empty:before {
 
 /* Imagem na mensagem editável */
 .editable-message .message-image {
-    margin: 0 0 8px 0;
+    margin: 0 0 0 0;
     padding: 0;
-    background: #dcf8c6;
-    border-radius: 18px;
+    background: transparent;
+    border-radius: 0;
     overflow: hidden;
 }
 
@@ -844,7 +856,7 @@ body.dark-mode .editable-message .message-text:empty:before {
     height: auto;
     max-height: 400px;
     min-height: 200px;
-    border-radius: 0;
+    border-radius: 18px 18px 0 0;
     box-shadow: none;
     object-fit: cover;
     display: block;
