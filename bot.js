@@ -350,38 +350,8 @@ class BotManager {
                 throw new Error('Servidor não disponível');
             }
 
-            // Estratégia especial para preview do link (apenas quando não há imagem)
-            if (!image) {
-                console.log('📱 WhatsApp: Enviando mensagem para carregar preview...');
-                
-                // Primeiro envio - para que o WhatsApp processe o link
-                this.socket.emit('send-whatsapp', {
-                    chatId: this.whatsappGroup,
-                    message: message,
-                    image: null
-                });
-                
-                console.log('📱 WhatsApp: Aguardando 3s para processar link...');
-                await new Promise(resolve => setTimeout(resolve, 3000));
-                
-                console.log('📱 WhatsApp: Enviando novamente para forçar preview...');
-                // Segundo envio - para forçar o preview
-                this.socket.emit('send-whatsapp', {
-                    chatId: this.whatsappGroup,
-                    message: message,
-                    image: null
-                });
-                
-                console.log('📱 WhatsApp: Aguardando mais 5s para preview carregar...');
-                await new Promise(resolve => setTimeout(resolve, 5000));
-                
-                console.log('📱 WhatsApp: Preview deve estar carregado!');
-                
-                return {
-                    success: true,
-                    message: `Mensagem enviada para o canal WhatsApp: ${this.whatsappGroup} (com preview)`
-                };
-            }
+            // Enviar mensagem normalmente (preview carrega automaticamente)
+            console.log('📱 WhatsApp: Enviando mensagem com link...');
 
             // Enviar via WebSocket real
             console.log('📱 Enviando para WhatsApp via WebSocket:', {
