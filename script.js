@@ -155,9 +155,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
     const whatsappScheduleResetBtn = document.getElementById('whatsappScheduleResetBtn');
     if (whatsappScheduleResetBtn) {
-        whatsappScheduleResetBtn.addEventListener('click', function() {
+        console.log('✅ Event listener do botão reset principal adicionado');
+        whatsappScheduleResetBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('🔄 Botão reset principal clicado!');
             resetWhatsAppSchedule();
         });
+    } else {
+        console.log('❌ Botão reset principal NÃO encontrado!');
     }
 });
 
@@ -1016,22 +1022,27 @@ function resetWhatsAppSchedule() {
     
     // Fechar área de agendamento
     const scheduleArea = document.getElementById('whatsappScheduleArea');
+    console.log('📍 Área de agendamento encontrada:', !!scheduleArea);
     if (scheduleArea) {
         scheduleArea.style.display = 'none';
+        console.log('✅ Área de agendamento fechada');
     }
     
     // Resetar botão de agendamento
     const scheduleBtn = document.getElementById('whatsappScheduleBtn');
+    console.log('📍 Botão de agendamento encontrado:', !!scheduleBtn);
     if (scheduleBtn) {
         scheduleBtn.classList.remove('active', 'scheduled');
         scheduleBtn.style.background = '';
         scheduleBtn.style.border = '';
+        console.log('✅ Classes removidas do botão');
         
         // Resetar ícone do relógio
         const clockIcon = scheduleBtn.querySelector('i');
         if (clockIcon) {
             clockIcon.style.color = '';
             clockIcon.style.textShadow = '';
+            console.log('✅ Ícone resetado');
         }
     }
     
@@ -1039,11 +1050,18 @@ function resetWhatsAppSchedule() {
     const dateSelect = document.getElementById('schedule-date-main');
     const timeInput = document.getElementById('schedule-time-main');
     
+    console.log('📍 Campos encontrados:', {
+        dateSelect: !!dateSelect,
+        timeInput: !!timeInput
+    });
+    
     if (dateSelect) {
         dateSelect.value = 'today';
+        console.log('✅ Data resetada para "today"');
     }
     if (timeInput) {
         timeInput.value = '';
+        console.log('✅ Hora resetada');
     }
     
     // Remover atributos de agendamento
@@ -1052,6 +1070,10 @@ function resetWhatsAppSchedule() {
         whatsappPreview.removeAttribute('data-scheduled');
         whatsappPreview.removeAttribute('data-schedule-time');
     }
+    
+    // Limpar mensagens agendadas da fila
+    messageQueue = messageQueue.filter(item => !item.schedule);
+    console.log('🧹 Mensagens agendadas removidas da fila');
     
     botManager.showMessage('🔄 Agendamento resetado!', 'info');
     console.log('✅ Agendamento da primeira caixa resetado');
@@ -1204,6 +1226,10 @@ function resetWhatsAppScheduleForBox(whatsappBox) {
     // Remover atributos de agendamento
     whatsappBox.removeAttribute('data-scheduled');
     whatsappBox.removeAttribute('data-schedule-time');
+    
+    // Limpar mensagens agendadas da fila
+    messageQueue = messageQueue.filter(item => !item.schedule);
+    console.log('🧹 Mensagens agendadas removidas da fila');
     
     botManager.showMessage('🔄 Agendamento resetado!', 'info');
     console.log('✅ Agendamento da caixa', whatsappBox.id, 'resetado');
