@@ -479,12 +479,19 @@ function handleWhatsAppImageUpload(event) {
 
 // Adicionar mensagem do input do WhatsApp
 function addMessageFromWhatsAppInput() {
+    console.log('addMessageFromWhatsAppInput chamada!');
     const messageTextInput = document.getElementById('messageTextInput');
     
+    console.log('messageTextInput:', messageTextInput);
+    console.log('textContent:', messageTextInput ? messageTextInput.textContent : 'não encontrado');
+    
     if (!messageTextInput || !messageTextInput.textContent.trim() || messageTextInput.textContent.trim() === 'Digite sua mensagem aqui...') {
+        console.log('Mensagem vazia ou inválida!');
         botManager.showMessage('Digite uma mensagem primeiro!', 'error');
         return;
     }
+    
+    console.log('Adicionando mensagem à fila...');
     
     // Adicionar mensagem à fila
     messageCounter++;
@@ -498,6 +505,7 @@ function addMessageFromWhatsAppInput() {
     };
     
     messageQueue.push(messageItem);
+    console.log('Mensagem adicionada! Fila agora tem:', messageQueue.length, 'mensagens');
     
     // Limpar input
     messageTextInput.textContent = '';
