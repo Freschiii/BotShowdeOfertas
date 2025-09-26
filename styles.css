@@ -286,6 +286,57 @@ body.dark-mode .queue-schedule-controls label {
     color: #ffffff;
 }
 
+/* Status dos Bots - Modo Escuro */
+body.dark-mode .bot-status {
+    background: #0D1117;
+}
+
+body.dark-mode .status-item {
+    background: #151B23;
+    color: #ffffff;
+    border: 1px solid #151B23;
+}
+
+body.dark-mode .status-item:hover {
+    background: #0D1117;
+    border-color: #29903B;
+}
+
+body.dark-mode .status-indicator {
+    color: #ffffff;
+}
+
+body.dark-mode .status-indicator.offline {
+    color: #dc3545;
+}
+
+body.dark-mode .status-indicator.online {
+    color: #29903B;
+}
+
+body.dark-mode .status-indicator.connecting {
+    color: #ffc107;
+}
+
+/* Melhorar legibilidade dos textos */
+body.dark-mode .status-item span {
+    color: #ffffff;
+    font-weight: 500;
+}
+
+body.dark-mode .status-item i {
+    color: #ffffff;
+    opacity: 0.9;
+}
+
+body.dark-mode .status-item i.fab.fa-whatsapp {
+    color: #25d366;
+}
+
+body.dark-mode .status-item i.fab.fa-telegram {
+    color: #0088cc;
+}
+
 .container {
     max-width: 800px;
     margin: 0 auto;
