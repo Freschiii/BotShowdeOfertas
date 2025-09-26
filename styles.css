@@ -765,7 +765,7 @@ body.dark-mode .whatsapp-attach-btn:hover {
 /* Quando há imagem, ajustar bordas */
 .editable-message:has(.message-image) .message-text {
     border-radius: 0 0 18px 18px;
-    margin-top: -8px;
+    margin-top: -10px;
     border: none;
     position: relative;
     z-index: 2;
@@ -860,7 +860,7 @@ body.dark-mode .editable-message .message-text:empty:before {
     border: none;
     position: relative;
     z-index: 1;
-    margin-bottom: -8px;
+    margin-bottom: -10px;
 }
 
 .editable-message .message-image img {
@@ -874,8 +874,7 @@ body.dark-mode .editable-message .message-text:empty:before {
     object-fit: cover;
     display: block;
     border-bottom: none;
-    background: #2A2A2A;
-    mix-blend-mode: multiply;
+    background: transparent;
 }
 
 /* Controles do WhatsApp */
@@ -1022,8 +1021,7 @@ body.dark-mode .whatsapp-message.typing .message-text {
     box-shadow: none;
     object-fit: cover;
     display: block;
-    background: #2A2A2A;
-    mix-blend-mode: multiply;
+    background: transparent;
 }
 
 /* Conteúdo da Mensagem */
