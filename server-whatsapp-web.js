@@ -104,11 +104,37 @@ async function connectWhatsApp() {
     }
 }
 
+// Função para verificar se preview carregou
+async function waitForPreviewLoad(message) {
+    // Verificar se a mensagem contém links
+    const urlRegex = /(https?:\/\/[^\s]+)/g;
+    const urls = message.match(urlRegex);
+    
+    if (!urls || urls.length === 0) {
+        console.log('📱 WhatsApp: Nenhum link encontrado, enviando imediatamente');
+        return true;
+    }
+    
+    console.log('📱 WhatsApp: Links encontrados, aguardando preview carregar...');
+    console.log('📱 WhatsApp: URLs detectadas:', urls);
+    
+    // Aguardar um tempo para o preview carregar
+    await new Promise(resolve => setTimeout(resolve, 8000)); // 8 segundos
+    
+    console.log('📱 WhatsApp: Preview deve estar carregado');
+    return true;
+}
+
 // Função para enviar mensagem WhatsApp
 async function sendWhatsAppMessage(chatId, message, image) {
     try {
         if (!whatsappClient || !isConnected) {
             throw new Error('WhatsApp não está conectado');
+        }
+
+        // Aguardar preview carregar se não há imagem
+        if (!image) {
+            await waitForPreviewLoad(message);
         }
 
         if (image) {

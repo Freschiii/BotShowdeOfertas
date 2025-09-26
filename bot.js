@@ -350,7 +350,7 @@ class BotManager {
                 throw new Error('Servidor não disponível');
             }
 
-            // Enviar mensagem normalmente - WhatsApp carrega preview automaticamente
+            // Enviar mensagem (servidor cuida do preview)
             console.log('📱 Enviando para WhatsApp via WebSocket:', {
                 chatId: this.whatsappGroup,
                 hasMessage: !!message,
