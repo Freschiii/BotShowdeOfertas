@@ -44,34 +44,28 @@ document.addEventListener('DOMContentLoaded', function() {
     const whatsappScheduleCancelBtn = document.getElementById('whatsappScheduleCancelBtn');
     
     if (messageTextInput) {
+        // Remover placeholder inicial
+        messageTextInput.textContent = '';
+        
         messageTextInput.addEventListener('input', function() {
-            // Atualizar placeholder
-            if (this.textContent.trim() === '') {
-                this.textContent = '';
-            }
+            updateWhatsAppPreview();
         });
         
-        messageTextInput.addEventListener('focus', function() {
-            if (this.textContent === 'Digite sua mensagem aqui...') {
-                this.textContent = '';
-            }
-        });
-        
-        messageTextInput.addEventListener('blur', function() {
-            if (this.textContent.trim() === '') {
-                this.textContent = 'Digite sua mensagem aqui...';
-            }
-        });
-        
-        // Interceptar colar para corrigir emojis
+        // Interceptar colar para preservar espaços
         messageTextInput.addEventListener('paste', function(e) {
             e.preventDefault();
             
             // Obter texto colado
             const pastedText = (e.clipboardData || window.clipboardData).getData('text/plain');
             
-            // Inserir texto sem formatação
-            document.execCommand('insertText', false, pastedText);
+            // Inserir texto preservando espaços
+            const selection = window.getSelection();
+            if (selection.rangeCount > 0) {
+                const range = selection.getRangeAt(0);
+                range.deleteContents();
+                range.insertNode(document.createTextNode(pastedText));
+                range.collapse(false);
+            }
             
             // Forçar tamanho correto após colar
             setTimeout(() => {

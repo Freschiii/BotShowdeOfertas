@@ -743,7 +743,7 @@ body.dark-mode .whatsapp-attach-btn:hover {
 }
 
 .editable-message .message-text:empty:before {
-    content: attr(placeholder);
+    content: 'Digite sua mensagem aqui...';
     color: #999;
     font-style: italic;
 }
@@ -816,16 +816,18 @@ body.dark-mode .editable-message .message-text:empty:before {
 
 /* Imagem na mensagem editável */
 .editable-message .message-image {
-    margin-bottom: 8px;
-    text-align: center;
+    margin: 0 0 8px 0;
+    padding: 0 8px 0 0; /* Alinha com a margem verde do texto */
 }
 
 .editable-message .message-image img {
-    max-width: 200px;
-    max-height: 200px;
+    max-width: 100%;
+    height: auto;
+    max-height: 300px;
     border-radius: 8px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     object-fit: contain;
+    display: block;
 }
 
 /* Controles do WhatsApp */
