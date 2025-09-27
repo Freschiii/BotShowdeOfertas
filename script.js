@@ -1706,183 +1706,38 @@ function updateHistoryDisplay() {
 }
 
 // Limpar todas as caixas de mensagem após envio
+// RESET SIMPLIFICADO - APENAS LIMPAR CAIXA DE TEXTO
 function clearAllMessageBoxes() {
-    console.log('🧹 Limpando todas as caixas de mensagem...');
+    console.log('🧹 Reset simplificado - apenas limpar caixa de texto');
     
-    // Limpar fila de mensagens
+    // 1. Limpar fila de mensagens
     messageQueue = [];
-    console.log('📋 Fila de mensagens limpa');
     
-    // Verificar quantas caixas existem
-    const allMessageBoxes = document.querySelectorAll('.whatsapp-message.received.editable-message');
-    console.log('📦 Caixas encontradas para limpeza:', allMessageBoxes.length);
-    
-    // Verificar também as caixas completas do WhatsApp
-    const allWhatsAppBoxes = document.querySelectorAll('.whatsapp-preview');
-    console.log('📦 Caixas completas do WhatsApp encontradas:', allWhatsAppBoxes.length);
-    
-    // Debug: listar todas as caixas encontradas
-    allWhatsAppBoxes.forEach((box, i) => {
-        console.log(`📦 Caixa ${i + 1}:`, box.id, box.className);
-    });
-    
-    // Limpar todas as caixas completas do WhatsApp
-    allWhatsAppBoxes.forEach((whatsappBox, index) => {
-        console.log(`🧹 Limpando caixa ${index + 1}:`, whatsappBox.id);
-        
-        // Debug: verificar conteúdo antes da limpeza
-        const beforeText = whatsappBox.querySelector('.message-text')?.textContent || '';
-        console.log(`📝 Conteúdo ANTES da limpeza da caixa ${index + 1}:`, beforeText.substring(0, 50));
-        
-        // Encontrar a mensagem dentro desta caixa (pode ser .editable-message ou .received)
-        let messageBox = whatsappBox.querySelector('.whatsapp-message.received.editable-message');
-        if (!messageBox) {
-            messageBox = whatsappBox.querySelector('.whatsapp-message.received');
-        }
-        if (!messageBox) {
-            messageBox = whatsappBox.querySelector('.whatsapp-message');
-        }
-        
-        console.log(`🔍 Mensagem encontrada na caixa ${index + 1}:`, !!messageBox);
-        
-        if (messageBox) {
-            const messageText = messageBox.querySelector('.message-text');
-            const messageImage = messageBox.querySelector('.message-image');
-            
-            // Limpar texto
-            if (messageText) {
-                messageText.textContent = '';
-                messageText.innerHTML = '';
-                console.log(`✅ Texto da caixa ${index + 1} limpo`);
-            }
-            
-            // Remover imagem
-            if (messageImage) {
-                messageImage.remove();
-                console.log(`✅ Imagem da caixa ${index + 1} removida`);
-            }
-            
-            // Limpeza adicional: remover TODOS os elementos de texto e imagem da caixa
-            const allTextElements = messageBox.querySelectorAll('.message-text, .whatsapp-message .message-text');
-            allTextElements.forEach((textEl, i) => {
-                textEl.textContent = '';
-                textEl.innerHTML = '';
-                console.log(`✅ Elemento de texto adicional ${i + 1} da caixa ${index + 1} limpo`);
-            });
-            
-            const allImages = messageBox.querySelectorAll('.message-image, .whatsapp-message .message-image');
-            allImages.forEach((imgEl, i) => {
-                imgEl.remove();
-                console.log(`✅ Elemento de imagem adicional ${i + 1} da caixa ${index + 1} removido`);
-            });
-        } else {
-            console.log(`⚠️ Nenhuma mensagem encontrada na caixa ${index + 1}, tentando limpar input principal`);
-            
-            // Se não encontrar mensagem, tentar limpar o input principal desta caixa
-            const mainInput = whatsappBox.querySelector('#messageTextInput');
-            if (mainInput) {
-                mainInput.textContent = '';
-                mainInput.innerHTML = '';
-                console.log(`✅ Input principal da caixa ${index + 1} limpo`);
-            }
-            
-            // Também tentar limpar qualquer texto que possa estar na caixa
-            const allTextElements = whatsappBox.querySelectorAll('.message-text, .whatsapp-message .message-text');
-            allTextElements.forEach((textEl, i) => {
-                textEl.textContent = '';
-                textEl.innerHTML = '';
-                console.log(`✅ Elemento de texto ${i + 1} da caixa ${index + 1} limpo`);
-            });
-        }
-        
-        // Resetar botão de agendamento
-        const scheduleBtn = whatsappBox.querySelector('.whatsapp-control-btn[title="Agendar Mensagem"]');
-        if (scheduleBtn) {
-            scheduleBtn.classList.remove('active', 'scheduled');
-            scheduleBtn.style.background = '';
-            scheduleBtn.style.border = '';
-            
-            // Resetar ícone do relógio
-            const clockIcon = scheduleBtn.querySelector('i');
-            if (clockIcon) {
-                clockIcon.style.color = '';
-                clockIcon.style.textShadow = '';
-            }
-            console.log(`✅ Botão de agendamento da caixa ${index + 1} resetado`);
-        }
-        
-        // Remover atributos de agendamento da caixa
-        whatsappBox.removeAttribute('data-scheduled');
-        whatsappBox.removeAttribute('data-schedule-time');
-        
-        // Fechar área de agendamento se estiver aberta
-        const scheduleArea = whatsappBox.querySelector('.whatsapp-schedule-area');
-        if (scheduleArea) {
-            scheduleArea.style.display = 'none';
-            
-            // Resetar campos de data e hora
-            const dateSelect = scheduleArea.querySelector('.schedule-date-select');
-            const timeInput = scheduleArea.querySelector('.schedule-time-input');
-            
-            if (dateSelect) {
-                dateSelect.value = 'today'; // Resetar para "Hoje"
-            }
-            if (timeInput) {
-                timeInput.value = ''; // Limpar horário
-            }
-            console.log(`✅ Área de agendamento da caixa ${index + 1} fechada`);
-        }
-        
-        // Para a primeira caixa, apenas esvaziar conteúdo (NÃO mexer na estrutura)
-        if (index === 0) {
-            console.log(`🔄 Esvaziando conteúdo da caixa ${index + 1} (primeira caixa)...`);
-            
-            // Apenas esvaziar o input principal - SEM mexer na estrutura
-            const mainInput = whatsappBox.querySelector('#messageTextInput');
-            if (mainInput) {
-                mainInput.textContent = '';
-                mainInput.innerHTML = '';
-                mainInput.value = '';
-                console.log(`✅ Input principal da caixa ${index + 1} esvaziado`);
-            }
-            
-            // Remover apenas mensagens recebidas (não o input principal)
-            const allReceivedMessages = whatsappBox.querySelectorAll('.whatsapp-message.received.editable-message');
-            allReceivedMessages.forEach(msg => {
-                msg.remove();
-            });
-            
-            console.log(`✅ Caixa ${index + 1} esvaziada (estrutura mantida intacta)`);
-        } else {
-            // Para caixas duplicadas, DELETAR completamente
-            console.log(`🗑️ Deletando caixa duplicada ${index + 1}...`);
-            whatsappBox.remove();
-            console.log(`✅ Caixa duplicada ${index + 1} deletada`);
-        }
-        
-        // Debug: verificar conteúdo após a limpeza
-        const afterText = whatsappBox.querySelector('.message-text')?.textContent || '';
-        console.log(`📝 Conteúdo APÓS a limpeza da caixa ${index + 1}:`, afterText.substring(0, 50));
-        
-        console.log(`✅ Caixa ${index + 1} completamente limpa`);
-    });
-    
-    // Apenas esvaziar input principal (NÃO mexer na estrutura)
+    // 2. Limpar input principal (primeira caixa)
     const mainInput = document.getElementById('messageTextInput');
     if (mainInput) {
-        mainInput.value = '';
         mainInput.textContent = '';
         mainInput.innerHTML = '';
-        console.log('✅ Input principal esvaziado (estrutura mantida)');
+        mainInput.value = '';
+        console.log('✅ Input principal limpo');
     }
     
-    // Atualizar contador de mensagens
+    // 3. Remover todas as caixas duplicadas
+    const allWhatsAppBoxes = document.querySelectorAll('.whatsapp-preview');
+    allWhatsAppBoxes.forEach((box, index) => {
+        if (index > 0) { // Manter apenas a primeira (index 0)
+            box.remove();
+            console.log(`✅ Caixa duplicada ${index + 1} removida`);
+        }
+    });
+    
+    // 4. Atualizar contador
     updateMessageCounter();
     
-    // Mostrar notificação para o usuário
+    // 5. Mostrar notificação
     botManager.showMessage('🧹 Caixas limpas! Pronto para novas mensagens.', 'info');
     
-    console.log('✅ Todas as caixas foram limpas!');
+    console.log('✅ Reset simplificado concluído!');
 }
 
 // Agendar mensagem da fila
