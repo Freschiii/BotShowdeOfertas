@@ -25,8 +25,7 @@ let messageQueue = [];
 let messageCounter = 0;
 let messageHistory = [];
 
-// Instanciar BotManager
-const botManager = new BotManager();
+// BotManager já está instanciado no bot.js
 
 // Event Listeners (com verificação de existência)
 if (elements.connectWhatsApp) {

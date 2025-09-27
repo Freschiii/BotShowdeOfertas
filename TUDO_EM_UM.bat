@@ -751,8 +751,7 @@ echo.
 echo     let messageQueue = [];
 echo     let messageHistory = [];
 echo.
-echo     // Instanciar BotManager
-echo     const botManager = new BotManager(^);
+echo     // BotManager já está instanciado no bot.js
 echo.
 echo     // Event listeners
 echo     messageTextInput.addEventListener('keydown', function(e^) {
