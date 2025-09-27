@@ -83,10 +83,17 @@ document.addEventListener('DOMContentLoaded', function() {
         messageTextInput.contentEditable = 'true';
         messageTextInput.setAttribute('contenteditable', 'true');
         
+        // Remover placeholder CSS
+        messageTextInput.style.setProperty('--placeholder', 'none');
+        
         // Configurar placeholder inicial
         messageTextInput.textContent = 'Digite sua mensagem aqui...';
         messageTextInput.style.color = '#999';
         messageTextInput.classList.add('placeholder');
+        
+        // Forçar foco para testar
+        messageTextInput.focus();
+        messageTextInput.blur();
         
         messageTextInput.addEventListener('input', function() {
             // Detectar e converter links automaticamente
@@ -1751,6 +1758,11 @@ function clearAllMessageBoxes() {
         mainInput.textContent = 'Digite sua mensagem aqui...';
         mainInput.style.color = '#999';
         mainInput.classList.add('placeholder');
+        
+        // Forçar foco para testar
+        mainInput.focus();
+        mainInput.blur();
+        
         console.log('✅ Input principal limpo e placeholder restaurado');
     }
     

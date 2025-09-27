@@ -789,14 +789,13 @@ body.dark-mode .whatsapp-attach-btn:hover {
     border-radius: 18px;
 }
 
+/* Placeholder CSS desabilitado - usando JavaScript */
 .editable-message .message-text:empty:before {
-    content: 'Digite sua mensagem aqui...';
-    color: #999;
-    font-style: italic;
+    content: none !important;
 }
 
 .editable-message .message-text:empty:focus:before {
-    content: '';
+    content: none !important;
 }
 
 body.dark-mode .editable-message .message-text:focus {
