@@ -155,19 +155,58 @@ class BotManager {
 
     // Mostrar QR Code real do servidor
     showRealQRCode(qrCodeDataURL) {
-        console.log('Mostrando QR Code visual:', qrCodeDataURL ? 'Sim' : 'Não');
-        const qrContainer = document.getElementById('qrCode');
-        if (qrContainer) {
-            qrContainer.innerHTML = `
-                <img src="${qrCodeDataURL}" alt="QR Code para conectar WhatsApp" style="max-width: 200px; height: auto; border-radius: 8px;">
-                <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">
-                    Escaneie este QR Code com seu WhatsApp
-                </p>
+        console.log('📱 Mostrando QR Code visual:', qrCodeDataURL ? 'Sim' : 'Não');
+        
+        // Criar ou encontrar container do QR Code
+        let qrContainer = document.getElementById('qrCode');
+        if (!qrContainer) {
+            // Criar container se não existir
+            qrContainer = document.createElement('div');
+            qrContainer.id = 'qrCode';
+            qrContainer.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                padding: 20px;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                z-index: 10000;
+                text-align: center;
+                max-width: 90vw;
+                max-height: 90vh;
             `;
-            console.log('QR Code visual inserido no HTML');
-        } else {
-            console.error('Container do QR Code não encontrado');
+            document.body.appendChild(qrContainer);
         }
+        
+        qrContainer.innerHTML = `
+            <div style="background: #25d366; color: white; padding: 15px; border-radius: 10px 10px 0 0; margin: -20px -20px 20px -20px;">
+                <h3 style="margin: 0; font-size: 1.2rem;">📱 Conectar WhatsApp</h3>
+            </div>
+            <img src="${qrCodeDataURL}" alt="QR Code para conectar WhatsApp" style="max-width: 300px; height: auto; border-radius: 8px; border: 2px solid #25d366;">
+            <p style="margin-top: 15px; font-size: 1rem; color: #333; font-weight: 600;">
+                Escaneie este QR Code com seu WhatsApp
+            </p>
+            <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">
+                • Abra o WhatsApp no seu celular<br>
+                • Toque em "Dispositivos conectados"<br>
+                • Toque em "Conectar um dispositivo"<br>
+                • Escaneie este QR Code
+            </p>
+            <button onclick="document.getElementById('qrCode').style.display='none'" style="
+                background: #ff6b35;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 20px;
+                cursor: pointer;
+                margin-top: 15px;
+                font-weight: 600;
+            ">Fechar</button>
+        `;
+        
+        console.log('✅ QR Code visual inserido no HTML');
     }
 
     // Mostrar QR Code ASCII do terminal

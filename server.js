@@ -69,22 +69,32 @@ async function connectWhatsApp() {
         whatsappSocket.ev.on('connection.update', (update) => {
             const { connection, lastDisconnect, qr } = update;
             
+            console.log('🔄 Status do WhatsApp:', connection);
+            
             // SEMPRE começar como offline
             if (!isConnected) {
                 io.emit('whatsapp-status', { status: 'offline' });
             }
             
             if (qr) {
-                console.log('QR Code gerado, enviando para cliente...');
+                console.log('📱 QR Code gerado, enviando para cliente...');
                 // Gerar QR Code e enviar para o cliente
-                qrcode.toDataURL(qr).then(qrCodeDataURL => {
-                    console.log('QR Code convertido para DataURL, enviando...');
+                qrcode.toDataURL(qr, {
+                    width: 300,
+                    margin: 2,
+                    color: {
+                        dark: '#000000',
+                        light: '#FFFFFF'
+                    }
+                }).then(qrCodeDataURL => {
+                    console.log('✅ QR Code convertido para DataURL, enviando...');
                     io.emit('whatsapp-qr', qrCodeDataURL);
                     // Resetar status quando QR Code é gerado
                     isConnected = false;
                     io.emit('whatsapp-status', { status: 'offline' });
                 }).catch(error => {
-                    console.error('Erro ao gerar QR Code:', error);
+                    console.error('❌ Erro ao gerar QR Code:', error);
+                    io.emit('whatsapp-error', { message: 'Erro ao gerar QR Code' });
                 });
             }
             
@@ -142,34 +152,40 @@ io.on('connection', (socket) => {
     
     // Conectar WhatsApp
     socket.on('connect-whatsapp', async () => {
-        console.log('Solicitação para conectar WhatsApp');
+        console.log('📱 Solicitação para conectar WhatsApp');
+        
         // Limpar sessão anterior
         if (whatsappSocket) {
             try {
+                console.log('🔄 Fazendo logout da sessão anterior...');
                 await whatsappSocket.logout();
             } catch (e) {
-                console.log('Erro ao fazer logout:', e.message);
+                console.log('⚠️ Erro ao fazer logout:', e.message);
             }
         }
+        
         // Limpar arquivos de autenticação
         const fs = require('fs');
         const path = require('path');
         try {
             const authDir = './auth_info_baileys';
             if (fs.existsSync(authDir)) {
+                console.log('🗑️ Limpando sessão anterior...');
                 const files = fs.readdirSync(authDir);
                 files.forEach(file => {
                     fs.unlinkSync(path.join(authDir, file));
                 });
-                console.log('Sessão anterior removida');
+                console.log('✅ Sessão anterior removida');
             }
         } catch (e) {
-            console.log('Erro ao limpar sessão:', e.message);
+            console.log('⚠️ Erro ao limpar sessão:', e.message);
         }
+        
         // Aguardar um pouco antes de conectar
+        console.log('⏳ Aguardando para reconectar...');
         setTimeout(() => {
             connectWhatsApp();
-        }, 1000);
+        }, 2000);
     });
     
     // Enviar mensagem WhatsApp

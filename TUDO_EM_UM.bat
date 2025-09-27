@@ -489,29 +489,213 @@ echo const express = require('express'^);
 echo const http = require('http'^);
 echo const socketIo = require('socket.io'^);
 echo const path = require('path'^);
+echo const { default: makeWASocket, DisconnectReason, useMultiFileAuthState } = require('@whiskeysockets/baileys'^);
+echo const qrcode = require('qrcode'^);
 echo.
 echo const app = express(^);
 echo const server = http.createServer(app^);
-echo const io = socketIo(server^);
+echo const io = socketIo(server, {
+echo     cors: {
+echo         origin: "*",
+echo         methods: ["GET", "POST"]
+echo     }
+echo }^);
 echo.
-echo const PORT = process.env.PORT ^|^| 3000;
+echo // Servir arquivos estáticos
+echo app.use(express.static('.'^)^);
 echo.
-echo app.use(express.static(__dirname^)^);
-echo.
+echo // Rota principal
 echo app.get('/', (req, res^) =^> {
 echo     res.sendFile(path.join(__dirname, 'index.html'^)^);
 echo }^);
 echo.
-echo io.on('connection', (socket^) =^> {
-echo     console.log('Cliente conectado:', socket.id^);
+echo // Estado do WhatsApp
+echo let whatsappSocket = null;
+echo let isConnected = false;
 echo.
+echo // Função para conectar WhatsApp
+echo async function connectWhatsApp(^) {
+echo     try {
+echo         // FORÇAR DESCONEXÃO COMPLETA
+echo         isConnected = false;
+echo         io.emit('whatsapp-status', { status: 'offline' }^);
+echo         
+echo         // Limpar socket anterior
+echo         if (whatsappSocket^) {
+echo             try {
+echo                 await whatsappSocket.logout(^);
+echo             } catch (e^) {}
+echo             whatsappSocket = null;
+echo         }
+echo         
+echo         const { state, saveCreds } = await useMultiFileAuthState('./auth_info_baileys'^);
+echo         
+echo         whatsappSocket = makeWASocket({
+echo             auth: state,
+echo             printQRInTerminal: false,
+echo             logger: {
+echo                 level: 'silent',
+echo                 child: (^) =^> ({
+echo                     level: 'silent',
+echo                     trace: (^) =^> {},
+echo                     debug: (^) =^> {},
+echo                     info: (^) =^> {},
+echo                     warn: (^) =^> {},
+echo                     error: (^) =^> {},
+echo                     fatal: (^) =^> {}
+echo                 }^),
+echo                 trace: (^) =^> {},
+echo                 debug: (^) =^> {},
+echo                 info: (^) =^> {},
+echo                 warn: (^) =^> {},
+echo                 error: (^) =^> {},
+echo                 fatal: (^) =^> {}
+echo             }
+echo         }^);
+echo.
+echo         whatsappSocket.ev.on('connection.update', (update^) =^> {
+echo             const { connection, lastDisconnect, qr } = update;
+echo             
+echo             console.log('🔄 Status do WhatsApp:', connection^);
+echo             
+echo             // SEMPRE começar como offline
+echo             if (!isConnected^) {
+echo                 io.emit('whatsapp-status', { status: 'offline' }^);
+echo             }
+echo             
+echo             if (qr^) {
+echo                 console.log('📱 QR Code gerado, enviando para cliente...'^);
+echo                 // Gerar QR Code e enviar para o cliente
+echo                 qrcode.toDataURL(qr, {
+echo                     width: 300,
+echo                     margin: 2,
+echo                     color: {
+echo                         dark: '#000000',
+echo                         light: '#FFFFFF'
+echo                     }
+echo                 }^).then(qrCodeDataURL =^> {
+echo                     console.log('✅ QR Code convertido para DataURL, enviando...'^);
+echo                     io.emit('whatsapp-qr', qrCodeDataURL^);
+echo                     // Resetar status quando QR Code é gerado
+echo                     isConnected = false;
+echo                     io.emit('whatsapp-status', { status: 'offline' }^);
+echo                 }^).catch(error =^> {
+echo                     console.error('❌ Erro ao gerar QR Code:', error^);
+echo                     io.emit('whatsapp-error', { message: 'Erro ao gerar QR Code' }^);
+echo                 }^);
+echo             }
+echo             
+echo             if (connection === 'close'^) {
+echo                 isConnected = false;
+echo                 io.emit('whatsapp-status', { status: 'offline' }^);
+echo                 console.log('WhatsApp desconectado'^);
+echo                 // NÃO RECONECTAR AUTOMATICAMENTE
+echo             } else if (connection === 'open'^) {
+echo                 // Só marcar como conectado quando realmente conectar
+echo                 isConnected = true;
+echo                 io.emit('whatsapp-status', { status: 'online' }^);
+echo                 console.log('WhatsApp conectado!'^);
+echo             } else if (connection === 'connecting'^) {
+echo                 // Mostrar status de conectando
+echo                 io.emit('whatsapp-status', { status: 'connecting' }^);
+echo             }
+echo         }^);
+echo.
+echo         whatsappSocket.ev.on('creds.update', saveCreds^);
+echo.
+echo     } catch (error^) {
+echo         console.error('Erro ao conectar WhatsApp:', error^);
+echo         io.emit('whatsapp-error', { message: error.message }^);
+echo     }
+echo }
+echo.
+echo // Função para enviar mensagem WhatsApp
+echo async function sendWhatsAppMessage(chatId, message, imagePath = null^) {
+echo     try {
+echo         if (!isConnected ^|^| !whatsappSocket^) {
+echo             throw new Error('WhatsApp não está conectado'^);
+echo         }
+echo.
+echo         if (imagePath^) {
+echo             // Enviar com imagem
+echo             await whatsappSocket.sendMessage(chatId, {
+echo                 image: { url: imagePath },
+echo                 caption: message
+echo             }^);
+echo         } else {
+echo             // Enviar apenas texto
+echo             await whatsappSocket.sendMessage(chatId, { text: message }^);
+echo         }
+echo.
+echo         return { success: true, message: 'Mensagem enviada com sucesso' };
+echo     } catch (error^) {
+echo         return { success: false, message: error.message };
+echo     }
+echo }
+echo.
+echo // WebSocket para comunicação em tempo real
+echo io.on('connection', (socket^) =^> {
+echo     console.log('Cliente conectado'^);
+echo     
+echo     // Conectar WhatsApp
+echo     socket.on('connect-whatsapp', async (^) =^> {
+echo         console.log('📱 Solicitação para conectar WhatsApp'^);
+echo         
+echo         // Limpar sessão anterior
+echo         if (whatsappSocket^) {
+echo             try {
+echo                 console.log('🔄 Fazendo logout da sessão anterior...'^);
+echo                 await whatsappSocket.logout(^);
+echo             } catch (e^) {
+echo                 console.log('⚠️ Erro ao fazer logout:', e.message^);
+echo             }
+echo         }
+echo         
+echo         // Limpar arquivos de autenticação
+echo         const fs = require('fs'^);
+echo         const path = require('path'^);
+echo         try {
+echo             const authDir = './auth_info_baileys';
+echo             if (fs.existsSync(authDir^)^) {
+echo                 console.log('🗑️ Limpando sessão anterior...'^);
+echo                 const files = fs.readdirSync(authDir^);
+echo                 files.forEach(file =^> {
+echo                     fs.unlinkSync(path.join(authDir, file^)^);
+echo                 }^);
+echo                 console.log('✅ Sessão anterior removida'^);
+echo             }
+echo         } catch (e^) {
+echo             console.log('⚠️ Erro ao limpar sessão:', e.message^);
+echo         }
+echo         
+echo         // Aguardar um pouco antes de conectar
+echo         console.log('⏳ Aguardando para reconectar...'^);
+echo         setTimeout((^) =^> {
+echo             connectWhatsApp(^);
+echo         }, 2000^);
+echo     }^);
+echo     
+echo     // Enviar mensagem WhatsApp
+echo     socket.on('send-whatsapp', async (data^) =^> {
+echo         const { chatId, message, image } = data;
+echo         const result = await sendWhatsAppMessage(chatId, message, image^);
+echo         socket.emit('whatsapp-result', result^);
+echo     }^);
+echo     
+echo     // Verificar status
+echo     socket.on('check-status', (^) =^> {
+echo         socket.emit('whatsapp-status', { status: isConnected ? 'online' : 'offline' }^);
+echo     }^);
+echo     
 echo     socket.on('disconnect', (^) =^> {
-echo         console.log('Cliente desconectado:', socket.id^);
+echo         console.log('Cliente desconectado'^);
 echo     }^);
 echo }^);
 echo.
+echo const PORT = process.env.PORT ^|^| 3000;
 echo server.listen(PORT, (^) =^> {
 echo     console.log(`🚀 Servidor rodando em http://localhost:${PORT}`^);
+echo     console.log(`Acesse: http://localhost:${PORT}`^);
 echo }^);
 ) > server.js
 

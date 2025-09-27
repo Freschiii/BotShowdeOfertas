@@ -1837,6 +1837,30 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Conectar automaticamente WhatsApp e Telegram
     autoConnectBots();
+    
+    // Adicionar botão de reconexão WhatsApp
+    const reconnectBtn = document.createElement('button');
+    reconnectBtn.innerHTML = '🔄 Reconectar WhatsApp';
+    reconnectBtn.style.cssText = `
+        background: #25d366;
+        color: white;
+        border: none;
+        padding: 10px 20px;
+        border-radius: 20px;
+        cursor: pointer;
+        margin: 10px;
+        font-weight: 600;
+    `;
+    reconnectBtn.onclick = () => {
+        console.log('🔄 Reconectando WhatsApp...');
+        botManager.connectWhatsApp();
+    };
+    
+    // Adicionar botão ao header
+    const header = document.querySelector('.whatsapp-header');
+    if (header) {
+        header.appendChild(reconnectBtn);
+    }
 });
 
 // Conectar automaticamente os bots
