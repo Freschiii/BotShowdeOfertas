@@ -928,40 +928,32 @@ function handlePastedImage(file, textInput) {
         // Encontrar a caixa de mensagem correspondente
         const messageBox = textInput.closest('.whatsapp-message.received.editable-message');
         if (messageBox) {
-            // Remover imagem anterior se existir
-            const existingImage = messageBox.querySelector('.message-image');
-            if (existingImage) {
-                existingImage.remove();
+            // Encontrar o message-content (mesmo local do upload por arquivo)
+            const messageContent = messageBox.querySelector('.message-content');
+            if (messageContent) {
+                // Remover imagem anterior se existir
+                const existingImage = messageContent.querySelector('.message-image');
+                if (existingImage) {
+                    existingImage.remove();
+                }
+                
+                // Criar elemento de imagem (mesmo formato do upload por arquivo)
+                const imageDiv = document.createElement('div');
+                imageDiv.className = 'message-image';
+                imageDiv.innerHTML = `<img src="${base64Data}" alt="Imagem colada">`;
+                
+                // Inserir imagem antes do texto (mesmo local do upload por arquivo)
+                const messageText = messageContent.querySelector('.message-text');
+                messageContent.insertBefore(imageDiv, messageText);
+                
+                // Salvar imagem para quando adicionar à fila (mesmo que upload por arquivo)
+                window.currentImage = base64Data;
+                
+                // Mostrar mensagem de sucesso
+                botManager.showMessage('Imagem colada com sucesso!', 'success');
+                
+                console.log('📷 Imagem colada adicionada no mesmo local do upload por arquivo');
             }
-            
-            // Criar elemento de imagem
-            const imageContainer = document.createElement('div');
-            imageContainer.className = 'message-image';
-            imageContainer.innerHTML = `
-                <img src="${base64Data}" alt="Imagem colada" style="max-width: 200px; max-height: 200px; border-radius: 8px; margin: 5px 0;">
-                <button class="remove-image-btn" onclick="removeImage(this)" style="
-                    position: absolute; 
-                    top: 5px; 
-                    right: 5px; 
-                    background: rgba(0,0,0,0.7); 
-                    color: white; 
-                    border: none; 
-                    border-radius: 50%; 
-                    width: 20px; 
-                    height: 20px; 
-                    cursor: pointer;
-                    font-size: 12px;
-                ">×</button>
-            `;
-            
-            // Adicionar imagem à caixa de mensagem (após o texto)
-            messageBox.appendChild(imageContainer);
-            
-            // Mostrar mensagem de sucesso
-            botManager.showMessage('Imagem colada com sucesso!', 'success');
-            
-            // NÃO chamar updateWhatsAppPreview para não limpar o texto
-            console.log('📷 Imagem adicionada sem limpar o texto');
         }
     };
     
