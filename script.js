@@ -1833,16 +1833,17 @@ function clearAllMessageBoxes() {
             console.log(`✅ Área de agendamento da caixa ${index + 1} fechada`);
         }
         
-        // Para a primeira caixa, apenas limpar conteúdo mas manter estrutura
+        // Para a primeira caixa, apenas esvaziar conteúdo (NÃO mexer na estrutura)
         if (index === 0) {
-            console.log(`🔄 Limpando conteúdo da caixa ${index + 1} (primeira caixa)...`);
+            console.log(`🔄 Esvaziando conteúdo da caixa ${index + 1} (primeira caixa)...`);
             
-            // Limpar input principal
+            // Apenas esvaziar o input principal - SEM mexer na estrutura
             const mainInput = whatsappBox.querySelector('#messageTextInput');
             if (mainInput) {
                 mainInput.textContent = '';
                 mainInput.innerHTML = '';
                 mainInput.value = '';
+                console.log(`✅ Input principal da caixa ${index + 1} esvaziado`);
             }
             
             // Remover apenas mensagens recebidas (não o input principal)
@@ -1851,38 +1852,7 @@ function clearAllMessageBoxes() {
                 msg.remove();
             });
             
-            // Garantir que o input principal está visível e funcional
-            if (mainInput) {
-                mainInput.style.display = 'block';
-                mainInput.style.minHeight = '40px';
-                mainInput.style.height = 'auto';
-                mainInput.style.fontSize = '14px';
-                mainInput.style.lineHeight = '1.4';
-                mainInput.style.padding = '10px';
-                mainInput.style.border = '1px solid #333';
-                mainInput.style.borderRadius = '20px';
-                mainInput.style.backgroundColor = '#1a1a1a';
-                mainInput.style.color = '#ffffff';
-                mainInput.style.outline = 'none';
-                mainInput.style.resize = 'none';
-                mainInput.style.overflow = 'hidden';
-                mainInput.style.wordWrap = 'break-word';
-                mainInput.style.whiteSpace = 'pre-wrap';
-                mainInput.style.fontFamily = 'inherit';
-                mainInput.style.width = '100%';
-                mainInput.style.boxSizing = 'border-box';
-                
-                // Restaurar placeholder via CSS
-                mainInput.setAttribute('data-placeholder', 'Digite sua mensagem aqui...');
-                
-                // Garantir que o input está editável
-                mainInput.contentEditable = 'true';
-                mainInput.setAttribute('contenteditable', 'true');
-                
-                console.log(`✅ Input principal da caixa ${index + 1} restaurado com estilos completos`);
-            }
-            
-            console.log(`✅ Caixa ${index + 1} limpa (mantendo estrutura e input)`);
+            console.log(`✅ Caixa ${index + 1} esvaziada (estrutura mantida intacta)`);
         } else {
             // Para caixas duplicadas, DELETAR completamente
             console.log(`🗑️ Deletando caixa duplicada ${index + 1}...`);
@@ -1897,41 +1867,13 @@ function clearAllMessageBoxes() {
         console.log(`✅ Caixa ${index + 1} completamente limpa`);
     });
     
-    // Limpar e restaurar input principal se existir
+    // Apenas esvaziar input principal (NÃO mexer na estrutura)
     const mainInput = document.getElementById('messageTextInput');
     if (mainInput) {
         mainInput.value = '';
         mainInput.textContent = '';
         mainInput.innerHTML = '';
-        
-        // Restaurar estilos completos do input principal
-        mainInput.style.display = 'block';
-        mainInput.style.minHeight = '40px';
-        mainInput.style.height = 'auto';
-        mainInput.style.fontSize = '14px';
-        mainInput.style.lineHeight = '1.4';
-        mainInput.style.padding = '10px';
-        mainInput.style.border = '1px solid #333';
-        mainInput.style.borderRadius = '20px';
-        mainInput.style.backgroundColor = '#1a1a1a';
-        mainInput.style.color = '#ffffff';
-        mainInput.style.outline = 'none';
-        mainInput.style.resize = 'none';
-        mainInput.style.overflow = 'hidden';
-        mainInput.style.wordWrap = 'break-word';
-        mainInput.style.whiteSpace = 'pre-wrap';
-        mainInput.style.fontFamily = 'inherit';
-        mainInput.style.width = '100%';
-        mainInput.style.boxSizing = 'border-box';
-        
-        // Restaurar placeholder via CSS
-        mainInput.setAttribute('data-placeholder', 'Digite sua mensagem aqui...');
-        
-        // Garantir que o input está editável
-        mainInput.contentEditable = 'true';
-        mainInput.setAttribute('contenteditable', 'true');
-        
-        console.log('✅ Input principal limpo e restaurado com estilos completos');
+        console.log('✅ Input principal esvaziado (estrutura mantida)');
     }
     
     // Atualizar contador de mensagens
