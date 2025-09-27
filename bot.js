@@ -309,18 +309,23 @@ class BotManager {
             border: 5px solid #25d366 !important;
         `;
         
+        // Converter QR Code ASCII para imagem visual
+        const qrImage = this.convertASCIIToImage(qrCodeASCII);
+        
         qrContainer.innerHTML = `
             <div style="background: #25d366; color: white; padding: 20px; border-radius: 15px 15px 0 0; margin: -30px -30px 20px -30px;">
                 <h2 style="margin: 0; font-size: 1.5rem;">📱 Conectar WhatsApp</h2>
             </div>
             <div style="background: #f0f0f0; padding: 20px; border-radius: 10px; margin: 20px 0; max-height: 400px; overflow: auto; border: 2px solid #25d366;">
                 <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
-                    <p style="color: #666; margin-bottom: 10px; font-size: 0.9rem;">QR Code ASCII:</p>
-                    <pre style="font-family: 'Courier New', monospace; font-size: 6px; line-height: 0.8; color: #000; margin: 0; white-space: pre; overflow: auto; text-align: left; display: inline-block;">${qrCodeASCII}</pre>
+                    <p style="color: #666; margin-bottom: 10px; font-size: 0.9rem;">QR Code Visual:</p>
+                    <div style="background: #000; padding: 10px; border-radius: 5px; display: inline-block;">
+                        <img src="${qrImage}" alt="QR Code WhatsApp" style="max-width: 300px; height: auto; border-radius: 5px; background: white; padding: 5px;">
+                    </div>
                 </div>
                 <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px;">
                     <p style="margin: 0; font-size: 0.8rem; color: #856404;">
-                        <strong>💡 Dica:</strong> Se o QR Code não aparecer, verifique o console do servidor onde deve estar sendo exibido.
+                        <strong>💡 Dica:</strong> QR Code visual gerado a partir do ASCII. Escaneie com seu WhatsApp.
                     </p>
                 </div>
             </div>
@@ -352,9 +357,9 @@ class BotManager {
         
         document.body.appendChild(qrContainer);
         
-        console.log('✅ QR Code ASCII inserido no HTML');
+        console.log('✅ QR Code ASCII convertido para imagem');
         console.log('✅ Modal do QR Code criado com sucesso');
-        console.log('🔍 Modal deve estar visível agora com borda verde');
+        console.log('🔍 Modal deve estar visível agora com QR Code visual');
         
         // TESTE VISUAL - Adicionar animação
         qrContainer.style.animation = 'pulse 2s infinite';
@@ -371,6 +376,45 @@ class BotManager {
                 }
             `;
             document.head.appendChild(style);
+        }
+    }
+    
+    // Converter QR Code ASCII para imagem visual
+    convertASCIIToImage(qrCodeASCII) {
+        try {
+            // Criar canvas
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Calcular tamanho baseado no QR Code ASCII
+            const lines = qrCodeASCII.split('\n');
+            const width = lines[0].length;
+            const height = lines.length;
+            
+            // Definir tamanho do canvas
+            const cellSize = 8;
+            canvas.width = width * cellSize;
+            canvas.height = height * cellSize;
+            
+            // Preencher fundo branco
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Desenhar QR Code
+            ctx.fillStyle = '#000000';
+            for (let y = 0; y < height; y++) {
+                for (let x = 0; x < width; x++) {
+                    if (lines[y] && lines[y][x] && lines[y][x] !== ' ') {
+                        ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                    }
+                }
+            }
+            
+            // Converter para DataURL
+            return canvas.toDataURL('image/png');
+        } catch (error) {
+            console.error('❌ Erro ao converter QR Code ASCII:', error);
+            return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
         }
     }
 
