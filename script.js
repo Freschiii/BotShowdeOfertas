@@ -1706,20 +1706,19 @@ function updateHistoryDisplay() {
 }
 
 // Limpar todas as caixas de mensagem após envio
-// RESET ULTRA SIMPLIFICADO - APENAS LIMPAR CONTEÚDO
+// RESET COMPLETO - LIMPAR TUDO MAS MANTER ESTRUTURA
 function clearAllMessageBoxes() {
-    console.log('🧹 Reset ultra simplificado - apenas conteúdo');
+    console.log('🧹 Reset completo - limpar tudo mas manter estrutura');
     
     // 1. Limpar fila de mensagens
     messageQueue = [];
     
-    // 2. Limpar APENAS o conteúdo do input principal (não mexer na estrutura)
+    // 2. Limpar input principal (texto)
     const mainInput = document.getElementById('messageTextInput');
     if (mainInput) {
-        // Limpar apenas o texto, manter estrutura
         mainInput.textContent = '';
         mainInput.innerHTML = '';
-        console.log('✅ Input principal limpo (estrutura mantida)');
+        console.log('✅ Input principal limpo');
     }
     
     // 3. Remover TODAS as imagens
@@ -1729,7 +1728,17 @@ function clearAllMessageBoxes() {
         console.log('✅ Imagem removida');
     });
     
-    // 4. Remover caixas duplicadas (manter apenas a primeira)
+    // 4. Limpar texto de todas as caixas de mensagem
+    const allMessageBoxes = document.querySelectorAll('.whatsapp-message');
+    allMessageBoxes.forEach(box => {
+        const textElements = box.querySelectorAll('.message-text');
+        textElements.forEach(text => {
+            text.textContent = '';
+            text.innerHTML = '';
+        });
+    });
+    
+    // 5. Remover caixas duplicadas (manter apenas a primeira)
     const allWhatsAppBoxes = document.querySelectorAll('.whatsapp-preview');
     allWhatsAppBoxes.forEach((box, index) => {
         if (index > 0) { // Manter apenas a primeira (index 0)
@@ -1738,13 +1747,13 @@ function clearAllMessageBoxes() {
         }
     });
     
-    // 5. Atualizar contador
+    // 6. Atualizar contador
     updateMessageCounter();
     
-    // 6. Mostrar notificação
+    // 7. Mostrar notificação
     botManager.showMessage('🧹 Caixas limpas! Pronto para novas mensagens.', 'info');
     
-    console.log('✅ Reset ultra simplificado concluído!');
+    console.log('✅ Reset completo concluído!');
 }
 
 // Agendar mensagem da fila
