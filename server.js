@@ -2,7 +2,7 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
-const { Client, LocalAuth } = require('whatsapp-web.js');
+const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 
 const app = express();
@@ -208,9 +208,22 @@ io.on('connection', (socket) => {
             
             if (image) {
                 console.log('📤 Enviando mensagem com imagem...');
-                // Enviar mensagem com imagem
-                const media = MessageMedia.fromFilePath(image);
-                await whatsappClient.sendMessage(targetNumber, media, { caption: message });
+                console.log('📤 Caminho da imagem:', image);
+                
+                try {
+                    // Criar MessageMedia a partir do arquivo
+                    const media = MessageMedia.fromFilePath(image);
+                    console.log('📤 Media criada com sucesso');
+                    
+                    // Enviar mensagem com imagem
+                    await whatsappClient.sendMessage(targetNumber, media, { caption: message });
+                    console.log('📤 Mensagem com imagem enviada');
+                } catch (mediaError) {
+                    console.error('❌ Erro ao criar media:', mediaError);
+                    // Fallback: enviar apenas texto
+                    console.log('📤 Fallback: enviando apenas texto...');
+                    await whatsappClient.sendMessage(targetNumber, message);
+                }
             } else {
                 console.log('📤 Enviando mensagem apenas texto...');
                 // Enviar apenas texto
