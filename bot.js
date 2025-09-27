@@ -45,15 +45,15 @@ class BotManager {
 
         this.socket.on('whatsapp-qr-ascii', (qrCodeASCII) => {
             console.log('📱 QR Code ASCII recebido no frontend:', qrCodeASCII ? 'Sim' : 'Não');
-            this.showASCIIQRCode(qrCodeASCII);
-            this.showMessage('QR Code gerado! Escaneie com seu WhatsApp.', 'success');
+            this.showQRCodeInTerminalMessage();
+            this.showMessage('QR Code gerado no terminal do servidor! Verifique o console onde o servidor está rodando.', 'info');
         });
         
         this.socket.on('whatsapp-qr', (qrCodeDataURL) => {
             console.log('📱 QR Code visual recebido no frontend:', qrCodeDataURL ? 'Sim' : 'Não');
             console.log('📱 QR Code visual data:', qrCodeDataURL ? qrCodeDataURL.substring(0, 50) + '...' : 'Nenhum');
-            this.showVisualQRCode(qrCodeDataURL);
-            this.showMessage('QR Code visual gerado! Escaneie com seu WhatsApp.', 'success');
+            // Não mostrar modal, apenas log
+            this.showMessage('QR Code visual gerado no terminal! Verifique o console do servidor.', 'info');
         });
 
         this.socket.on('whatsapp-status', (data) => {
@@ -256,6 +256,18 @@ class BotManager {
         console.log('✅ QR Code visual inserido no HTML');
         console.log('✅ Modal do QR Code visual criado com sucesso');
         console.log('🔍 Modal deve estar visível agora com QR Code visual');
+    }
+
+    // Mostrar mensagem sobre QR Code no terminal
+    showQRCodeInTerminalMessage() {
+        console.log('📱 QR Code disponível no terminal do servidor!');
+        console.log('📱 Verifique o console onde o servidor está rodando para ver o QR Code.');
+        
+        // Mostrar aviso no site
+        const warning = document.getElementById('qrCodeTerminalWarning');
+        if (warning) {
+            warning.style.display = 'block';
+        }
     }
 
     // Mostrar QR Code ASCII do terminal

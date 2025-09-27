@@ -14,9 +14,39 @@
         <header>
             <h1><i class="fas fa-robot"></i> Show de Ofertas Bot</h1>
             <p>Bot automático para WhatsApp e Telegram</p>
-            <button onclick="testarWhatsApp()" style="background: #25d366; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 10px;">
-                🔧 Testar WhatsApp
-            </button>
+        <button onclick="testarWhatsApp()" style="background: #25d366; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 10px;">
+            🔧 Testar WhatsApp
+        </button>
+        
+        <div id="qrCodeTerminalWarning" style="display: none; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 10px; padding: 15px; margin: 20px; color: #856404;">
+            <div style="display: flex; align-items: center; margin-bottom: 10px;">
+                <span style="font-size: 1.5rem; margin-right: 10px;">📱</span>
+                <strong>QR Code Gerado!</strong>
+            </div>
+            <p style="margin: 5px 0; font-size: 0.9rem;">
+                <strong>⚠️ Importante:</strong> O QR Code foi gerado no terminal do servidor (console onde você rodou o comando).
+            </p>
+            <p style="margin: 5px 0; font-size: 0.9rem;">
+                <strong>📱 Como conectar:</strong>
+            </p>
+            <ul style="margin: 5px 0; padding-left: 20px; font-size: 0.9rem;">
+                <li>Verifique o terminal/console onde o servidor está rodando</li>
+                <li>Você verá um QR Code ASCII lá</li>
+                <li>Abra o WhatsApp no seu celular</li>
+                <li>Toque em "Dispositivos conectados" → "Conectar um dispositivo"</li>
+                <li>Escaneie o QR Code que aparece no terminal</li>
+            </ul>
+            <button onclick="document.getElementById('qrCodeTerminalWarning').style.display='none';" style="
+                background: #ff6b35; 
+                color: white; 
+                border: none; 
+                padding: 8px 15px; 
+                border-radius: 5px; 
+                cursor: pointer; 
+                margin-top: 10px;
+                font-size: 0.8rem;
+            ">❌ Fechar</button>
+        </div>
         </header>
 
         <main>
