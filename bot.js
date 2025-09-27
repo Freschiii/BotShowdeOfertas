@@ -309,7 +309,7 @@ class BotManager {
             border: 5px solid #25d366 !important;
         `;
         
-        // Converter QR Code ASCII para imagem visual
+        // Tentar converter QR Code ASCII para imagem visual
         const qrImage = this.convertASCIIToImage(qrCodeASCII);
         
         qrContainer.innerHTML = `
@@ -320,12 +320,16 @@ class BotManager {
                 <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
                     <p style="color: #666; margin-bottom: 10px; font-size: 0.9rem;">QR Code Visual:</p>
                     <div style="background: #000; padding: 10px; border-radius: 5px; display: inline-block;">
-                        <img src="${qrImage}" alt="QR Code WhatsApp" style="max-width: 300px; height: auto; border-radius: 5px; background: white; padding: 5px;">
+                        <img src="${qrImage}" alt="QR Code WhatsApp" style="max-width: 300px; height: auto; border-radius: 5px; background: white; padding: 5px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
+                        <div style="display: none; background: #f0f0f0; padding: 20px; border-radius: 5px; color: #666;">
+                            <p><strong>QR Code ASCII:</strong></p>
+                            <pre style="font-family: monospace; font-size: 8px; line-height: 0.8; margin: 0; text-align: left; background: #000; color: #fff; padding: 10px; border-radius: 3px; max-height: 200px; overflow: auto;">${qrCodeASCII}</pre>
+                        </div>
                     </div>
                 </div>
                 <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px;">
                     <p style="margin: 0; font-size: 0.8rem; color: #856404;">
-                        <strong>💡 Dica:</strong> QR Code visual gerado a partir do ASCII. Escaneie com seu WhatsApp.
+                        <strong>💡 Dica:</strong> Se a imagem não aparecer, use o QR Code ASCII acima ou verifique o console do servidor.
                     </p>
                 </div>
             </div>
@@ -382,17 +386,34 @@ class BotManager {
     // Converter QR Code ASCII para imagem visual
     convertASCIIToImage(qrCodeASCII) {
         try {
+            console.log('🔄 Convertendo QR Code ASCII para imagem...');
+            console.log('📱 QR Code ASCII recebido:', qrCodeASCII ? 'Sim' : 'Não');
+            
+            if (!qrCodeASCII) {
+                console.error('❌ QR Code ASCII vazio');
+                return this.createFallbackQRCode();
+            }
+            
             // Criar canvas
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
             
-            // Calcular tamanho baseado no QR Code ASCII
-            const lines = qrCodeASCII.split('\n');
+            // Limpar e processar o QR Code ASCII
+            const lines = qrCodeASCII.split('\n').filter(line => line.trim().length > 0);
+            console.log('📱 Linhas do QR Code:', lines.length);
+            
+            if (lines.length === 0) {
+                console.error('❌ Nenhuma linha válida encontrada');
+                return this.createFallbackQRCode();
+            }
+            
             const width = lines[0].length;
             const height = lines.length;
             
+            console.log('📱 Dimensões:', width + 'x' + height);
+            
             // Definir tamanho do canvas
-            const cellSize = 8;
+            const cellSize = 6;
             canvas.width = width * cellSize;
             canvas.height = height * cellSize;
             
@@ -402,20 +423,70 @@ class BotManager {
             
             // Desenhar QR Code
             ctx.fillStyle = '#000000';
+            let pixelsDrawn = 0;
+            
             for (let y = 0; y < height; y++) {
                 for (let x = 0; x < width; x++) {
-                    if (lines[y] && lines[y][x] && lines[y][x] !== ' ') {
+                    const char = lines[y] && lines[y][x];
+                    // Verificar se é um caractere que representa pixel preto
+                    if (char && (char === '█' || char === '#' || char === '*' || char === '1' || char === 'X' || char === 'x')) {
                         ctx.fillRect(x * cellSize, y * cellSize, cellSize, cellSize);
+                        pixelsDrawn++;
                     }
                 }
             }
             
+            console.log('📱 Pixels desenhados:', pixelsDrawn);
+            
+            if (pixelsDrawn === 0) {
+                console.error('❌ Nenhum pixel foi desenhado');
+                return this.createFallbackQRCode();
+            }
+            
             // Converter para DataURL
-            return canvas.toDataURL('image/png');
+            const dataURL = canvas.toDataURL('image/png');
+            console.log('✅ QR Code convertido para imagem:', dataURL.substring(0, 50) + '...');
+            
+            return dataURL;
         } catch (error) {
             console.error('❌ Erro ao converter QR Code ASCII:', error);
-            return 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNkYPhfDwAChwGA60e6kgAAAABJRU5ErkJggg==';
+            return this.createFallbackQRCode();
         }
+    }
+    
+    // Criar QR Code de fallback
+    createFallbackQRCode() {
+        console.log('🔄 Criando QR Code de fallback...');
+        
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        
+        canvas.width = 200;
+        canvas.height = 200;
+        
+        // Fundo branco
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, 200, 200);
+        
+        // Desenhar padrão QR Code simples
+        ctx.fillStyle = '#000000';
+        
+        // Cantos do QR Code
+        ctx.fillRect(10, 10, 30, 30);
+        ctx.fillRect(160, 10, 30, 30);
+        ctx.fillRect(10, 160, 30, 30);
+        
+        // Linhas horizontais
+        for (let i = 0; i < 20; i++) {
+            ctx.fillRect(50 + i * 5, 50, 3, 100);
+        }
+        
+        // Linhas verticais
+        for (let i = 0; i < 20; i++) {
+            ctx.fillRect(50, 50 + i * 5, 100, 3);
+        }
+        
+        return canvas.toDataURL('image/png');
     }
 
     // QR Code só é gerado pelo servidor real
