@@ -187,8 +187,11 @@ io.on('connection', (socket) => {
         }
     });
 
-    socket.on('send-message', async (data) => {
-        console.log('📤 Enviando mensagem:', data);
+    socket.on('send-whatsapp', async (data) => {
+        console.log('📤 Evento send-whatsapp recebido!');
+        console.log('📤 Dados recebidos:', JSON.stringify(data, null, 2));
+        console.log('📤 isConnected:', isConnected);
+        console.log('📤 whatsappClient existe:', !!whatsappClient);
         
         if (!isConnected || !whatsappClient) {
             console.log('❌ WhatsApp não conectado');
@@ -197,15 +200,21 @@ io.on('connection', (socket) => {
         }
 
         try {
-            const { number, message, image } = data;
+            const { chatId, number, message, image } = data;
+            const targetNumber = number || chatId;
+            console.log('📤 Número/ChatId:', targetNumber);
+            console.log('📤 Mensagem:', message);
+            console.log('📤 Imagem:', image);
             
             if (image) {
+                console.log('📤 Enviando mensagem com imagem...');
                 // Enviar mensagem com imagem
                 const media = MessageMedia.fromFilePath(image);
-                await whatsappClient.sendMessage(number, media, { caption: message });
+                await whatsappClient.sendMessage(targetNumber, media, { caption: message });
             } else {
+                console.log('📤 Enviando mensagem apenas texto...');
                 // Enviar apenas texto
-                await whatsappClient.sendMessage(number, message);
+                await whatsappClient.sendMessage(targetNumber, message);
             }
             
             console.log('✅ Mensagem enviada com sucesso');
