@@ -98,12 +98,32 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         });
         
-        // Interceptar colar para preservar espaços
+        // Interceptar colar para preservar espaços e processar imagens
         messageTextInput.addEventListener('paste', function(e) {
             e.preventDefault();
             
-            // Obter texto colado
-            const pastedText = (e.clipboardData || window.clipboardData).getData('text/plain');
+            const clipboardData = e.clipboardData || window.clipboardData;
+            
+            // Verificar se há imagem no clipboard
+            if (clipboardData.items) {
+                for (let i = 0; i < clipboardData.items.length; i++) {
+                    const item = clipboardData.items[i];
+                    
+                    if (item.type.indexOf('image') !== -1) {
+                        console.log('📷 Imagem detectada no clipboard!');
+                        
+                        const file = item.getAsFile();
+                        if (file) {
+                            // Processar imagem colada
+                            handlePastedImage(file, this);
+                            return;
+                        }
+                    }
+                }
+            }
+            
+            // Se não há imagem, processar como texto
+            const pastedText = clipboardData.getData('text/plain');
             
             // Inserir texto preservando espaços
             const selection = window.getSelection();
@@ -713,7 +733,29 @@ function setupNewWhatsAppBox(whatsappBox) {
         
         messageText.addEventListener('paste', function(e) {
             e.preventDefault();
-            const pastedText = (e.clipboardData || window.clipboardData).getData('text/plain');
+            
+            const clipboardData = e.clipboardData || window.clipboardData;
+            
+            // Verificar se há imagem no clipboard
+            if (clipboardData.items) {
+                for (let i = 0; i < clipboardData.items.length; i++) {
+                    const item = clipboardData.items[i];
+                    
+                    if (item.type.indexOf('image') !== -1) {
+                        console.log('📷 Imagem detectada no clipboard!');
+                        
+                        const file = item.getAsFile();
+                        if (file) {
+                            // Processar imagem colada
+                            handlePastedImage(file, this);
+                            return;
+                        }
+                    }
+                }
+            }
+            
+            // Se não há imagem, processar como texto
+            const pastedText = clipboardData.getData('text/plain');
             const selection = window.getSelection();
             if (selection.rangeCount > 0) {
                 const range = selection.getRangeAt(0);
@@ -818,7 +860,29 @@ function setupNewMessageBox(messageBox) {
         
         messageText.addEventListener('paste', function(e) {
             e.preventDefault();
-            const pastedText = (e.clipboardData || window.clipboardData).getData('text/plain');
+            
+            const clipboardData = e.clipboardData || window.clipboardData;
+            
+            // Verificar se há imagem no clipboard
+            if (clipboardData.items) {
+                for (let i = 0; i < clipboardData.items.length; i++) {
+                    const item = clipboardData.items[i];
+                    
+                    if (item.type.indexOf('image') !== -1) {
+                        console.log('📷 Imagem detectada no clipboard!');
+                        
+                        const file = item.getAsFile();
+                        if (file) {
+                            // Processar imagem colada
+                            handlePastedImage(file, this);
+                            return;
+                        }
+                    }
+                }
+            }
+            
+            // Se não há imagem, processar como texto
+            const pastedText = clipboardData.getData('text/plain');
             const selection = window.getSelection();
             if (selection.rangeCount > 0) {
                 const range = selection.getRangeAt(0);
@@ -827,6 +891,87 @@ function setupNewMessageBox(messageBox) {
                 range.collapse(false);
             }
         });
+    }
+}
+
+// Processar imagem colada
+function handlePastedImage(file, textInput) {
+    console.log('📷 Processando imagem colada:', file.name, file.type, file.size);
+    
+    // Verificar se é uma imagem válida
+    if (!file.type.startsWith('image/')) {
+        console.log('❌ Arquivo não é uma imagem válida');
+        return;
+    }
+    
+    // Verificar tamanho (máximo 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+        console.log('❌ Imagem muito grande (máximo 10MB)');
+        botManager.showMessage('Imagem muito grande! Máximo 10MB.', 'error');
+        return;
+    }
+    
+    // Converter para base64
+    const reader = new FileReader();
+    reader.onload = function(e) {
+        const base64Data = e.target.result;
+        console.log('📷 Imagem convertida para base64');
+        
+        // Encontrar a caixa de mensagem correspondente
+        const messageBox = textInput.closest('.whatsapp-message.received.editable-message');
+        if (messageBox) {
+            // Remover imagem anterior se existir
+            const existingImage = messageBox.querySelector('.message-image');
+            if (existingImage) {
+                existingImage.remove();
+            }
+            
+            // Criar elemento de imagem
+            const imageContainer = document.createElement('div');
+            imageContainer.className = 'message-image';
+            imageContainer.innerHTML = `
+                <img src="${base64Data}" alt="Imagem colada" style="max-width: 200px; max-height: 200px; border-radius: 8px; margin: 5px 0;">
+                <button class="remove-image-btn" onclick="removeImage(this)" style="
+                    position: absolute; 
+                    top: 5px; 
+                    right: 5px; 
+                    background: rgba(0,0,0,0.7); 
+                    color: white; 
+                    border: none; 
+                    border-radius: 50%; 
+                    width: 20px; 
+                    height: 20px; 
+                    cursor: pointer;
+                    font-size: 12px;
+                ">×</button>
+            `;
+            
+            // Adicionar imagem à caixa de mensagem
+            messageBox.appendChild(imageContainer);
+            
+            // Mostrar mensagem de sucesso
+            botManager.showMessage('Imagem colada com sucesso!', 'success');
+            
+            // Atualizar preview
+            updateWhatsAppPreview();
+        }
+    };
+    
+    reader.onerror = function() {
+        console.log('❌ Erro ao ler imagem');
+        botManager.showMessage('Erro ao processar imagem!', 'error');
+    };
+    
+    reader.readAsDataURL(file);
+}
+
+// Remover imagem
+function removeImage(button) {
+    const imageContainer = button.closest('.message-image');
+    if (imageContainer) {
+        imageContainer.remove();
+        updateWhatsAppPreview();
+        botManager.showMessage('Imagem removida!', 'success');
     }
 }
 
