@@ -1706,33 +1706,30 @@ function updateHistoryDisplay() {
 }
 
 // Limpar todas as caixas de mensagem após envio
-// RESET SIMPLIFICADO - LIMPAR TEXTO E IMAGENS, MANTER EDITÁVEL
+// RESET ULTRA SIMPLIFICADO - APENAS LIMPAR CONTEÚDO
 function clearAllMessageBoxes() {
-    console.log('🧹 Reset simplificado - limpar texto e imagens');
+    console.log('🧹 Reset ultra simplificado - apenas conteúdo');
     
     // 1. Limpar fila de mensagens
     messageQueue = [];
     
-    // 2. Limpar input principal (primeira caixa) - APENAS o conteúdo
+    // 2. Limpar APENAS o conteúdo do input principal (não mexer na estrutura)
     const mainInput = document.getElementById('messageTextInput');
     if (mainInput) {
+        // Limpar apenas o texto, manter estrutura
         mainInput.textContent = '';
         mainInput.innerHTML = '';
-        mainInput.value = '';
-        // Garantir que está editável
-        mainInput.contentEditable = 'true';
-        mainInput.setAttribute('contenteditable', 'true');
-        console.log('✅ Input principal limpo e editável');
+        console.log('✅ Input principal limpo (estrutura mantida)');
     }
     
-    // 3. Remover TODAS as imagens das caixas
+    // 3. Remover TODAS as imagens
     const allImages = document.querySelectorAll('.message-image');
     allImages.forEach(img => {
         img.remove();
         console.log('✅ Imagem removida');
     });
     
-    // 4. Remover todas as caixas duplicadas
+    // 4. Remover caixas duplicadas (manter apenas a primeira)
     const allWhatsAppBoxes = document.querySelectorAll('.whatsapp-preview');
     allWhatsAppBoxes.forEach((box, index) => {
         if (index > 0) { // Manter apenas a primeira (index 0)
@@ -1741,23 +1738,13 @@ function clearAllMessageBoxes() {
         }
     });
     
-    // 5. Limpar qualquer texto que possa estar nas caixas
-    const allMessageBoxes = document.querySelectorAll('.whatsapp-message');
-    allMessageBoxes.forEach(box => {
-        const textElements = box.querySelectorAll('.message-text');
-        textElements.forEach(text => {
-            text.textContent = '';
-            text.innerHTML = '';
-        });
-    });
-    
-    // 6. Atualizar contador
+    // 5. Atualizar contador
     updateMessageCounter();
     
-    // 7. Mostrar notificação
+    // 6. Mostrar notificação
     botManager.showMessage('🧹 Caixas limpas! Pronto para novas mensagens.', 'info');
     
-    console.log('✅ Reset simplificado concluído!');
+    console.log('✅ Reset ultra simplificado concluído!');
 }
 
 // Agendar mensagem da fila
