@@ -48,6 +48,12 @@ class BotManager {
             this.showASCIIQRCode(qrCodeASCII);
             this.showMessage('QR Code gerado! Escaneie com seu WhatsApp.', 'success');
         });
+        
+        this.socket.on('whatsapp-qr', (qrCodeDataURL) => {
+            console.log('📱 QR Code visual recebido no frontend:', qrCodeDataURL ? 'Sim' : 'Não');
+            this.showVisualQRCode(qrCodeDataURL);
+            this.showMessage('QR Code visual gerado! Escaneie com seu WhatsApp.', 'success');
+        });
 
         this.socket.on('whatsapp-status', (data) => {
             // Só atualizar status quando for real
@@ -161,60 +167,94 @@ class BotManager {
         throw new Error('QR Code só é gerado pelo servidor real');
     }
 
-    // Mostrar QR Code real do servidor
-    showRealQRCode(qrCodeDataURL) {
+    // Mostrar QR Code visual do servidor
+    showVisualQRCode(qrCodeDataURL) {
         console.log('📱 Mostrando QR Code visual:', qrCodeDataURL ? 'Sim' : 'Não');
         
-        // Criar ou encontrar container do QR Code
-        let qrContainer = document.getElementById('qrCode');
-        if (!qrContainer) {
-            // Criar container se não existir
-            qrContainer = document.createElement('div');
-            qrContainer.id = 'qrCode';
-            qrContainer.style.cssText = `
-                position: fixed;
-                top: 50%;
-                left: 50%;
-                transform: translate(-50%, -50%);
-                background: white;
-                padding: 20px;
-                border-radius: 15px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
-                z-index: 10000;
-                text-align: center;
-                max-width: 90vw;
-                max-height: 90vh;
-            `;
-            document.body.appendChild(qrContainer);
-        }
+        // REMOVER QUALQUER MODAL ANTERIOR
+        const existingModal = document.getElementById('qrCode');
+        const existingOverlay = document.getElementById('qrOverlay');
+        if (existingModal) existingModal.remove();
+        if (existingOverlay) existingOverlay.remove();
+        
+        console.log('📱 Criando modal do QR Code visual...');
+        
+        // Criar overlay de fundo
+        const overlay = document.createElement('div');
+        overlay.id = 'qrOverlay';
+        overlay.style.cssText = `
+            position: fixed !important;
+            top: 0 !important;
+            left: 0 !important;
+            width: 100% !important;
+            height: 100% !important;
+            background: rgba(0,0,0,0.9) !important;
+            z-index: 99999 !important;
+            display: block !important;
+        `;
+        document.body.appendChild(overlay);
+        
+        // Criar container do QR Code
+        const qrContainer = document.createElement('div');
+        qrContainer.id = 'qrCode';
+        qrContainer.style.cssText = `
+            position: fixed !important;
+            top: 50% !important;
+            left: 50% !important;
+            transform: translate(-50%, -50%) !important;
+            background: white !important;
+            padding: 30px !important;
+            border-radius: 20px !important;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.8) !important;
+            z-index: 100000 !important;
+            text-align: center !important;
+            max-width: 80vw !important;
+            max-height: 80vh !important;
+            overflow: auto !important;
+            display: block !important;
+            visibility: visible !important;
+            opacity: 1 !important;
+            border: 5px solid #25d366 !important;
+        `;
         
         qrContainer.innerHTML = `
-            <div style="background: #25d366; color: white; padding: 15px; border-radius: 10px 10px 0 0; margin: -20px -20px 20px -20px;">
-                <h3 style="margin: 0; font-size: 1.2rem;">📱 Conectar WhatsApp</h3>
+            <div style="background: #25d366; color: white; padding: 20px; border-radius: 15px 15px 0 0; margin: -30px -30px 20px -30px;">
+                <h2 style="margin: 0; font-size: 1.5rem;">📱 Conectar WhatsApp</h2>
             </div>
-            <img src="${qrCodeDataURL}" alt="QR Code para conectar WhatsApp" style="max-width: 300px; height: auto; border-radius: 8px; border: 2px solid #25d366;">
-            <p style="margin-top: 15px; font-size: 1rem; color: #333; font-weight: 600;">
-                Escaneie este QR Code com seu WhatsApp
+            <div style="background: #f0f0f0; padding: 20px; border-radius: 10px; margin: 20px 0; border: 2px solid #25d366;">
+                <img src="${qrCodeDataURL}" alt="QR Code para conectar WhatsApp" style="max-width: 300px; height: auto; border-radius: 8px; border: 2px solid #25d366; background: white; padding: 10px;">
+            </div>
+            <p style="margin-top: 20px; font-size: 1.2rem; color: #333; font-weight: 700;">
+                📱 Escaneie este QR Code com seu WhatsApp
             </p>
-            <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">
-                • Abra o WhatsApp no seu celular<br>
-                • Toque em "Dispositivos conectados"<br>
-                • Toque em "Conectar um dispositivo"<br>
-                • Escaneie este QR Code
-            </p>
-            <button onclick="document.getElementById('qrCode').style.display='none'" style="
+            <div style="background: #e8f5e8; padding: 15px; border-radius: 10px; margin: 15px 0; border-left: 4px solid #25d366;">
+                <p style="margin: 5px 0; font-size: 1rem; color: #333;">
+                    <strong>📱 Como escanear:</strong><br>
+                    • Abra o WhatsApp no seu celular<br>
+                    • Toque em "Dispositivos conectados"<br>
+                    • Toque em "Conectar um dispositivo"<br>
+                    • Escaneie este QR Code
+                </p>
+            </div>
+            <button onclick="document.getElementById('qrCode').remove(); document.getElementById('qrOverlay').remove();" style="
                 background: #ff6b35;
                 color: white;
                 border: none;
-                padding: 10px 20px;
-                border-radius: 20px;
+                padding: 15px 30px;
+                border-radius: 25px;
                 cursor: pointer;
-                margin-top: 15px;
-                font-weight: 600;
-            ">Fechar</button>
+                margin-top: 20px;
+                font-weight: 700;
+                font-size: 1.1rem;
+                box-shadow: 0 5px 15px rgba(255,107,53,0.3);
+            ">❌ Fechar</button>
         `;
         
+        document.body.appendChild(qrContainer);
+        
         console.log('✅ QR Code visual inserido no HTML');
+        console.log('✅ Modal do QR Code visual criado com sucesso');
+        console.log('🔍 Modal deve estar visível agora com QR Code visual');
     }
 
     // Mostrar QR Code ASCII do terminal

@@ -85,6 +85,26 @@ async function connectWhatsApp() {
                 // Enviar QR Code ASCII para o cliente
                 io.emit('whatsapp-qr-ascii', qr);
                 
+                // Também gerar QR Code visual
+                try {
+                    const QRCode = require('qrcode');
+                    QRCode.toDataURL(qr, {
+                        width: 300,
+                        margin: 2,
+                        color: {
+                            dark: '#000000',
+                            light: '#FFFFFF'
+                        }
+                    }).then(qrCodeDataURL => {
+                        console.log('📱 QR Code visual gerado, enviando...');
+                        io.emit('whatsapp-qr', qrCodeDataURL);
+                    }).catch(error => {
+                        console.error('❌ Erro ao gerar QR Code visual:', error);
+                    });
+                } catch (error) {
+                    console.error('❌ Erro ao gerar QR Code visual:', error);
+                }
+                
                 // Resetar status quando QR Code é gerado
                 isConnected = false;
                 io.emit('whatsapp-status', { status: 'offline' });
