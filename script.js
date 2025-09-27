@@ -1750,7 +1750,7 @@ function clearAllMessageBoxes() {
         mainInput.contentEditable = 'true';
         mainInput.setAttribute('contenteditable', 'true');
         
-        // Limpar conteúdo
+        // Limpar apenas o conteúdo, manter estrutura
         mainInput.textContent = '';
         mainInput.innerHTML = '';
         
@@ -1759,9 +1759,10 @@ function clearAllMessageBoxes() {
         mainInput.style.color = '#999';
         mainInput.classList.add('placeholder');
         
-        // Forçar foco para testar
-        mainInput.focus();
-        mainInput.blur();
+        // Garantir que está visível e funcional
+        mainInput.style.display = 'block';
+        mainInput.style.visibility = 'visible';
+        mainInput.style.opacity = '1';
         
         console.log('✅ Input principal limpo e placeholder restaurado');
     }
@@ -1789,6 +1790,17 @@ function clearAllMessageBoxes() {
         if (index > 0) { // Manter apenas a primeira (index 0)
             box.remove();
             console.log(`✅ Caixa duplicada ${index + 1} removida`);
+        } else {
+            // Garantir que a primeira caixa está visível e funcional
+            const firstBoxInput = box.querySelector('#messageTextInput');
+            if (firstBoxInput) {
+                firstBoxInput.contentEditable = 'true';
+                firstBoxInput.setAttribute('contenteditable', 'true');
+                firstBoxInput.style.display = 'block';
+                firstBoxInput.style.visibility = 'visible';
+                firstBoxInput.style.opacity = '1';
+                console.log('✅ Primeira caixa preservada e funcional');
+            }
         }
     });
     
