@@ -4,6 +4,7 @@ const socketIo = require('socket.io');
 const path = require('path');
 const { default: makeWASocket, DisconnectReason, useMultiFileAuthState } = require('@whiskeysockets/baileys');
 const qrcode = require('qrcode-terminal');
+const QRCode = require('qrcode');
 
 const app = express();
 const server = http.createServer(app);
@@ -87,7 +88,7 @@ async function connectWhatsApp() {
                 
                 // Também gerar QR Code visual
                 try {
-                    const QRCode = require('qrcode');
+                    console.log('📱 Gerando QR Code visual...');
                     QRCode.toDataURL(qr, {
                         width: 300,
                         margin: 2,

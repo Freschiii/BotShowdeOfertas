@@ -51,6 +51,7 @@ class BotManager {
         
         this.socket.on('whatsapp-qr', (qrCodeDataURL) => {
             console.log('📱 QR Code visual recebido no frontend:', qrCodeDataURL ? 'Sim' : 'Não');
+            console.log('📱 QR Code visual data:', qrCodeDataURL ? qrCodeDataURL.substring(0, 50) + '...' : 'Nenhum');
             this.showVisualQRCode(qrCodeDataURL);
             this.showMessage('QR Code visual gerado! Escaneie com seu WhatsApp.', 'success');
         });
