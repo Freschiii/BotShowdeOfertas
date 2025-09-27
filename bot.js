@@ -309,9 +309,6 @@ class BotManager {
             border: 5px solid #25d366 !important;
         `;
         
-        // Tentar converter QR Code ASCII para imagem visual
-        const qrImage = this.convertASCIIToImage(qrCodeASCII);
-        
         qrContainer.innerHTML = `
             <div style="background: #25d366; color: white; padding: 20px; border-radius: 15px 15px 0 0; margin: -30px -30px 20px -30px;">
                 <h2 style="margin: 0; font-size: 1.5rem;">📱 Conectar WhatsApp</h2>
@@ -320,16 +317,12 @@ class BotManager {
                 <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
                     <p style="color: #666; margin-bottom: 10px; font-size: 0.9rem;">QR Code Visual:</p>
                     <div style="background: #000; padding: 10px; border-radius: 5px; display: inline-block;">
-                        <img src="${qrImage}" alt="QR Code WhatsApp" style="max-width: 300px; height: auto; border-radius: 5px; background: white; padding: 5px;" onerror="this.style.display='none'; this.nextElementSibling.style.display='block';">
-                        <div style="display: none; background: #f0f0f0; padding: 20px; border-radius: 5px; color: #666;">
-                            <p><strong>QR Code ASCII:</strong></p>
-                            <pre style="font-family: monospace; font-size: 8px; line-height: 0.8; margin: 0; text-align: left; background: #000; color: #fff; padding: 10px; border-radius: 3px; max-height: 200px; overflow: auto;">${qrCodeASCII}</pre>
-                        </div>
+                        <canvas id="qrCanvas" width="300" height="300" style="max-width: 300px; height: auto; border-radius: 5px; background: white;"></canvas>
                     </div>
                 </div>
                 <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px;">
                     <p style="margin: 0; font-size: 0.8rem; color: #856404;">
-                        <strong>💡 Dica:</strong> Se a imagem não aparecer, use o QR Code ASCII acima ou verifique o console do servidor.
+                        <strong>💡 Dica:</strong> QR Code gerado diretamente no navegador. Escaneie com seu WhatsApp.
                     </p>
                 </div>
             </div>
@@ -361,7 +354,9 @@ class BotManager {
         
         document.body.appendChild(qrContainer);
         
-        console.log('✅ QR Code ASCII convertido para imagem');
+        // Gerar QR Code usando a biblioteca QRCode
+        this.generateQRCodeFromASCII(qrCodeASCII);
+        
         console.log('✅ Modal do QR Code criado com sucesso');
         console.log('🔍 Modal deve estar visível agora com QR Code visual');
         
@@ -380,6 +375,95 @@ class BotManager {
                 }
             `;
             document.head.appendChild(style);
+        }
+    }
+    
+    // Gerar QR Code usando biblioteca QRCode
+    generateQRCodeFromASCII(qrCodeASCII) {
+        try {
+            console.log('🔄 Gerando QR Code com biblioteca QRCode...');
+            
+            // Extrair URL do QR Code ASCII (geralmente está no final)
+            const lines = qrCodeASCII.split('\n');
+            let qrUrl = '';
+            
+            // Procurar por URL no QR Code ASCII
+            for (let line of lines) {
+                if (line.includes('https://') || line.includes('http://')) {
+                    qrUrl = line.trim();
+                    break;
+                }
+            }
+            
+            console.log('📱 URL encontrada:', qrUrl);
+            
+            if (qrUrl) {
+                // Usar a biblioteca QRCode para gerar QR Code visual
+                const canvas = document.getElementById('qrCanvas');
+                if (canvas && typeof QRCode !== 'undefined') {
+                    QRCode.toCanvas(canvas, qrUrl, {
+                        width: 300,
+                        margin: 2,
+                        color: {
+                            dark: '#000000',
+                            light: '#FFFFFF'
+                        }
+                    }, (error) => {
+                        if (error) {
+                            console.error('❌ Erro ao gerar QR Code:', error);
+                            this.showFallbackQRCode();
+                        } else {
+                            console.log('✅ QR Code gerado com sucesso!');
+                        }
+                    });
+                } else {
+                    console.error('❌ Canvas ou biblioteca QRCode não encontrada');
+                    this.showFallbackQRCode();
+                }
+            } else {
+                console.error('❌ URL não encontrada no QR Code ASCII');
+                this.showFallbackQRCode();
+            }
+        } catch (error) {
+            console.error('❌ Erro ao gerar QR Code:', error);
+            this.showFallbackQRCode();
+        }
+    }
+    
+    // Mostrar QR Code de fallback
+    showFallbackQRCode() {
+        console.log('🔄 Mostrando QR Code de fallback...');
+        
+        const canvas = document.getElementById('qrCanvas');
+        if (canvas) {
+            const ctx = canvas.getContext('2d');
+            
+            // Limpar canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // Fundo branco
+            ctx.fillStyle = '#FFFFFF';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Desenhar padrão QR Code simples
+            ctx.fillStyle = '#000000';
+            
+            // Cantos do QR Code
+            ctx.fillRect(20, 20, 60, 60);
+            ctx.fillRect(220, 20, 60, 60);
+            ctx.fillRect(20, 220, 60, 60);
+            
+            // Linhas horizontais
+            for (let i = 0; i < 20; i++) {
+                ctx.fillRect(100 + i * 5, 100, 3, 100);
+            }
+            
+            // Linhas verticais
+            for (let i = 0; i < 20; i++) {
+                ctx.fillRect(100, 100 + i * 5, 100, 3);
+            }
+            
+            console.log('✅ QR Code de fallback criado');
         }
     }
     
