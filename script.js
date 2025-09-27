@@ -1706,30 +1706,31 @@ function updateHistoryDisplay() {
 }
 
 // Limpar todas as caixas de mensagem após envio
-// RESET SIMPLIFICADO - APENAS LIMPAR CAIXA DE TEXTO
+// RESET SIMPLIFICADO - LIMPAR TEXTO E IMAGENS, MANTER EDITÁVEL
 function clearAllMessageBoxes() {
-    console.log('🧹 Reset simplificado - apenas limpar caixa de texto');
+    console.log('🧹 Reset simplificado - limpar texto e imagens');
     
     // 1. Limpar fila de mensagens
     messageQueue = [];
     
-    // 2. Limpar TODOS os inputs de texto (mais robusto)
-    const allTextInputs = document.querySelectorAll('#messageTextInput, .message-text, [contenteditable="true"]');
-    allTextInputs.forEach(input => {
-        input.textContent = '';
-        input.innerHTML = '';
-        input.value = '';
-        console.log('✅ Input limpo:', input.id || input.className);
-    });
-    
-    // 3. Limpar input principal específico
+    // 2. Limpar input principal (primeira caixa) - APENAS o conteúdo
     const mainInput = document.getElementById('messageTextInput');
     if (mainInput) {
         mainInput.textContent = '';
         mainInput.innerHTML = '';
         mainInput.value = '';
-        console.log('✅ Input principal limpo');
+        // Garantir que está editável
+        mainInput.contentEditable = 'true';
+        mainInput.setAttribute('contenteditable', 'true');
+        console.log('✅ Input principal limpo e editável');
     }
+    
+    // 3. Remover TODAS as imagens das caixas
+    const allImages = document.querySelectorAll('.message-image');
+    allImages.forEach(img => {
+        img.remove();
+        console.log('✅ Imagem removida');
+    });
     
     // 4. Remover todas as caixas duplicadas
     const allWhatsAppBoxes = document.querySelectorAll('.whatsapp-preview');
