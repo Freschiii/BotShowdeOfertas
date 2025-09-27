@@ -38,9 +38,17 @@ function initializeWhatsApp() {
                 '--no-first-run',
                 '--no-zygote',
                 '--single-process',
-                '--disable-gpu'
-            ]
-        }
+                '--disable-gpu',
+                '--disable-web-security',
+                '--disable-features=VizDisplayCompositor',
+                '--disable-background-timer-throttling',
+                '--disable-backgrounding-occluded-windows',
+                '--disable-renderer-backgrounding'
+            ],
+            timeout: 60000
+        },
+        restartOnAuthFail: true,
+        qrMaxRetries: 3
     });
 
     // Evento quando QR Code é gerado
@@ -107,6 +115,16 @@ function initializeWhatsApp() {
         console.error('❌ Falha na autenticação WhatsApp:', msg);
         isConnected = false;
         io.emit('whatsapp-status', { status: 'offline' });
+    });
+
+    // Tratamento de erros gerais
+    whatsappClient.on('change_state', (state) => {
+        console.log('🔄 Estado do WhatsApp mudou:', state);
+    });
+
+    // Tratamento de erros do Puppeteer
+    whatsappClient.on('remote_session_saved', () => {
+        console.log('✅ Sessão remota salva');
     });
 
     // Inicializar cliente
