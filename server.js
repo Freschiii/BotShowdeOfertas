@@ -140,11 +140,11 @@ async function sendWhatsAppMessage(chatId, message, imagePath = null) {
 
 // WebSocket para comunicação em tempo real
 io.on('connection', (socket) => {
-    console.log('Cliente conectado');
+    console.log('✅ Cliente conectado via WebSocket');
     
     // Conectar WhatsApp
     socket.on('connect-whatsapp', async () => {
-        console.log('📱 Solicitação para conectar WhatsApp');
+        console.log('📱 Solicitação para conectar WhatsApp recebida');
         
         // Limpar sessão anterior
         if (whatsappSocket) {

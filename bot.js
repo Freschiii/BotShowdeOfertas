@@ -21,15 +21,21 @@ class BotManager {
     // Inicializar WebSocket
     initializeWebSocket() {
         try {
+            console.log('🔌 Inicializando WebSocket...');
+            console.log('🔍 io disponível:', typeof io !== 'undefined');
+            console.log('🔍 serverUrl:', this.serverUrl);
+            
             // Carregar Socket.IO do CDN
             if (typeof io !== 'undefined') {
+                console.log('📡 Conectando ao servidor via Socket.IO...');
                 this.socket = io(this.serverUrl);
                 this.setupWebSocketListeners();
+                console.log('✅ WebSocket configurado com sucesso');
             } else {
-                console.log('Socket.IO não carregado, usando modo offline');
+                console.error('❌ Socket.IO não carregado, usando modo offline');
             }
         } catch (error) {
-            console.log('WebSocket não disponível, usando modo offline');
+            console.error('❌ WebSocket não disponível, usando modo offline:', error);
         }
     }
 
@@ -123,20 +129,27 @@ class BotManager {
     // Conectar WhatsApp Bot
     async connectWhatsApp() {
         try {
+            console.log('🔄 BotManager.connectWhatsApp chamado');
+            console.log('🔍 Socket disponível:', !!this.socket);
+            
             // Só mostrar status real
             this.isConnected.whatsapp = false;
             this.updateStatus('whatsapp', 'offline');
             
             if (this.socket) {
+                console.log('📡 Enviando evento connect-whatsapp via WebSocket');
                 // Usar WebSocket real
                 this.socket.emit('connect-whatsapp');
+                this.showMessage('🔄 Conectando WhatsApp... Aguarde o QR Code.', 'info');
                 // Não mostrar mensagem até ter QR Code real
             } else {
+                console.error('❌ Socket não disponível');
                 // Sem servidor = sem WhatsApp
                 this.showMessage('Servidor não disponível. WhatsApp não funciona.', 'error');
             }
             
         } catch (error) {
+            console.error('❌ Erro em connectWhatsApp:', error);
             this.updateStatus('whatsapp', 'offline');
             this.showMessage('Erro ao conectar WhatsApp Bot: ' + error.message, 'error');
         }
