@@ -1851,10 +1851,35 @@ function clearAllMessageBoxes() {
                 msg.remove();
             });
             
-            // Garantir que o input principal está visível
+            // Garantir que o input principal está visível e funcional
             if (mainInput) {
                 mainInput.style.display = 'block';
-                mainInput.placeholder = 'Digite sua mensagem aqui...';
+                mainInput.style.minHeight = '40px';
+                mainInput.style.height = 'auto';
+                mainInput.style.fontSize = '14px';
+                mainInput.style.lineHeight = '1.4';
+                mainInput.style.padding = '10px';
+                mainInput.style.border = '1px solid #333';
+                mainInput.style.borderRadius = '20px';
+                mainInput.style.backgroundColor = '#1a1a1a';
+                mainInput.style.color = '#ffffff';
+                mainInput.style.outline = 'none';
+                mainInput.style.resize = 'none';
+                mainInput.style.overflow = 'hidden';
+                mainInput.style.wordWrap = 'break-word';
+                mainInput.style.whiteSpace = 'pre-wrap';
+                mainInput.style.fontFamily = 'inherit';
+                mainInput.style.width = '100%';
+                mainInput.style.boxSizing = 'border-box';
+                
+                // Restaurar placeholder via CSS
+                mainInput.setAttribute('data-placeholder', 'Digite sua mensagem aqui...');
+                
+                // Garantir que o input está editável
+                mainInput.contentEditable = 'true';
+                mainInput.setAttribute('contenteditable', 'true');
+                
+                console.log(`✅ Input principal da caixa ${index + 1} restaurado com estilos completos`);
             }
             
             console.log(`✅ Caixa ${index + 1} limpa (mantendo estrutura e input)`);
@@ -1872,12 +1897,41 @@ function clearAllMessageBoxes() {
         console.log(`✅ Caixa ${index + 1} completamente limpa`);
     });
     
-    // Limpar input principal se existir
+    // Limpar e restaurar input principal se existir
     const mainInput = document.getElementById('messageTextInput');
     if (mainInput) {
         mainInput.value = '';
         mainInput.textContent = '';
         mainInput.innerHTML = '';
+        
+        // Restaurar estilos completos do input principal
+        mainInput.style.display = 'block';
+        mainInput.style.minHeight = '40px';
+        mainInput.style.height = 'auto';
+        mainInput.style.fontSize = '14px';
+        mainInput.style.lineHeight = '1.4';
+        mainInput.style.padding = '10px';
+        mainInput.style.border = '1px solid #333';
+        mainInput.style.borderRadius = '20px';
+        mainInput.style.backgroundColor = '#1a1a1a';
+        mainInput.style.color = '#ffffff';
+        mainInput.style.outline = 'none';
+        mainInput.style.resize = 'none';
+        mainInput.style.overflow = 'hidden';
+        mainInput.style.wordWrap = 'break-word';
+        mainInput.style.whiteSpace = 'pre-wrap';
+        mainInput.style.fontFamily = 'inherit';
+        mainInput.style.width = '100%';
+        mainInput.style.boxSizing = 'border-box';
+        
+        // Restaurar placeholder via CSS
+        mainInput.setAttribute('data-placeholder', 'Digite sua mensagem aqui...');
+        
+        // Garantir que o input está editável
+        mainInput.contentEditable = 'true';
+        mainInput.setAttribute('contenteditable', 'true');
+        
+        console.log('✅ Input principal limpo e restaurado com estilos completos');
     }
     
     // Atualizar contador de mensagens
