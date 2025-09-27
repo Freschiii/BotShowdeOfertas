@@ -751,6 +751,9 @@ echo.
 echo     let messageQueue = [];
 echo     let messageHistory = [];
 echo.
+echo     // Instanciar BotManager
+echo     const botManager = new BotManager(^);
+echo.
 echo     // Event listeners
 echo     messageTextInput.addEventListener('keydown', function(e^) {
 echo         if (e.key === 'Enter' && !e.shiftKey^) {

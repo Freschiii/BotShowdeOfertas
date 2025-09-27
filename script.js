@@ -25,10 +25,19 @@ let messageQueue = [];
 let messageCounter = 0;
 let messageHistory = [];
 
-// Event Listeners
-elements.connectWhatsApp.addEventListener('click', connectWhatsApp);
-elements.connectTelegram.addEventListener('click', connectTelegram);
-elements.saveGroups.addEventListener('click', saveGroups);
+// Instanciar BotManager
+const botManager = new BotManager();
+
+// Event Listeners (com verificação de existência)
+if (elements.connectWhatsApp) {
+    elements.connectWhatsApp.addEventListener('click', connectWhatsApp);
+}
+if (elements.connectTelegram) {
+    elements.connectTelegram.addEventListener('click', connectTelegram);
+}
+if (elements.saveGroups) {
+    elements.saveGroups.addEventListener('click', saveGroups);
+}
 
 // Verificar se o botão de enviar existe antes de adicionar o listener
 if (elements.sendMessage) {
@@ -1238,22 +1247,13 @@ function resetWhatsAppScheduleForBox(whatsappBox) {
 // Conectar WhatsApp
 async function connectWhatsApp() {
     try {
-        // Mostrar QR Code
-        elements.whatsappQR.style.display = 'block';
-        elements.connectWhatsApp.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Conectando...';
-        elements.connectWhatsApp.disabled = true;
+        console.log('🔄 Iniciando conexão WhatsApp...');
         
         // Conectar WhatsApp real
         await botManager.connectWhatsApp();
         console.log('✅ WhatsApp conectado automaticamente!');
         
-        // NÃO ESCONDER O QR CODE - DEIXAR NA TELA ATÉ ESCANEAR
-        // O QR Code só será escondido quando o WhatsApp realmente conectar
-        
     } catch (error) {
-        elements.connectWhatsApp.innerHTML = '<i class="fas fa-qrcode"></i> Conectar WhatsApp';
-        elements.connectWhatsApp.disabled = false;
-        elements.whatsappQR.style.display = 'none';
         console.log('❌ Erro ao conectar WhatsApp automaticamente:', error.message);
         throw error; // Re-throw para que a função autoConnectBots possa capturar
     }
@@ -1853,7 +1853,15 @@ document.addEventListener('DOMContentLoaded', function() {
     `;
     reconnectBtn.onclick = () => {
         console.log('🔄 Reconectando WhatsApp...');
-        botManager.connectWhatsApp();
+        console.log('🔍 BotManager disponível:', !!botManager);
+        console.log('🔍 Método connectWhatsApp disponível:', typeof botManager.connectWhatsApp);
+        
+        if (botManager && typeof botManager.connectWhatsApp === 'function') {
+            botManager.connectWhatsApp();
+        } else {
+            console.error('❌ BotManager ou método connectWhatsApp não disponível');
+            alert('Erro: BotManager não está disponível. Recarregue a página.');
+        }
     };
     
     // Adicionar botão ao header
