@@ -79,8 +79,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const whatsappScheduleCancelBtn = document.getElementById('whatsappScheduleCancelBtn');
     
     if (messageTextInput) {
-        // Remover placeholder inicial
-        messageTextInput.textContent = '';
+        // Garantir que está editável
+        messageTextInput.contentEditable = 'true';
+        messageTextInput.setAttribute('contenteditable', 'true');
+        
+        // Configurar placeholder inicial
+        messageTextInput.textContent = 'Digite sua mensagem aqui...';
+        messageTextInput.style.color = '#999';
+        messageTextInput.classList.add('placeholder');
         
         messageTextInput.addEventListener('input', function() {
             // Detectar e converter links automaticamente
@@ -1733,9 +1739,14 @@ function clearAllMessageBoxes() {
     // 2. Limpar input principal (texto) e restaurar placeholder
     const mainInput = document.getElementById('messageTextInput');
     if (mainInput) {
+        // Garantir que está editável
+        mainInput.contentEditable = 'true';
+        mainInput.setAttribute('contenteditable', 'true');
+        
         // Limpar conteúdo
         mainInput.textContent = '';
         mainInput.innerHTML = '';
+        
         // Restaurar placeholder funcional
         mainInput.textContent = 'Digite sua mensagem aqui...';
         mainInput.style.color = '#999';
