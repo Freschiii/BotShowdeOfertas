@@ -208,11 +208,25 @@ io.on('connection', (socket) => {
             
             if (image) {
                 console.log('📤 Enviando mensagem com imagem...');
-                console.log('📤 Caminho da imagem:', image);
+                console.log('📤 Dados da imagem:', image);
+                console.log('📤 Tipo da imagem:', typeof image);
+                console.log('📤 É base64?', image.startsWith('data:'));
                 
                 try {
-                    // Criar MessageMedia a partir do arquivo
-                    const media = MessageMedia.fromFilePath(image);
+                    let media;
+                    
+                    if (image.startsWith('data:')) {
+                        // É uma URL base64 (data:image/jpeg;base64,...)
+                        console.log('📤 Criando media a partir de base64...');
+                        const base64Data = image.split(',')[1];
+                        const mimeType = image.split(';')[0].split(':')[1];
+                        media = new MessageMedia(mimeType, base64Data);
+                    } else {
+                        // É um caminho de arquivo
+                        console.log('📤 Criando media a partir de arquivo...');
+                        media = MessageMedia.fromFilePath(image);
+                    }
+                    
                     console.log('📤 Media criada com sucesso');
                     
                     // Enviar mensagem com imagem
