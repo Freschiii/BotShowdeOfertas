@@ -737,6 +737,7 @@ function setupNewWhatsAppBox(whatsappBox) {
             const clipboardData = e.clipboardData || window.clipboardData;
             
             // Verificar se há imagem no clipboard
+            let hasImage = false;
             if (clipboardData.items) {
                 for (let i = 0; i < clipboardData.items.length; i++) {
                     const item = clipboardData.items[i];
@@ -748,20 +749,23 @@ function setupNewWhatsAppBox(whatsappBox) {
                         if (file) {
                             // Processar imagem colada
                             handlePastedImage(file, this);
-                            return;
+                            hasImage = true;
                         }
                     }
                 }
             }
             
-            // Se não há imagem, processar como texto
+            // Processar texto (mesmo se houver imagem)
             const pastedText = clipboardData.getData('text/plain');
-            const selection = window.getSelection();
-            if (selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                range.deleteContents();
-                range.insertNode(document.createTextNode(pastedText));
-                range.collapse(false);
+            if (pastedText && pastedText.trim()) {
+                console.log('📝 Texto detectado no clipboard:', pastedText);
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    range.deleteContents();
+                    range.insertNode(document.createTextNode(pastedText));
+                    range.collapse(false);
+                }
             }
         });
     }
@@ -864,6 +868,7 @@ function setupNewMessageBox(messageBox) {
             const clipboardData = e.clipboardData || window.clipboardData;
             
             // Verificar se há imagem no clipboard
+            let hasImage = false;
             if (clipboardData.items) {
                 for (let i = 0; i < clipboardData.items.length; i++) {
                     const item = clipboardData.items[i];
@@ -875,20 +880,23 @@ function setupNewMessageBox(messageBox) {
                         if (file) {
                             // Processar imagem colada
                             handlePastedImage(file, this);
-                            return;
+                            hasImage = true;
                         }
                     }
                 }
             }
             
-            // Se não há imagem, processar como texto
+            // Processar texto (mesmo se houver imagem)
             const pastedText = clipboardData.getData('text/plain');
-            const selection = window.getSelection();
-            if (selection.rangeCount > 0) {
-                const range = selection.getRangeAt(0);
-                range.deleteContents();
-                range.insertNode(document.createTextNode(pastedText));
-                range.collapse(false);
+            if (pastedText && pastedText.trim()) {
+                console.log('📝 Texto detectado no clipboard:', pastedText);
+                const selection = window.getSelection();
+                if (selection.rangeCount > 0) {
+                    const range = selection.getRangeAt(0);
+                    range.deleteContents();
+                    range.insertNode(document.createTextNode(pastedText));
+                    range.collapse(false);
+                }
             }
         });
     }
@@ -946,14 +954,14 @@ function handlePastedImage(file, textInput) {
                 ">×</button>
             `;
             
-            // Adicionar imagem à caixa de mensagem
+            // Adicionar imagem à caixa de mensagem (após o texto)
             messageBox.appendChild(imageContainer);
             
             // Mostrar mensagem de sucesso
             botManager.showMessage('Imagem colada com sucesso!', 'success');
             
-            // Atualizar preview
-            updateWhatsAppPreview();
+            // NÃO chamar updateWhatsAppPreview para não limpar o texto
+            console.log('📷 Imagem adicionada sem limpar o texto');
         }
     };
     
