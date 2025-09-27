@@ -1,88 +1,131 @@
-# 🤖 Bot Show de Ofertas
+# 🚀 Projeto Show de Ofertas
 
-Sistema completo para envio automático de mensagens com imagens para WhatsApp e Telegram.
+Sistema completo para envio de mensagens via WhatsApp e Telegram com agendamento e histórico.
 
-## 🚀 Funcionalidades
+## 📋 Funcionalidades
 
-- ✅ **WhatsApp:** Conexão real via QR Code + envio de imagens
-- ✅ **Telegram:** Bot API + envio de imagens  
-- ✅ **Salvamento Automático:** Dados persistem entre sessões
-- ✅ **Interface Moderna:** Design responsivo e intuitivo
-- ✅ **Logs Detalhados:** Debug completo
+- ✅ **Múltiplas caixas de mensagem** - Crie quantas mensagens quiser
+- ✅ **Agendamento inteligente** - Hoje/Amanhã com horário específico
+- ✅ **Histórico completo** - Todas as mensagens enviadas e agendadas
+- ✅ **Reset automático** - Limpeza após envio para evitar duplicatas
+- ✅ **Interface moderna** - Design dark mode responsivo
+- ✅ **Conexão automática** - WhatsApp e Telegram conectam automaticamente
+- ✅ **Portável** - Funciona em qualquer computador!
 
-## 📦 Instalação
+## 🚀 Como Executar
 
+### 🎯 **PRIMEIRA VEZ (Instalação)**
 ```bash
-# Clonar o repositório
-git clone https://github.com/Freschiii/BotShowdeOfertas.git
-cd BotShowdeOfertas
+# 1. Baixe o projeto do GitHub
+# 2. Clique duplo em:
+install.bat
+# ou
+install.ps1
+```
 
-# Instalar dependências
+### ⚡ **USO DIÁRIO (Após instalação)**
+```bash
+# Clique duplo em:
+start.bat
+# ou
+start.ps1
+```
+
+### 🔧 **Manual (Avançado)**
+```bash
+# Navegue para o diretório do projeto
+cd "caminho/para/o/projeto"
+
+# Instale dependências (primeira vez)
 npm install
 
-# Executar o projeto
-npm start
+# Inicie o servidor
+node server.js
 ```
+
+## 🌐 Acesso
+
+Após executar, acesse: **http://localhost:3000**
+
+## 📱 Configuração
+
+### WhatsApp
+- Conecta automaticamente ao carregar a página
+- QR Code será exibido para autenticação
+
+### Telegram
+- Token salvo automaticamente no localStorage
+- Conecta automaticamente se token válido
 
 ## 🎯 Como Usar
 
-1. **Acesse:** http://localhost:3000
-2. **Conecte WhatsApp:** Escaneie o QR Code
-3. **Configure Telegram:** Digite o token do bot
-4. **Descubra IDs:** Use as instruções na interface
-5. **Envie mensagens:** Selecione imagem + digite mensagem
+1. **Digite sua mensagem** na primeira caixa
+2. **Adicione imagens** (opcional) - arraste e solte ou clique para selecionar
+3. **Agende** (opcional) - clique no ícone do relógio
+4. **Adicione mais mensagens** - clique no botão "+"
+5. **Envie** - clique em "Enviar Mensagens"
 
-## 🔧 Configuração
+## 🔧 Recursos Avançados
 
-### **WhatsApp:**
-- Conecta via QR Code real
-- Dados salvos automaticamente
-- Suporte a imagens
+- **Reset de agendamento** - Ícone no canto superior direito
+- **Histórico compacto** - Visualize todas as mensagens enviadas
+- **Reset automático** - Limpeza completa após envio
+- **Múltiplas plataformas** - Envie para WhatsApp, Telegram ou ambos
 
-### **Telegram:**
-- Token do bot obrigatório
-- ID do canal obrigatório
-- Suporte a imagens
-
-## 📱 Descoberta de IDs
-
-### **WhatsApp:**
-1. Abra o WhatsApp Web
-2. Acesse o canal desejado
-3. Abra o Console (F12)
-4. Cole o código fornecido na interface
-5. Copie o ID que aparecer
-
-### **Telegram:**
-1. Adicione o bot ao canal
-2. Digite o token do bot
-3. Clique em "Descobrir Canais"
-4. Copie o ID do canal
-
-## 🛠️ Tecnologias
-
-- **Frontend:** HTML, CSS, JavaScript
-- **Backend:** Node.js, Express
-- **WhatsApp:** whatsapp-web.js
-- **Telegram:** Bot API
-- **Comunicação:** Socket.IO
-- **Salvamento:** LocalStorage
-
-## 📁 Estrutura
+## 📁 Estrutura do Projeto
 
 ```
-├── index.html              # Interface principal
-├── styles.css              # Estilos
-├── script.js               # Lógica frontend
-├── bot.js                  # Gerenciador de bots
-├── discover-ids.js         # Descoberta de IDs
-├── server-whatsapp-web.js  # Servidor WhatsApp
-├── package.json            # Dependências
-└── README.md               # Este arquivo
+Projeto Show de Ofertas/
+├── index.html          # Interface principal
+├── script.js           # Lógica JavaScript
+├── styles.css          # Estilos CSS
+├── server.js           # Servidor Node.js
+├── bot.js              # Gerenciador de bots
+├── start.bat           # Executador Windows
+├── start.ps1           # Executador PowerShell
+└── package.json        # Dependências
 ```
 
-## 🎉 Sistema Pronto!
+## 🛠️ Dependências
 
-O projeto está **100% funcional** e pronto para uso!
+- Node.js
+- Express
+- Socket.IO
+- Baileys (WhatsApp)
+- Telegraf (Telegram)
 
-**Repositório:** [https://github.com/Freschiii/BotShowdeOfertas.git](https://github.com/Freschiii/BotShowdeOfertas.git)
+## 📞 Suporte
+
+### 🆘 **Problemas Comuns:**
+
+1. **"Node.js não encontrado"**
+   - Baixe em: https://nodejs.org/
+   - Reinicie o computador após instalar
+
+2. **"Falha ao instalar dependências"**
+   - Verifique conexão com internet
+   - Execute como administrador
+   - Tente: `npm cache clean --force`
+
+3. **"Porta 3000 em uso"**
+   - Feche outros programas que usam a porta 3000
+   - Reinicie o computador
+
+4. **"WhatsApp não conecta"**
+   - Verifique se o WhatsApp Web está fechado
+   - Escaneie o QR Code novamente
+
+### 🔧 **Para Desenvolvedores:**
+- Clone o repositório
+- Execute `install.bat` (primeira vez)
+- Execute `start.bat` (uso diário)
+- Acesse `http://localhost:3000`
+
+---
+**Desenvolvido com ❤️ para facilitar o envio de ofertas!**
+
+### 📱 **Compatibilidade:**
+- ✅ Windows 10/11
+- ✅ Qualquer computador
+- ✅ Funciona offline (após instalação)
+- ✅ Portável (copie a pasta para qualquer lugar)

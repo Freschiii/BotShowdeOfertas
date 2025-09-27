@@ -1,0 +1,70 @@
+========================================
+    PROJETO SHOW DE OFERTAS
+========================================
+
+🚀 COMO USAR EM QUALQUER COMPUTADOR:
+
+1️⃣ PRIMEIRA VEZ (Instalação):
+   - Baixe o projeto do GitHub
+   - Clique duplo em: install.bat
+   - Aguarde a instalação terminar
+
+2️⃣ USO DIÁRIO:
+   - Clique duplo em: start.bat
+   - Acesse: http://localhost:3000
+
+========================================
+    ARQUIVOS IMPORTANTES:
+========================================
+
+📁 install.bat     - Instala tudo (primeira vez)
+📁 start.bat       - Inicia o sistema (uso diário)
+📁 install.ps1     - Instalador PowerShell
+📁 start.ps1       - Iniciador PowerShell
+📁 README.md       - Documentação completa
+
+========================================
+    REQUISITOS:
+========================================
+
+✅ Node.js (baixe em: https://nodejs.org/)
+✅ Conexão com internet (apenas na instalação)
+✅ Windows 10/11
+
+========================================
+    PROBLEMAS COMUNS:
+========================================
+
+❌ "Node.js não encontrado"
+   → Baixe e instale o Node.js
+   → Reinicie o computador
+
+❌ "Falha ao instalar dependências"
+   → Verifique sua internet
+   → Execute como administrador
+
+❌ "Porta 3000 em uso"
+   → Feche outros programas
+   → Reinicie o computador
+
+========================================
+    FUNCIONALIDADES:
+========================================
+
+✅ Múltiplas mensagens
+✅ Agendamento (hoje/amanhã)
+✅ Histórico completo
+✅ WhatsApp + Telegram
+✅ Interface moderna
+✅ Reset automático
+✅ Funciona offline (após instalação)
+
+========================================
+    SUPORTE:
+========================================
+
+📧 Para dúvidas, verifique o README.md
+🔧 Sistema testado em Windows 10/11
+📱 Funciona em qualquer computador
+
+========================================
