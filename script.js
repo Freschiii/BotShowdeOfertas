@@ -1716,10 +1716,12 @@ function clearAllMessageBoxes() {
     // 2. Limpar input principal (texto) e restaurar placeholder
     const mainInput = document.getElementById('messageTextInput');
     if (mainInput) {
+        // Limpar conteúdo
         mainInput.textContent = '';
         mainInput.innerHTML = '';
-        // Restaurar placeholder
-        mainInput.setAttribute('data-placeholder', 'Digite sua mensagem aqui...');
+        // Restaurar placeholder como texto visível
+        mainInput.textContent = 'Digite sua mensagem aqui...';
+        mainInput.style.color = '#999';
         console.log('✅ Input principal limpo e placeholder restaurado');
     }
     
