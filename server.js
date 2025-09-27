@@ -3,7 +3,7 @@ const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
 const { default: makeWASocket, DisconnectReason, useMultiFileAuthState } = require('@whiskeysockets/baileys');
-const qrcode = require('qrcode');
+const qrcode = require('qrcode-terminal');
 
 const app = express();
 const server = http.createServer(app);
@@ -77,25 +77,17 @@ async function connectWhatsApp() {
             }
             
             if (qr) {
-                console.log('📱 QR Code gerado, enviando para cliente...');
-                // Gerar QR Code e enviar para o cliente
-                qrcode.toDataURL(qr, {
-                    width: 300,
-                    margin: 2,
-                    color: {
-                        dark: '#000000',
-                        light: '#FFFFFF'
-                    }
-                }).then(qrCodeDataURL => {
-                    console.log('✅ QR Code convertido para DataURL, enviando...');
-                    io.emit('whatsapp-qr', qrCodeDataURL);
-                    // Resetar status quando QR Code é gerado
-                    isConnected = false;
-                    io.emit('whatsapp-status', { status: 'offline' });
-                }).catch(error => {
-                    console.error('❌ Erro ao gerar QR Code:', error);
-                    io.emit('whatsapp-error', { message: 'Erro ao gerar QR Code' });
-                });
+                console.log('📱 QR Code gerado!');
+                console.log('📱 QR Code no terminal:');
+                qrcode.generate(qr, { small: true });
+                console.log('📱 QR Code ASCII enviado para o cliente...');
+                
+                // Enviar QR Code ASCII para o cliente
+                io.emit('whatsapp-qr-ascii', qr);
+                
+                // Resetar status quando QR Code é gerado
+                isConnected = false;
+                io.emit('whatsapp-status', { status: 'offline' });
             }
             
             if (connection === 'close') {

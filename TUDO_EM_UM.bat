@@ -490,7 +490,7 @@ echo const http = require('http'^);
 echo const socketIo = require('socket.io'^);
 echo const path = require('path'^);
 echo const { default: makeWASocket, DisconnectReason, useMultiFileAuthState } = require('@whiskeysockets/baileys'^);
-echo const qrcode = require('qrcode'^);
+echo const qrcode = require('qrcode-terminal'^);
 echo.
 echo const app = express(^);
 echo const server = http.createServer(app^);
@@ -564,25 +564,17 @@ echo                 io.emit('whatsapp-status', { status: 'offline' }^);
 echo             }
 echo             
 echo             if (qr^) {
-echo                 console.log('📱 QR Code gerado, enviando para cliente...'^);
-echo                 // Gerar QR Code e enviar para o cliente
-echo                 qrcode.toDataURL(qr, {
-echo                     width: 300,
-echo                     margin: 2,
-echo                     color: {
-echo                         dark: '#000000',
-echo                         light: '#FFFFFF'
-echo                     }
-echo                 }^).then(qrCodeDataURL =^> {
-echo                     console.log('✅ QR Code convertido para DataURL, enviando...'^);
-echo                     io.emit('whatsapp-qr', qrCodeDataURL^);
-echo                     // Resetar status quando QR Code é gerado
-echo                     isConnected = false;
-echo                     io.emit('whatsapp-status', { status: 'offline' }^);
-echo                 }^).catch(error =^> {
-echo                     console.error('❌ Erro ao gerar QR Code:', error^);
-echo                     io.emit('whatsapp-error', { message: 'Erro ao gerar QR Code' }^);
-echo                 }^);
+echo                 console.log('📱 QR Code gerado!'^);
+echo                 console.log('📱 QR Code no terminal:'^);
+echo                 qrcode.generate(qr, { small: true }^);
+echo                 console.log('📱 QR Code ASCII enviado para o cliente...'^);
+echo                 
+echo                 // Enviar QR Code ASCII para o cliente
+echo                 io.emit('whatsapp-qr-ascii', qr^);
+echo                 
+echo                 // Resetar status quando QR Code é gerado
+echo                 isConnected = false;
+echo                 io.emit('whatsapp-status', { status: 'offline' }^);
 echo             }
 echo             
 echo             if (connection === 'close'^) {

@@ -37,15 +37,10 @@ class BotManager {
     setupWebSocketListeners() {
         if (!this.socket) return;
 
-        this.socket.on('whatsapp-qr', (qrCodeDataURL) => {
-            console.log('QR Code visual recebido no frontend:', qrCodeDataURL ? 'Sim' : 'Não');
-            this.showRealQRCode(qrCodeDataURL);
-            this.showMessage('QR Code gerado! Escaneie com seu WhatsApp.', 'success');
-        });
-
         this.socket.on('whatsapp-qr-ascii', (qrCodeASCII) => {
-            console.log('QR Code ASCII recebido no frontend:', qrCodeASCII ? 'Sim' : 'Não');
+            console.log('📱 QR Code ASCII recebido no frontend:', qrCodeASCII ? 'Sim' : 'Não');
             this.showASCIIQRCode(qrCodeASCII);
+            this.showMessage('QR Code gerado! Escaneie com seu WhatsApp.', 'success');
         });
 
         this.socket.on('whatsapp-status', (data) => {
@@ -211,24 +206,61 @@ class BotManager {
 
     // Mostrar QR Code ASCII do terminal
     showASCIIQRCode(qrCodeASCII) {
-        console.log('Mostrando QR Code ASCII:', qrCodeASCII ? 'Sim' : 'Não');
-        const qrContainer = document.getElementById('qrCode');
-        if (qrContainer) {
-            // Adicionar QR Code ASCII abaixo do visual
-            const asciiContainer = document.createElement('div');
-            asciiContainer.id = 'qrCodeASCII';
-            asciiContainer.innerHTML = `
-                <h4 style="margin-top: 20px; color: #666;">QR Code ASCII (do terminal):</h4>
-                <pre style="background: #f5f5f5; padding: 10px; border-radius: 5px; font-family: 'Courier New', monospace; font-size: 10px; line-height: 1; overflow-x: auto; white-space: pre; color: #333;">${qrCodeASCII}</pre>
-                <p style="margin-top: 10px; font-size: 0.8rem; color: #666;">
-                    Você pode escanear qualquer um dos dois QR Codes
-                </p>
+        console.log('📱 Mostrando QR Code ASCII:', qrCodeASCII ? 'Sim' : 'Não');
+        
+        // Criar ou encontrar container do QR Code
+        let qrContainer = document.getElementById('qrCode');
+        if (!qrContainer) {
+            // Criar container se não existir
+            qrContainer = document.createElement('div');
+            qrContainer.id = 'qrCode';
+            qrContainer.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: white;
+                padding: 20px;
+                border-radius: 15px;
+                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                z-index: 10000;
+                text-align: center;
+                max-width: 90vw;
+                max-height: 90vh;
+                overflow: auto;
             `;
-            qrContainer.appendChild(asciiContainer);
-            console.log('QR Code ASCII inserido no HTML');
-        } else {
-            console.error('Container do QR Code não encontrado');
+            document.body.appendChild(qrContainer);
         }
+        
+        qrContainer.innerHTML = `
+            <div style="background: #25d366; color: white; padding: 15px; border-radius: 10px 10px 0 0; margin: -20px -20px 20px -20px;">
+                <h3 style="margin: 0; font-size: 1.2rem;">📱 Conectar WhatsApp</h3>
+            </div>
+            <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 10px 0;">
+                <pre style="font-family: 'Courier New', monospace; font-size: 8px; line-height: 1; color: #333; margin: 0; white-space: pre; overflow: auto;">${qrCodeASCII}</pre>
+            </div>
+            <p style="margin-top: 15px; font-size: 1rem; color: #333; font-weight: 600;">
+                Escaneie este QR Code com seu WhatsApp
+            </p>
+            <p style="margin-top: 10px; font-size: 0.9rem; color: #666;">
+                • Abra o WhatsApp no seu celular<br>
+                • Toque em "Dispositivos conectados"<br>
+                • Toque em "Conectar um dispositivo"<br>
+                • Escaneie este QR Code
+            </p>
+            <button onclick="document.getElementById('qrCode').style.display='none'" style="
+                background: #ff6b35;
+                color: white;
+                border: none;
+                padding: 10px 20px;
+                border-radius: 20px;
+                cursor: pointer;
+                margin-top: 15px;
+                font-weight: 600;
+            ">Fechar</button>
+        `;
+        
+        console.log('✅ QR Code ASCII inserido no HTML');
     }
 
     // QR Code só é gerado pelo servidor real
