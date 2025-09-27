@@ -96,11 +96,33 @@ function initializeWhatsApp() {
         console.log('✅ WhatsApp conectado com sucesso!');
         isConnected = true;
         io.emit('whatsapp-status', { status: 'online' });
+        console.log('📱 Status online enviado para o frontend');
     });
 
     // Evento quando autenticado
     whatsappClient.on('authenticated', () => {
         console.log('✅ WhatsApp autenticado!');
+        isConnected = true;
+        io.emit('whatsapp-status', { status: 'online' });
+    });
+
+    // Evento quando autenticação falha
+    whatsappClient.on('auth_failure', (msg) => {
+        console.error('❌ Falha na autenticação WhatsApp:', msg);
+        isConnected = false;
+        io.emit('whatsapp-status', { status: 'offline' });
+    });
+
+    // Evento de mudança de estado
+    whatsappClient.on('change_state', (state) => {
+        console.log('🔄 Estado do WhatsApp mudou para:', state);
+        if (state === 'CONNECTED') {
+            isConnected = true;
+            io.emit('whatsapp-status', { status: 'online' });
+        } else if (state === 'UNPAIRED' || state === 'UNLAUNCHED') {
+            isConnected = false;
+            io.emit('whatsapp-status', { status: 'offline' });
+        }
     });
 
     // Evento quando desconectado
@@ -137,6 +159,7 @@ io.on('connection', (socket) => {
     
     socket.on('connect-whatsapp', async () => {
         console.log('📱 Solicitação para conectar WhatsApp recebida');
+        console.log('📱 Status atual isConnected:', isConnected);
         
         if (!whatsappClient) {
             console.log('🔄 Inicializando WhatsApp...');
@@ -147,6 +170,20 @@ io.on('connection', (socket) => {
         } else {
             console.log('✅ WhatsApp já está conectado');
             socket.emit('whatsapp-status', { status: 'online' });
+        }
+        
+        // Verificação adicional do status
+        try {
+            if (whatsappClient && whatsappClient.info) {
+                const info = await whatsappClient.info;
+                if (info && info.wid) {
+                    console.log('✅ WhatsApp conectado (verificação manual)');
+                    isConnected = true;
+                    socket.emit('whatsapp-status', { status: 'online' });
+                }
+            }
+        } catch (error) {
+            console.log('❌ Erro ao verificar status:', error.message);
         }
     });
 
@@ -186,6 +223,22 @@ io.on('connection', (socket) => {
 
 // Inicializar WhatsApp automaticamente
 initializeWhatsApp();
+
+// Verificar status do WhatsApp periodicamente
+setInterval(async () => {
+    if (whatsappClient && !isConnected) {
+        try {
+            const info = await whatsappClient.info;
+            if (info && info.wid) {
+                console.log('✅ WhatsApp conectado (verificação periódica)');
+                isConnected = true;
+                io.emit('whatsapp-status', { status: 'online' });
+            }
+        } catch (error) {
+            // Cliente não conectado
+        }
+    }
+}, 5000); // Verificar a cada 5 segundos
 
 // Iniciar servidor
 server.listen(PORT, () => {
