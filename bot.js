@@ -273,7 +273,15 @@ class BotManager {
                 <h2 style="margin: 0; font-size: 1.5rem;">📱 Conectar WhatsApp</h2>
             </div>
             <div style="background: #f0f0f0; padding: 20px; border-radius: 10px; margin: 20px 0; max-height: 400px; overflow: auto; border: 2px solid #25d366;">
-                <pre style="font-family: 'Courier New', monospace; font-size: 4px; line-height: 0.6; color: #000; margin: 0; white-space: pre; overflow: auto;">${qrCodeASCII}</pre>
+                <div style="background: white; padding: 15px; border-radius: 8px; text-align: center;">
+                    <p style="color: #666; margin-bottom: 10px; font-size: 0.9rem;">QR Code ASCII:</p>
+                    <pre style="font-family: 'Courier New', monospace; font-size: 6px; line-height: 0.8; color: #000; margin: 0; white-space: pre; overflow: auto; text-align: left; display: inline-block;">${qrCodeASCII}</pre>
+                </div>
+                <div style="margin-top: 15px; padding: 10px; background: #fff3cd; border: 1px solid #ffeaa7; border-radius: 5px;">
+                    <p style="margin: 0; font-size: 0.8rem; color: #856404;">
+                        <strong>💡 Dica:</strong> Se o QR Code não aparecer, verifique o console do servidor onde deve estar sendo exibido.
+                    </p>
+                </div>
             </div>
             <p style="margin-top: 20px; font-size: 1.2rem; color: #333; font-weight: 700;">
                 📱 Escaneie este QR Code com seu WhatsApp
