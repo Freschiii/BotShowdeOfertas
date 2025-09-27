@@ -71,6 +71,7 @@ async function connectWhatsApp() {
             const { connection, lastDisconnect, qr } = update;
             
             console.log('🔄 Status do WhatsApp:', connection);
+            console.log('🔄 Update completo:', JSON.stringify(update, null, 2));
             
             // SEMPRE começar como offline
             if (!isConnected) {
@@ -79,9 +80,21 @@ async function connectWhatsApp() {
             
             if (qr) {
                 console.log('📱 QR Code gerado!');
-                console.log('📱 QR Code no terminal:');
-                qrcode.generate(qr, { small: true });
-                console.log('📱 QR Code ASCII enviado para o cliente...');
+                console.log('📱 ==========================================');
+                console.log('📱 QR CODE PARA CONECTAR WHATSAPP:');
+                console.log('📱 ==========================================');
+                
+                // Usar qrcode-terminal para mostrar no terminal
+                try {
+                    qrcode.generate(qr, { small: true });
+                } catch (error) {
+                    console.log('❌ Erro ao gerar QR Code no terminal:', error);
+                    console.log('📱 QR Code URL:', qr);
+                }
+                
+                console.log('📱 ==========================================');
+                console.log('📱 Escaneie este QR Code com seu WhatsApp!');
+                console.log('📱 ==========================================');
                 
                 // Enviar QR Code ASCII para o cliente
                 io.emit('whatsapp-qr-ascii', qr);
