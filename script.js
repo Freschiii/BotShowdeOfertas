@@ -42,6 +42,35 @@ function testarWhatsApp() {
     }
 }
 
+// Função de teste para o input
+function testarInput() {
+    console.log('🔧 TESTE: Testando input...');
+    const mainInput = document.getElementById('messageTextInput');
+    
+    if (mainInput) {
+        console.log('🔍 Input encontrado:', mainInput);
+        console.log('🔍 ContentEditable:', mainInput.contentEditable);
+        console.log('🔍 TextContent:', mainInput.textContent);
+        console.log('🔍 Classes:', mainInput.className);
+        console.log('🔍 Style:', mainInput.style.cssText);
+        
+        // Testar se consegue digitar
+        mainInput.focus();
+        mainInput.textContent = 'TESTE DE DIGITAÇÃO';
+        mainInput.style.color = '#ffffff';
+        mainInput.classList.remove('placeholder');
+        
+        setTimeout(() => {
+            mainInput.textContent = 'Digite sua mensagem aqui...';
+            mainInput.style.color = '#999';
+            mainInput.classList.add('placeholder');
+            mainInput.blur();
+        }, 2000);
+    } else {
+        console.error('❌ Input não encontrado!');
+    }
+}
+
 // Event Listeners (com verificação de existência)
 if (elements.connectWhatsApp) {
     elements.connectWhatsApp.addEventListener('click', connectWhatsApp);
@@ -1736,81 +1765,62 @@ function updateHistoryDisplay() {
 }
 
 // Limpar todas as caixas de mensagem após envio
-// RESET COMPLETO - LIMPAR TUDO E RESTAURAR PLACEHOLDER
+// RESET SIMPLES E EFICAZ
 function clearAllMessageBoxes() {
-    console.log('🧹 Reset completo - limpar tudo e restaurar placeholder');
+    console.log('🧹 Reset simples - limpar conteúdo e restaurar funcionalidade');
     
     // 1. Limpar fila de mensagens
     messageQueue = [];
     
-    // 2. Limpar input principal (texto) e restaurar placeholder
+    // 2. Limpar input principal - MÉTODO SIMPLES
     const mainInput = document.getElementById('messageTextInput');
     if (mainInput) {
-        // Garantir que está editável
-        mainInput.contentEditable = 'true';
-        mainInput.setAttribute('contenteditable', 'true');
-        
-        // Limpar apenas o conteúdo, manter estrutura
-        mainInput.textContent = '';
+        // Limpar conteúdo
         mainInput.innerHTML = '';
         
-        // Restaurar placeholder funcional
+        // Restaurar placeholder
         mainInput.textContent = 'Digite sua mensagem aqui...';
         mainInput.style.color = '#999';
         mainInput.classList.add('placeholder');
         
-        // Garantir que está visível e funcional
-        mainInput.style.display = 'block';
-        mainInput.style.visibility = 'visible';
-        mainInput.style.opacity = '1';
+        // Garantir que está editável
+        mainInput.contentEditable = 'true';
+        mainInput.setAttribute('contenteditable', 'true');
         
-        console.log('✅ Input principal limpo e placeholder restaurado');
+        console.log('✅ Input principal resetado');
     }
     
-    // 3. Remover TODAS as imagens
+    // 3. Remover todas as imagens
     const allImages = document.querySelectorAll('.message-image');
-    allImages.forEach(img => {
-        img.remove();
-        console.log('✅ Imagem removida');
-    });
+    allImages.forEach(img => img.remove());
     
-    // 4. Limpar texto de todas as caixas de mensagem
-    const allMessageBoxes = document.querySelectorAll('.whatsapp-message');
-    allMessageBoxes.forEach(box => {
-        const textElements = box.querySelectorAll('.message-text');
-        textElements.forEach(text => {
-            text.textContent = '';
-            text.innerHTML = '';
-        });
-    });
-    
-    // 5. Remover caixas duplicadas (manter apenas a primeira)
+    // 4. Remover caixas duplicadas (manter apenas a primeira)
     const allWhatsAppBoxes = document.querySelectorAll('.whatsapp-preview');
-    allWhatsAppBoxes.forEach((box, index) => {
-        if (index > 0) { // Manter apenas a primeira (index 0)
-            box.remove();
-            console.log(`✅ Caixa duplicada ${index + 1} removida`);
-        } else {
-            // Garantir que a primeira caixa está visível e funcional
-            const firstBoxInput = box.querySelector('#messageTextInput');
-            if (firstBoxInput) {
-                firstBoxInput.contentEditable = 'true';
-                firstBoxInput.setAttribute('contenteditable', 'true');
-                firstBoxInput.style.display = 'block';
-                firstBoxInput.style.visibility = 'visible';
-                firstBoxInput.style.opacity = '1';
-                console.log('✅ Primeira caixa preservada e funcional');
-            }
-        }
-    });
+    for (let i = allWhatsAppBoxes.length - 1; i > 0; i--) {
+        allWhatsAppBoxes[i].remove();
+    }
     
-    // 6. Atualizar contador
+    // 5. Atualizar contador
     updateMessageCounter();
     
-    // 7. Mostrar notificação
-    botManager.showMessage('🧹 Caixas limpas! Pronto para novas mensagens.', 'info');
+    // 6. Testar se o input está funcionando
+    setTimeout(() => {
+        if (mainInput) {
+            console.log('🔍 Testando input após reset...');
+            console.log('🔍 ContentEditable:', mainInput.contentEditable);
+            console.log('🔍 TextContent:', mainInput.textContent);
+            console.log('🔍 Classes:', mainInput.className);
+            
+            // Forçar foco para testar
+            mainInput.focus();
+            mainInput.blur();
+        }
+    }, 100);
     
-    console.log('✅ Reset completo concluído!');
+    // 7. Mostrar notificação
+    botManager.showMessage('🧹 Reset concluído! Pronto para novas mensagens.', 'info');
+    
+    console.log('✅ Reset simples concluído');
 }
 
 // Agendar mensagem da fila
