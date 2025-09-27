@@ -1713,7 +1713,16 @@ function clearAllMessageBoxes() {
     // 1. Limpar fila de mensagens
     messageQueue = [];
     
-    // 2. Limpar input principal (primeira caixa)
+    // 2. Limpar TODOS os inputs de texto (mais robusto)
+    const allTextInputs = document.querySelectorAll('#messageTextInput, .message-text, [contenteditable="true"]');
+    allTextInputs.forEach(input => {
+        input.textContent = '';
+        input.innerHTML = '';
+        input.value = '';
+        console.log('✅ Input limpo:', input.id || input.className);
+    });
+    
+    // 3. Limpar input principal específico
     const mainInput = document.getElementById('messageTextInput');
     if (mainInput) {
         mainInput.textContent = '';
@@ -1722,7 +1731,7 @@ function clearAllMessageBoxes() {
         console.log('✅ Input principal limpo');
     }
     
-    // 3. Remover todas as caixas duplicadas
+    // 4. Remover todas as caixas duplicadas
     const allWhatsAppBoxes = document.querySelectorAll('.whatsapp-preview');
     allWhatsAppBoxes.forEach((box, index) => {
         if (index > 0) { // Manter apenas a primeira (index 0)
@@ -1731,10 +1740,20 @@ function clearAllMessageBoxes() {
         }
     });
     
-    // 4. Atualizar contador
+    // 5. Limpar qualquer texto que possa estar nas caixas
+    const allMessageBoxes = document.querySelectorAll('.whatsapp-message');
+    allMessageBoxes.forEach(box => {
+        const textElements = box.querySelectorAll('.message-text');
+        textElements.forEach(text => {
+            text.textContent = '';
+            text.innerHTML = '';
+        });
+    });
+    
+    // 6. Atualizar contador
     updateMessageCounter();
     
-    // 5. Mostrar notificação
+    // 7. Mostrar notificação
     botManager.showMessage('🧹 Caixas limpas! Pronto para novas mensagens.', 'info');
     
     console.log('✅ Reset simplificado concluído!');
