@@ -1706,19 +1706,21 @@ function updateHistoryDisplay() {
 }
 
 // Limpar todas as caixas de mensagem após envio
-// RESET COMPLETO - LIMPAR TUDO MAS MANTER ESTRUTURA
+// RESET COMPLETO - LIMPAR TUDO E RESTAURAR PLACEHOLDER
 function clearAllMessageBoxes() {
-    console.log('🧹 Reset completo - limpar tudo mas manter estrutura');
+    console.log('🧹 Reset completo - limpar tudo e restaurar placeholder');
     
     // 1. Limpar fila de mensagens
     messageQueue = [];
     
-    // 2. Limpar input principal (texto)
+    // 2. Limpar input principal (texto) e restaurar placeholder
     const mainInput = document.getElementById('messageTextInput');
     if (mainInput) {
         mainInput.textContent = '';
         mainInput.innerHTML = '';
-        console.log('✅ Input principal limpo');
+        // Restaurar placeholder
+        mainInput.setAttribute('data-placeholder', 'Digite sua mensagem aqui...');
+        console.log('✅ Input principal limpo e placeholder restaurado');
     }
     
     // 3. Remover TODAS as imagens
