@@ -2,9 +2,8 @@ const express = require('express');
 const http = require('http');
 const socketIo = require('socket.io');
 const path = require('path');
-const { default: makeWASocket, DisconnectReason, useMultiFileAuthState } = require('@whiskeysockets/baileys');
+const { Client, LocalAuth } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
-const QRCode = require('qrcode');
 
 const app = express();
 const server = http.createServer(app);
@@ -18,221 +17,140 @@ const io = socketIo(server, {
 // Servir arquivos estáticos
 app.use(express.static('.'));
 
-// Rota principal
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, 'index.html'));
-});
-
-// Estado do WhatsApp
-let whatsappSocket = null;
+// Configurações
+const PORT = process.env.PORT || 3000;
 let isConnected = false;
+let whatsappClient = null;
 
-// Função para conectar WhatsApp
-async function connectWhatsApp() {
-    try {
-        // FORÇAR DESCONEXÃO COMPLETA
+// Inicializar WhatsApp Client
+function initializeWhatsApp() {
+    console.log('🔄 Inicializando WhatsApp Web.js...');
+    
+    whatsappClient = new Client({
+        authStrategy: new LocalAuth(),
+        puppeteer: {
+            headless: true,
+            args: [
+                '--no-sandbox',
+                '--disable-setuid-sandbox',
+                '--disable-dev-shm-usage',
+                '--disable-accelerated-2d-canvas',
+                '--no-first-run',
+                '--no-zygote',
+                '--single-process',
+                '--disable-gpu'
+            ]
+        }
+    });
+
+    // Evento quando QR Code é gerado
+    whatsappClient.on('qr', (qr) => {
+        console.log('📱 QR Code gerado!');
+        console.log('📱 ==========================================');
+        console.log('📱 QR CODE PARA CONECTAR WHATSAPP:');
+        console.log('📱 ==========================================');
+        
+        // Mostrar QR Code no terminal
+        qrcode.generate(qr, { small: true });
+        
+        console.log('📱 ==========================================');
+        console.log('📱 Escaneie este QR Code com seu WhatsApp!');
+        console.log('📱 ==========================================');
+        
+        // Enviar para o frontend
+        io.emit('whatsapp-qr-ascii', qr);
+        io.emit('whatsapp-status', { status: 'offline' });
+    });
+
+    // Evento quando conectado
+    whatsappClient.on('ready', () => {
+        console.log('✅ WhatsApp conectado com sucesso!');
+        isConnected = true;
+        io.emit('whatsapp-status', { status: 'online' });
+    });
+
+    // Evento quando autenticado
+    whatsappClient.on('authenticated', () => {
+        console.log('✅ WhatsApp autenticado!');
+    });
+
+    // Evento quando desconectado
+    whatsappClient.on('disconnected', (reason) => {
+        console.log('❌ WhatsApp desconectado:', reason);
         isConnected = false;
         io.emit('whatsapp-status', { status: 'offline' });
-        
-        // Limpar socket anterior
-        if (whatsappSocket) {
-            try {
-                await whatsappSocket.logout();
-            } catch (e) {}
-            whatsappSocket = null;
-        }
-        
-        const { state, saveCreds } = await useMultiFileAuthState('./auth_info_baileys');
-        
-        whatsappSocket = makeWASocket({
-            auth: state,
-            printQRInTerminal: false,
-            logger: {
-                level: 'silent',
-                child: () => ({
-                    level: 'silent',
-                    trace: () => {},
-                    debug: () => {},
-                    info: () => {},
-                    warn: () => {},
-                    error: () => {},
-                    fatal: () => {}
-                }),
-                trace: () => {},
-                debug: () => {},
-                info: () => {},
-                warn: () => {},
-                error: () => {},
-                fatal: () => {}
-            }
-        });
+    });
 
-        whatsappSocket.ev.on('connection.update', (update) => {
-            const { connection, lastDisconnect, qr } = update;
-            
-            console.log('🔄 Status do WhatsApp:', connection);
-            console.log('🔄 Update completo:', JSON.stringify(update, null, 2));
-            
-            // SEMPRE começar como offline
-            if (!isConnected) {
-                io.emit('whatsapp-status', { status: 'offline' });
-            }
-            
-            if (qr) {
-                console.log('📱 QR Code gerado!');
-                console.log('📱 ==========================================');
-                console.log('📱 QR CODE PARA CONECTAR WHATSAPP:');
-                console.log('📱 ==========================================');
-                
-                // Usar qrcode-terminal para mostrar no terminal
-                try {
-                    qrcode.generate(qr, { small: true });
-                } catch (error) {
-                    console.log('❌ Erro ao gerar QR Code no terminal:', error);
-                    console.log('📱 QR Code URL:', qr);
-                }
-                
-                console.log('📱 ==========================================');
-                console.log('📱 Escaneie este QR Code com seu WhatsApp!');
-                console.log('📱 ==========================================');
-                
-                // Enviar QR Code ASCII para o cliente
-                io.emit('whatsapp-qr-ascii', qr);
-                
-                // Também gerar QR Code visual
-                try {
-                    console.log('📱 Gerando QR Code visual...');
-                    QRCode.toDataURL(qr, {
-                        width: 300,
-                        margin: 2,
-                        color: {
-                            dark: '#000000',
-                            light: '#FFFFFF'
-                        }
-                    }).then(qrCodeDataURL => {
-                        console.log('📱 QR Code visual gerado, enviando...');
-                        io.emit('whatsapp-qr', qrCodeDataURL);
-                    }).catch(error => {
-                        console.error('❌ Erro ao gerar QR Code visual:', error);
-                    });
-                } catch (error) {
-                    console.error('❌ Erro ao gerar QR Code visual:', error);
-                }
-                
-                // Resetar status quando QR Code é gerado
-                isConnected = false;
-                io.emit('whatsapp-status', { status: 'offline' });
-            }
-            
-            if (connection === 'close') {
-                isConnected = false;
-                io.emit('whatsapp-status', { status: 'offline' });
-                console.log('WhatsApp desconectado');
-                // NÃO RECONECTAR AUTOMATICAMENTE
-            } else if (connection === 'open') {
-                // Só marcar como conectado quando realmente conectar
-                isConnected = true;
-                io.emit('whatsapp-status', { status: 'online' });
-                console.log('WhatsApp conectado!');
-            } else if (connection === 'connecting') {
-                // Mostrar status de conectando
-                io.emit('whatsapp-status', { status: 'connecting' });
-            }
-        });
+    // Evento de erro
+    whatsappClient.on('auth_failure', (msg) => {
+        console.error('❌ Falha na autenticação WhatsApp:', msg);
+        isConnected = false;
+        io.emit('whatsapp-status', { status: 'offline' });
+    });
 
-        whatsappSocket.ev.on('creds.update', saveCreds);
-
-    } catch (error) {
-        console.error('Erro ao conectar WhatsApp:', error);
-        io.emit('whatsapp-error', { message: error.message });
-    }
+    // Inicializar cliente
+    whatsappClient.initialize();
 }
 
-// Função para enviar mensagem WhatsApp
-async function sendWhatsAppMessage(chatId, message, imagePath = null) {
-    try {
-        if (!isConnected || !whatsappSocket) {
-            throw new Error('WhatsApp não está conectado');
-        }
-
-        if (imagePath) {
-            // Enviar com imagem
-            await whatsappSocket.sendMessage(chatId, {
-                image: { url: imagePath },
-                caption: message
-            });
-        } else {
-            // Enviar apenas texto
-            await whatsappSocket.sendMessage(chatId, { text: message });
-        }
-
-        return { success: true, message: 'Mensagem enviada com sucesso' };
-    } catch (error) {
-        return { success: false, message: error.message };
-    }
-}
-
-// WebSocket para comunicação em tempo real
+// WebSocket listeners
 io.on('connection', (socket) => {
     console.log('✅ Cliente conectado via WebSocket');
     
-    // Conectar WhatsApp
     socket.on('connect-whatsapp', async () => {
         console.log('📱 Solicitação para conectar WhatsApp recebida');
         
-        // Limpar sessão anterior
-        if (whatsappSocket) {
-            try {
-                console.log('🔄 Fazendo logout da sessão anterior...');
-                await whatsappSocket.logout();
-            } catch (e) {
-                console.log('⚠️ Erro ao fazer logout:', e.message);
-            }
+        if (!whatsappClient) {
+            console.log('🔄 Inicializando WhatsApp...');
+            initializeWhatsApp();
+        } else if (!isConnected) {
+            console.log('🔄 Reconectando WhatsApp...');
+            whatsappClient.initialize();
+        } else {
+            console.log('✅ WhatsApp já está conectado');
+            socket.emit('whatsapp-status', { status: 'online' });
         }
+    });
+
+    socket.on('send-message', async (data) => {
+        console.log('📤 Enviando mensagem:', data);
         
-        // Limpar arquivos de autenticação
-        const fs = require('fs');
-        const path = require('path');
+        if (!isConnected || !whatsappClient) {
+            console.log('❌ WhatsApp não conectado');
+            socket.emit('message-status', { success: false, error: 'WhatsApp não conectado' });
+            return;
+        }
+
         try {
-            const authDir = './auth_info_baileys';
-            if (fs.existsSync(authDir)) {
-                console.log('🗑️ Limpando sessão anterior...');
-                const files = fs.readdirSync(authDir);
-                files.forEach(file => {
-                    fs.unlinkSync(path.join(authDir, file));
-                });
-                console.log('✅ Sessão anterior removida');
+            const { number, message, image } = data;
+            
+            if (image) {
+                // Enviar mensagem com imagem
+                const media = MessageMedia.fromFilePath(image);
+                await whatsappClient.sendMessage(number, media, { caption: message });
+            } else {
+                // Enviar apenas texto
+                await whatsappClient.sendMessage(number, message);
             }
-        } catch (e) {
-            console.log('⚠️ Erro ao limpar sessão:', e.message);
+            
+            console.log('✅ Mensagem enviada com sucesso');
+            socket.emit('message-status', { success: true });
+        } catch (error) {
+            console.error('❌ Erro ao enviar mensagem:', error);
+            socket.emit('message-status', { success: false, error: error.message });
         }
-        
-        // Aguardar um pouco antes de conectar
-        console.log('⏳ Aguardando para reconectar...');
-        setTimeout(() => {
-            connectWhatsApp();
-        }, 2000);
     });
-    
-    // Enviar mensagem WhatsApp
-    socket.on('send-whatsapp', async (data) => {
-        const { chatId, message, image } = data;
-        const result = await sendWhatsAppMessage(chatId, message, image);
-        socket.emit('whatsapp-result', result);
-    });
-    
-    // Verificar status
-    socket.on('check-status', () => {
-        socket.emit('whatsapp-status', { status: isConnected ? 'online' : 'offline' });
-    });
-    
+
     socket.on('disconnect', () => {
-        console.log('Cliente desconectado');
+        console.log('❌ Cliente desconectado');
     });
 });
 
-const PORT = process.env.PORT || 3000;
+// Inicializar WhatsApp automaticamente
+initializeWhatsApp();
+
+// Iniciar servidor
 server.listen(PORT, () => {
-    console.log(`Servidor rodando na porta ${PORT}`);
-    console.log(`Acesse: http://localhost:${PORT}`);
+    console.log(`🚀 Servidor rodando na porta ${PORT}`);
+    console.log(`🌐 Acesse: http://localhost:${PORT}`);
+    console.log('📱 WhatsApp Web.js inicializado!');
 });
