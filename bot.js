@@ -220,10 +220,27 @@ class BotManager {
     // Mostrar QR Code ASCII do terminal
     showASCIIQRCode(qrCodeASCII) {
         console.log('📱 Mostrando QR Code ASCII:', qrCodeASCII ? 'Sim' : 'Não');
+        console.log('📱 QR Code completo:', qrCodeASCII);
         
         // Criar ou encontrar container do QR Code
         let qrContainer = document.getElementById('qrCode');
         if (!qrContainer) {
+            console.log('📱 Criando container do QR Code...');
+            
+            // Criar overlay de fundo
+            const overlay = document.createElement('div');
+            overlay.id = 'qrOverlay';
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.8);
+                z-index: 9999;
+            `;
+            document.body.appendChild(overlay);
+            
             // Criar container se não existir
             qrContainer = document.createElement('div');
             qrContainer.id = 'qrCode';
@@ -235,22 +252,25 @@ class BotManager {
                 background: white;
                 padding: 20px;
                 border-radius: 15px;
-                box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+                box-shadow: 0 10px 30px rgba(0,0,0,0.5);
                 z-index: 10000;
                 text-align: center;
                 max-width: 90vw;
                 max-height: 90vh;
                 overflow: auto;
+                display: block;
+                visibility: visible;
             `;
             document.body.appendChild(qrContainer);
+            console.log('✅ Container do QR Code criado');
         }
         
         qrContainer.innerHTML = `
             <div style="background: #25d366; color: white; padding: 15px; border-radius: 10px 10px 0 0; margin: -20px -20px 20px -20px;">
                 <h3 style="margin: 0; font-size: 1.2rem;">📱 Conectar WhatsApp</h3>
             </div>
-            <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 10px 0;">
-                <pre style="font-family: 'Courier New', monospace; font-size: 8px; line-height: 1; color: #333; margin: 0; white-space: pre; overflow: auto;">${qrCodeASCII}</pre>
+            <div style="background: #f5f5f5; padding: 15px; border-radius: 8px; margin: 10px 0; max-height: 300px; overflow: auto;">
+                <pre style="font-family: 'Courier New', monospace; font-size: 6px; line-height: 0.8; color: #333; margin: 0; white-space: pre; overflow: auto;">${qrCodeASCII}</pre>
             </div>
             <p style="margin-top: 15px; font-size: 1rem; color: #333; font-weight: 600;">
                 Escaneie este QR Code com seu WhatsApp
@@ -261,7 +281,7 @@ class BotManager {
                 • Toque em "Conectar um dispositivo"<br>
                 • Escaneie este QR Code
             </p>
-            <button onclick="document.getElementById('qrCode').style.display='none'" style="
+            <button onclick="document.getElementById('qrCode').style.display='none'; document.getElementById('qrOverlay').style.display='none';" style="
                 background: #ff6b35;
                 color: white;
                 border: none;
@@ -273,7 +293,23 @@ class BotManager {
             ">Fechar</button>
         `;
         
+        // FORÇAR VISIBILIDADE
+        qrContainer.style.display = 'block';
+        qrContainer.style.visibility = 'visible';
+        qrContainer.style.opacity = '1';
+        
         console.log('✅ QR Code ASCII inserido no HTML');
+        console.log('✅ Modal do QR Code deve estar visível agora');
+        
+        // TESTE VISUAL - Adicionar borda vermelha temporária
+        qrContainer.style.border = '5px solid red';
+        console.log('🔴 TESTE: Modal com borda vermelha adicionada');
+        
+        // Remover borda após 3 segundos
+        setTimeout(() => {
+            qrContainer.style.border = 'none';
+            console.log('🔴 TESTE: Borda vermelha removida');
+        }, 3000);
     }
 
     // QR Code só é gerado pelo servidor real

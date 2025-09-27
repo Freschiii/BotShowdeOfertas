@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste de Conexão</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; background: #1a1a1a; color: white; }
+        .log { background: #333; padding: 10px; margin: 5px 0; border-radius: 5px; }
+        button { background: #25d366; color: white; border: none; padding: 10px 20px; border-radius: 5px; cursor: pointer; margin: 5px; }
+        button:hover { background: #128c7e; }
+    </style>
+</head>
+<body>
+    <h1>🔧 Teste de Conexão WhatsApp</h1>
+    
+    <button onclick="testarConexao()">🔄 Testar Conexão</button>
+    <button onclick="limparLogs()">🗑️ Limpar Logs</button>
+    
+    <div id="logs"></div>
+
+    <script src="https://cdn.socket.io/4.7.2/socket.io.min.js"></script>
+    <script>
+        let socket = null;
+        
+        function log(mensagem) {
+            const logs = document.getElementById('logs');
+            const div = document.createElement('div');
+            div.className = 'log';
+            div.innerHTML = `[${new Date().toLocaleTimeString()}] ${mensagem}`;
+            logs.appendChild(div);
+            console.log(mensagem);
+        }
+        
+        function limparLogs() {
+            document.getElementById('logs').innerHTML = '';
+        }
+        
+        function testarConexao() {
+            log('🔄 Iniciando teste de conexão...');
+            
+            // Verificar se Socket.IO está disponível
+            if (typeof io === 'undefined') {
+                log('❌ Socket.IO não está disponível!');
+                return;
+            }
+            
+            log('✅ Socket.IO disponível');
+            
+            // Conectar ao servidor
+            try {
+                log('📡 Conectando ao servidor...');
+                socket = io('http://localhost:3000');
+                
+                socket.on('connect', () => {
+                    log('✅ Conectado ao servidor!');
+                    log('🆔 ID da conexão: ' + socket.id);
+                });
+                
+                socket.on('disconnect', () => {
+                    log('❌ Desconectado do servidor');
+                });
+                
+                socket.on('whatsapp-qr-ascii', (qrCode) => {
+                    log('📱 QR Code recebido!');
+                    log('QR Code: ' + qrCode.substring(0, 50) + '...');
+                });
+                
+                socket.on('whatsapp-status', (data) => {
+                    log('📊 Status WhatsApp: ' + data.status);
+                });
+                
+                // Aguardar um pouco e solicitar conexão WhatsApp
+                setTimeout(() => {
+                    log('📱 Solicitando conexão WhatsApp...');
+                    socket.emit('connect-whatsapp');
+                }, 2000);
+                
+            } catch (error) {
+                log('❌ Erro ao conectar: ' + error.message);
+            }
+        }
+        
+        // Teste automático ao carregar
+        window.onload = () => {
+            log('🚀 Página carregada - pronto para teste');
+        };
+    </script>
+</body>
+</html>

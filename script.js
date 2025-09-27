@@ -27,6 +27,21 @@ let messageHistory = [];
 
 // BotManager já está instanciado no bot.js
 
+// Função de teste para debug
+function testarWhatsApp() {
+    console.log('🔧 TESTE: Iniciando teste do WhatsApp...');
+    console.log('🔍 BotManager disponível:', typeof botManager !== 'undefined');
+    console.log('🔍 Socket.IO disponível:', typeof io !== 'undefined');
+    
+    if (typeof botManager !== 'undefined') {
+        console.log('🔄 Chamando botManager.connectWhatsApp()...');
+        botManager.connectWhatsApp();
+    } else {
+        console.error('❌ BotManager não está disponível!');
+        alert('Erro: BotManager não está disponível. Verifique o console.');
+    }
+}
+
 // Event Listeners (com verificação de existência)
 if (elements.connectWhatsApp) {
     elements.connectWhatsApp.addEventListener('click', connectWhatsApp);
