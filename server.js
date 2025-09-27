@@ -57,8 +57,29 @@ function initializeWhatsApp() {
         console.log('📱 Escaneie este QR Code com seu WhatsApp!');
         console.log('📱 ==========================================');
         
-        // Enviar para o frontend
+        // Enviar QR Code ASCII para o frontend
         io.emit('whatsapp-qr-ascii', qr);
+        
+        // Gerar QR Code visual para o site
+        try {
+            const QRCode = require('qrcode');
+            QRCode.toDataURL(qr, {
+                width: 300,
+                margin: 2,
+                color: {
+                    dark: '#000000',
+                    light: '#FFFFFF'
+                }
+            }).then(qrCodeDataURL => {
+                console.log('📱 QR Code visual gerado para o site');
+                io.emit('whatsapp-qr', qrCodeDataURL);
+            }).catch(error => {
+                console.error('❌ Erro ao gerar QR Code visual:', error);
+            });
+        } catch (error) {
+            console.error('❌ Erro ao gerar QR Code visual:', error);
+        }
+        
         io.emit('whatsapp-status', { status: 'offline' });
     });
 
