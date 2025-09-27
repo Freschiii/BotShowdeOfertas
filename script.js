@@ -147,6 +147,23 @@ document.addEventListener('DOMContentLoaded', function() {
                 });
             }, 10);
         });
+        
+        // Placeholder funcional
+        messageTextInput.addEventListener('focus', function() {
+            if (this.classList.contains('placeholder')) {
+                this.textContent = '';
+                this.style.color = '#ffffff';
+                this.classList.remove('placeholder');
+            }
+        });
+        
+        messageTextInput.addEventListener('blur', function() {
+            if (this.textContent.trim() === '') {
+                this.textContent = 'Digite sua mensagem aqui...';
+                this.style.color = '#999';
+                this.classList.add('placeholder');
+            }
+        });
     }
     
     if (whatsappAttachBtn) {
@@ -1719,9 +1736,10 @@ function clearAllMessageBoxes() {
         // Limpar conteúdo
         mainInput.textContent = '';
         mainInput.innerHTML = '';
-        // Restaurar placeholder como texto visível
+        // Restaurar placeholder funcional
         mainInput.textContent = 'Digite sua mensagem aqui...';
         mainInput.style.color = '#999';
+        mainInput.classList.add('placeholder');
         console.log('✅ Input principal limpo e placeholder restaurado');
     }
     
